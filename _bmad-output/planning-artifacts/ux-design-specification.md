@@ -1,5 +1,8 @@
 ---
-stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+lastStep: 14
+workflowComplete: true
+completedAt: "2026-01-30T22:47:00+05:30"
 inputDocuments:
   - planning-artifacts/prd.md
   - planning-artifacts/prd-validation-report.md
@@ -1362,3 +1365,585 @@ All journeys follow this consistent pattern for predictability.
 | **Instant Feedback** | Response within 100ms                 |
 | **Easy Recovery**    | Undo accessible everywhere            |
 | **Contextual Help**  | Tooltips on hover, help icons         |
+
+---
+
+## Component Strategy
+
+### Design System Coverage
+
+#### Available from Material Design 3
+
+| Category         | Components                                                                |
+| ---------------- | ------------------------------------------------------------------------- |
+| **Buttons**      | ElevatedButton, FilledButton, OutlinedButton, TextButton, IconButton, FAB |
+| **Inputs**       | TextField, SearchBar, Checkbox, Radio, Switch, Slider                     |
+| **Selection**    | DropdownMenu, MenuBar, PopupMenu, Chip, FilterChip                        |
+| **Navigation**   | NavigationBar, NavigationDrawer, NavigationRail, Tabs                     |
+| **Containment**  | Card, Dialog, BottomSheet, ExpansionPanel                                 |
+| **Feedback**     | SnackBar, ProgressIndicator, CircularProgress, LinearProgress             |
+| **Data Display** | DataTable, ListTile, Tooltip, Badge                                       |
+
+#### Custom Components Required
+
+| Component                  | Reason                            |
+| -------------------------- | --------------------------------- |
+| **Bracket Visualization**  | Domain-specific tournament tree   |
+| **Score Entry Modal**      | Keyboard-first scoring interface  |
+| **Smart Division Builder** | Wizard for athlete categorization |
+| **Athlete Card**           | TKD-specific athlete display      |
+| **Match Card**             | Match status and quick actions    |
+| **Venue Display Suite**    | Projector-optimized components    |
+
+---
+
+### Custom Component Specifications
+
+#### 1. Bracket Visualization Widget
+
+**Purpose:** Display tournament bracket structure with interactive match selection.
+
+| Aspect          | Specification                                        |
+| --------------- | ---------------------------------------------------- |
+| **Content**     | Rounds, matches, athletes, scores, advancement lines |
+| **Layout**      | Horizontal tree structure, left-to-right progression |
+| **Interaction** | Pan, zoom, click match for details                   |
+
+**States:**
+
+| State         | Description                            |
+| ------------- | -------------------------------------- |
+| Default       | Full bracket view, all matches visible |
+| Focused       | Selected match highlighted             |
+| Editing       | Drag-drop enabled for athlete swapping |
+| Completed     | Winner path highlighted, medals marked |
+| Venue Display | Dark mode, projection-optimized        |
+
+**Variants:** Single Elimination, Double Elimination, Round Robin, Compact (PDF)
+
+**Accessibility:** Keyboard navigation, screen reader announcements, focus indicators
+
+---
+
+#### 2. Score Entry Modal
+
+**Purpose:** Quick, keyboard-friendly score input for matches.
+
+| Aspect          | Specification                                |
+| --------------- | -------------------------------------------- |
+| **Content**     | Two athletes, score inputs, winner selection |
+| **Layout**      | Modal on desktop, full-screen on mobile      |
+| **Interaction** | Keyboard-first, Tab navigation               |
+
+**Keyboard Shortcuts:**
+
+| Key        | Action                |
+| ---------- | --------------------- |
+| `1` or `←` | Select first athlete  |
+| `2` or `→` | Select second athlete |
+| `Tab`      | Move between fields   |
+| `Enter`    | Confirm/Submit        |
+| `Esc`      | Cancel/Close          |
+| `Ctrl+Z`   | Undo last action      |
+
+**Accessibility:** ARIA live regions, focus trap, screen reader announcements
+
+---
+
+#### 3. Smart Division Builder
+
+**Purpose:** Wizard for configuring athlete divisions with intelligent suggestions.
+
+| Aspect          | Specification                                 |
+| --------------- | --------------------------------------------- |
+| **Content**     | Division configuration, athlete distribution  |
+| **Layout**      | Split view: configuration left, preview right |
+| **Interaction** | Progressive disclosure, smart defaults        |
+
+**Wizard Steps:**
+
+1. Federation Selection (WT/ITF/ATA)
+2. Age Categories
+3. Weight Classes
+4. Review & Confirm
+
+**Smart Features:** Auto-detection, suggestions, edge case alerts
+
+---
+
+#### 4. Athlete Card
+
+**Purpose:** Display athlete information in lists and cards.
+
+| Aspect       | Specification                               |
+| ------------ | ------------------------------------------- |
+| **Content**  | Name, dojang, age, weight, belt rank        |
+| **Variants** | List Item, Card, Compact, Badge             |
+| **States**   | Default, Selected, Disabled, Winner, Active |
+
+---
+
+#### 5. Match Card
+
+**Purpose:** Display match information with quick actions.
+
+| Aspect      | Specification                                   |
+| ----------- | ----------------------------------------------- |
+| **Content** | Match number, athletes, ring, time, score       |
+| **Layout**  | Horizontal card with two athlete areas          |
+| **States**  | Scheduled, In Progress, Completed, Bye, No Show |
+
+---
+
+#### 6. Venue Display Components
+
+**Purpose:** Large-format display for tournament venue screens.
+
+| Subcomponent        | Purpose                       |
+| ------------------- | ----------------------------- |
+| Active Match Banner | Current match in large format |
+| Upcoming Queue      | Next 3-5 matches per ring     |
+| Ring Status Grid    | Overview of all rings         |
+| Recent Results      | Last completed matches        |
+
+---
+
+### Component Implementation Strategy
+
+| Strategy                | Description                                   |
+| ----------------------- | --------------------------------------------- |
+| **Design System First** | Use Material 3 widgets as base                |
+| **Token Consistency**   | All custom components use established tokens  |
+| **Composition**         | Build complex from simple                     |
+| **State Management**    | BLoC pattern for component state              |
+| **Documentation**       | Each component documented with usage examples |
+
+#### Component Hierarchy
+
+```
+AppShell (Scaffold + Navigation)
+├── Dashboard
+│   ├── TournamentCard (custom)
+│   └── QuickActions (Material)
+├── TournamentView
+│   ├── DivisionList (custom)
+│   ├── BracketVisualization (custom)
+│   └── AthleteList (custom)
+├── ScoringMode
+│   ├── ScoreEntryModal (custom)
+│   └── MatchQueue (custom)
+└── VenueDisplay
+    ├── ActiveMatchBanner (custom)
+    └── UpcomingQueue (custom)
+```
+
+---
+
+### Implementation Roadmap
+
+#### Phase 1: Core Components (Week 1-2)
+
+| Component             | Priority | Justification           |
+| --------------------- | -------- | ----------------------- |
+| Bracket Visualization | P0       | Core product value      |
+| Score Entry Modal     | P0       | Tournament day critical |
+| Match Card            | P0       | Used everywhere         |
+| Athlete Card          | P1       | Used in all lists       |
+
+#### Phase 2: Supporting Components (Week 3-4)
+
+| Component              | Priority | Justification          |
+| ---------------------- | -------- | ---------------------- |
+| Smart Division Builder | P1       | Setup flow enabler     |
+| Tournament Card        | P1       | Dashboard main element |
+| Import Preview         | P1       | Onboarding flow        |
+
+#### Phase 3: Enhancement Components (Week 5-6)
+
+| Component            | Priority | Justification        |
+| -------------------- | -------- | -------------------- |
+| Venue Display Suite  | P2       | Professional upgrade |
+| Animated Transitions | P3       | Polish               |
+| Keyboard Hints       | P3       | Power user discovery |
+
+---
+
+## UX Consistency Patterns
+
+### Button Hierarchy
+
+#### Button Types & Usage
+
+| Button Type              | Visual                  | When to Use           | Example             |
+| ------------------------ | ----------------------- | --------------------- | ------------------- |
+| **Primary (Filled)**     | Navy fill, white text   | Main action on screen | "Generate Brackets" |
+| **Secondary (Outlined)** | Navy outline, navy text | Alternative action    | "Save Draft"        |
+| **Tertiary (Text)**      | No fill, navy text      | Minor action          | "Cancel"            |
+| **Destructive**          | Red fill/outline        | Dangerous action      | "Delete Tournament" |
+| **Icon Only**            | Icon with tooltip       | Compact UI            | Edit, Delete icons  |
+
+#### Button Placement Rules
+
+| Rule                            | Application                             |
+| ------------------------------- | --------------------------------------- |
+| **Primary on right**            | Modal confirmations: [Cancel] [Confirm] |
+| **Destructive isolated**        | Separated from other actions            |
+| **One primary per context**     | Never compete for attention             |
+| **Icons + labels on first use** | Learn icons, then icon-only OK          |
+
+#### Button States
+
+| State    | Design                         |
+| -------- | ------------------------------ |
+| Default  | Standard styling               |
+| Hover    | Slight elevation, lighter fill |
+| Pressed  | Darker fill, pressed shadow    |
+| Focused  | 2px navy outline (keyboard)    |
+| Disabled | 50% opacity, no interaction    |
+| Loading  | Spinner replaces label         |
+
+---
+
+### Feedback Patterns
+
+#### Feedback Types
+
+| Type               | Visual              | Duration            | Use Case          |
+| ------------------ | ------------------- | ------------------- | ----------------- |
+| **Success Toast**  | Green with ✓ icon   | 3 seconds           | Score saved       |
+| **Error Toast**    | Red with ✗ icon     | 5 seconds + dismiss | Validation failed |
+| **Warning Banner** | Amber with ⚠ icon   | Persistent          | Dojang conflict   |
+| **Info Toast**     | Blue with ℹ icon    | 4 seconds           | Athletes imported |
+| **Progress Bar**   | Navy fill animation | Until complete      | File upload       |
+
+#### Confirmation Patterns
+
+| Action Severity  | Confirmation Type              |
+| ---------------- | ------------------------------ |
+| Non-destructive  | No confirmation needed         |
+| Recoverable      | Toast with undo option         |
+| Destructive      | Dialog with explicit button    |
+| Very destructive | Dialog with typed confirmation |
+
+---
+
+### Form Patterns
+
+#### Form Layout
+
+| Element                | Specification                |
+| ---------------------- | ---------------------------- |
+| **Label Position**     | Above input (stacked)        |
+| **Required Indicator** | Red asterisk (*) after label |
+| **Help Text**          | Below input, gray, 12px      |
+| **Error Messages**     | Below input, red, 12px       |
+| **Field Spacing**      | 16px between fields          |
+
+#### Validation States
+
+| State    | Visual                          |
+| -------- | ------------------------------- |
+| Default  | Gray border                     |
+| Focused  | Navy border, subtle shadow      |
+| Valid    | Green check icon (optional)     |
+| Error    | Red border, red error message   |
+| Disabled | Gray background, no interaction |
+
+---
+
+### Navigation Patterns
+
+#### Navigation Structure
+
+```
+App Shell
+├── Sidebar (permanent on desktop)
+│   ├── Dashboard (home)
+│   ├── Tournaments (list)
+│   ├── Templates (list)
+│   └── Settings
+└── Content Area
+    ├── Breadcrumbs (context)
+    ├── Page Header (title + actions)
+    └── Page Content
+```
+
+#### Sidebar Behavior
+
+| Breakpoint          | Behavior                    |
+| ------------------- | --------------------------- |
+| Desktop (1280px+)   | Always visible, collapsible |
+| Tablet (768-1279px) | Collapsed by default        |
+| Mobile              | Hidden, hamburger menu      |
+
+#### Page Transitions
+
+| From   | To     | Transition  |
+| ------ | ------ | ----------- |
+| List   | Detail | Slide right |
+| Parent | Child  | Slide right |
+| Modal  | Close  | Fade out    |
+| Tab    | Tab    | Fade cross  |
+
+---
+
+### Empty & Loading States
+
+#### Empty States
+
+| Context           | Design                                            |
+| ----------------- | ------------------------------------------------- |
+| First use         | Illustration + "Create your first tournament" CTA |
+| Search no results | "No athletes match" + suggestion                  |
+| Empty list        | Contextual illustration + CTA                     |
+
+#### Loading States
+
+| Duration   | Pattern                      |
+| ---------- | ---------------------------- |
+| < 300ms    | No indicator (feels instant) |
+| 300ms - 2s | Subtle spinner or skeleton   |
+| > 2s       | Progress bar with percentage |
+
+---
+
+### Modal & Overlay Patterns
+
+#### Modal Types
+
+| Type         | Use Case                   | Close Behavior     |
+| ------------ | -------------------------- | ------------------ |
+| Dialog       | Confirmation, simple forms | Esc, Cancel button |
+| Full-screen  | Score entry, complex forms | Close button, Esc  |
+| Bottom Sheet | Mobile actions, pickers    | Swipe down         |
+| Popover      | Contextual menus           | Click outside      |
+
+#### Z-Index Hierarchy
+
+| Layer                | Z-Index |
+| -------------------- | ------- |
+| Navigation (sidebar) | 100     |
+| Page content         | 0       |
+| Floating buttons     | 200     |
+| Tooltips             | 300     |
+| Modal overlay        | 400     |
+| Modal content        | 500     |
+| Toast notifications  | 600     |
+
+---
+
+### Error & Recovery Patterns
+
+#### Error Prevention
+
+| Strategy       | Application                        |
+| -------------- | ---------------------------------- |
+| Validation     | Inline, before submit              |
+| Confirmation   | Preview before destructive actions |
+| Smart Defaults | Pre-fill likely values             |
+| Constraints    | Disable impossible actions         |
+
+#### Error Recovery
+
+| Error Type        | Recovery Pattern             |
+| ----------------- | ---------------------------- |
+| Typo              | Inline edit, re-validate     |
+| Wrong selection   | Ctrl+Z undo                  |
+| Wrong winner      | Edit match, recalculate      |
+| Accidental delete | Toast with undo (5 seconds)  |
+| System error      | Retry button + clear message |
+
+---
+
+### Mobile Considerations
+
+#### Touch Targets
+
+| Element    | Minimum Size             |
+| ---------- | ------------------------ |
+| Buttons    | 44x44px                  |
+| List items | 48px height              |
+| Icons      | 24px icon + 10px padding |
+
+#### Mobile Adaptations
+
+| Desktop Pattern | Mobile Adaptation       |
+| --------------- | ----------------------- |
+| Hover states    | Tap states              |
+| Tooltips        | Long-press or help icon |
+| Sidebars        | Hamburger menu          |
+| Tables          | Card-based list         |
+| Multi-column    | Stacked single column   |
+
+---
+
+## Responsive Design & Accessibility
+
+### Platform Focus
+
+| Platform                  | Support Level | Focus                         |
+| ------------------------- | ------------- | ----------------------------- |
+| **Desktop Web (1280px+)** | Primary       | Full feature set, power users |
+| **Tablet (768-1279px)**   | Secondary     | Touch-optimized admin         |
+| **Mobile (< 768px)**      | View-only     | Spectator access              |
+
+### Responsive Strategy
+
+#### Desktop Strategy (Primary)
+
+| Aspect                  | Approach                               |
+| ----------------------- | -------------------------------------- |
+| **Layout**              | Full sidebar + content area            |
+| **Information Density** | High — show more data                  |
+| **Navigation**          | Persistent sidebar, keyboard shortcuts |
+| **Interactions**        | Keyboard-first, hover states           |
+
+#### Tablet Strategy (Secondary)
+
+| Aspect           | Approach                        |
+| ---------------- | ------------------------------- |
+| **Layout**       | Collapsible sidebar             |
+| **Navigation**   | Tab bar or drawer               |
+| **Interactions** | Touch-optimized, larger targets |
+
+#### Mobile Strategy (View-Only)
+
+| Aspect       | Approach                          |
+| ------------ | --------------------------------- |
+| **Layout**   | Single column, bottom navigation  |
+| **Purpose**  | Spectator viewing, athlete lookup |
+| **Features** | Search, follow, share             |
+
+---
+
+### Breakpoint Strategy
+
+| Breakpoint             | Range           | Layout                       |
+| ---------------------- | --------------- | ---------------------------- |
+| **Mobile (sm)**        | < 768px         | Single column, bottom nav    |
+| **Tablet (md)**        | 768px - 1279px  | Collapsed sidebar            |
+| **Desktop (lg)**       | 1280px - 1439px | Full sidebar, 12-column grid |
+| **Large Desktop (xl)** | 1440px+         | Extended sidebar, 3-panel    |
+
+**Design Approach:** Desktop-First (primary platform)
+
+---
+
+### Accessibility Strategy
+
+#### WCAG Compliance Target
+
+**WCAG 2.1 Level AA** — Industry standard for good accessibility.
+
+#### Color & Contrast
+
+| Requirement      | Specification        |
+| ---------------- | -------------------- |
+| Text Contrast    | 4.5:1 minimum        |
+| Large Text       | 3:1 minimum (18px+)  |
+| UI Components    | 3:1 against adjacent |
+| Focus Indicators | Visible, 2px minimum |
+
+#### Keyboard Navigation
+
+| Requirement     | Implementation        |
+| --------------- | --------------------- |
+| All Interactive | Keyboard accessible   |
+| Focus Order     | Logical tab order     |
+| Skip Links      | Skip to main content  |
+| Focus Trap      | Modals trap focus     |
+| Visible Focus   | Clear focus indicator |
+
+---
+
+### Visual Feedback Strategy (No Audio)
+
+*Decision: No audio feedback — rely on visual + screen reader announcements*
+
+| Feedback Type            | Implementation                         |
+| ------------------------ | -------------------------------------- |
+| **Save Flash**           | Subtle green border pulse (150ms)      |
+| **Persistent Indicator** | "Last saved: just now" in corner       |
+| **Haptic Feedback**      | Brief vibration on mobile/tablet       |
+| **Screen Reader**        | `aria-live="polite"` announces actions |
+
+---
+
+### Flutter-Specific Accessibility
+
+| Feature                    | Implementation                        |
+| -------------------------- | ------------------------------------- |
+| **Semantic Bracket Nodes** | Each match as navigable semantic node |
+| **Match Relationships**    | "Winner advances to..." announcements |
+| **Reduced Motion**         | Respect `prefers-reduced-motion`      |
+| **Text Scaling**           | Handle browser zoom 100%-200%         |
+| **Large Text Toggle**      | In-app setting independent of system  |
+| **High-Contrast Mode**     | Dedicated mode for bright/dim venues  |
+
+---
+
+### Mobile Code Optimization
+
+| Strategy                     | Benefit                          |
+| ---------------------------- | -------------------------------- |
+| **Conditional Code Loading** | Exclude editing code from mobile |
+| **Smaller Bundle**           | Faster load for spectators       |
+| **View-Only Enforcement**    | Clean separation at build level  |
+
+---
+
+### Testing Strategy
+
+#### Automated Accessibility Testing
+
+| Tool                    | Purpose                     | Stage       |
+| ----------------------- | --------------------------- | ----------- |
+| **axe-core**            | WCAG compliance scanning    | CI Pipeline |
+| **accessibility_tools** | Debug semantic tree overlay | Development |
+| **Contrast Checker**    | Color ratio verification    | CI Pipeline |
+| **Focus Tests**         | Tab order and trap testing  | CI Pipeline |
+
+#### Manual Testing Checklist
+
+| Test                       | Platform                   | Priority |
+| -------------------------- | -------------------------- | -------- |
+| VoiceOver Testing          | Safari macOS               | P0       |
+| Keyboard-Only Navigation   | All browsers               | P0       |
+| 200% Browser Zoom          | Chrome, Firefox            | P1       |
+| Color Blindness Simulation | Chromatic Vision Simulator | P1       |
+
+#### CI Pipeline Structure
+
+```
+Stage 1: Unit Tests (fast feedback)
+    ↓
+Stage 2: Integration Tests
+    ↓
+Stage 3: Accessibility Tests (separate stage)
+    ↓
+Stage 4: Build & Deploy
+```
+
+---
+
+### Implementation Guidelines
+
+#### Responsive Development
+
+| Guideline        | Implementation                 |
+| ---------------- | ------------------------------ |
+| Relative Units   | Use rem, %, vw, vh             |
+| Fluid Typography | clamp() for responsive fonts   |
+| Flexible Images  | max-width: 100%                |
+| CSS Grid         | Responsive layouts             |
+| Mobile-First CSS | Base styles, min-width queries |
+
+#### Accessibility Development
+
+| Guideline         | Implementation                     |
+| ----------------- | ---------------------------------- |
+| Semantic HTML     | header, nav, main, article         |
+| Heading Hierarchy | Single h1, logical h2-h6           |
+| ARIA Roles        | role="button", role="dialog"       |
+| Live Regions      | aria-live for dynamic updates      |
+| Focus Management  | Focus new content, return on close |
