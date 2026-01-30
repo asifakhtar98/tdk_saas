@@ -955,11 +955,11 @@ TKD Brackets will ship as a fully-featured tournament management platform from D
 
 ### 10. Offline & Reliability
 
-- **FR65:** System saves data aggressively (autosave)
+- **FR65:** System saves data every 5 seconds (autosave)
 - **FR66:** System works offline with full functionality
 - **FR67:** System syncs data when connection restored
 - **FR68:** System shows sync status indicator
-- **FR69:** System handles multi-user edit conflicts gracefully
+- **FR69:** System resolves multi-user edit conflicts using last-write-wins with visual notification to affected users
 
 ---
 
