@@ -4174,6 +4174,651 @@ class EmergencyExportUseCase {
 
 ---
 
+### 18. Stripe Checkout Integration Architecture
+
+**Purpose:** Supports FR64: "System integrates with Stripe for payment processing"
+
+**Location:** `lib/features/billing/`
+
+**Flow:**
+
+```
+User clicks "Upgrade" → Create Checkout Session → Redirect to Stripe → 
+Webhook receives success → Update organization.subscription_tier → Redirect to app
+```
+
+**Service Contract:**
+
+```dart
+// features/billing/domain/services/billing_service.dart
+abstract class BillingService {
+  Future<Either<BillingFailure, String>> createCheckoutSession({
+    required String organizationId,
+    required SubscriptionTier targetTier,
+  });
+  
+  Future<Either<BillingFailure, String>> createCustomerPortalSession({
+    required String organizationId,
+  });
+  
+  Future<Either<BillingFailure, SubscriptionStatus>> getSubscriptionStatus({
+    required String organizationId,
+  });
+}
+```
+
+**Supabase Edge Function (Webhook Handler):**
+
+```typescript
+// supabase/functions/stripe-webhook/index.ts
+import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
+
+Deno.serve(async (req) => {
+  const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!);
+  const signature = req.headers.get('stripe-signature')!;
+  const body = await req.text();
+  
+  const event = stripe.webhooks.constructEvent(
+    body, signature, Deno.env.get('STRIPE_WEBHOOK_SECRET')!
+  );
+  
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  );
+  
+  switch (event.type) {
+    case 'checkout.session.completed':
+      const session = event.data.object;
+      await supabase.from('organizations').update({
+        subscription_tier: 'enterprise',
+        subscription_status: 'active',
+        stripe_customer_id: session.customer,
+      }).eq('id', session.metadata.organization_id);
+      break;
+      
+    case 'customer.subscription.deleted':
+      await supabase.from('organizations').update({
+        subscription_tier: 'free',
+        subscription_status: 'cancelled',
+      }).eq('stripe_customer_id', event.data.object.customer);
+      break;
+  }
+  
+  return new Response(JSON.stringify({ received: true }));
+});
+```
+
+---
+
+### 19. CSV/Spreadsheet Import Architecture
+
+**Purpose:** Supports FR09: "Import participants via CSV"
+
+**Location:** `lib/features/participants/import/`
+
+**Import Flow:**
+
+```
+Paste/Upload → Parse → Detect Columns → Preview → Confirm → Create Participants
+```
+
+**Service Contract:**
+
+```dart
+// features/participants/domain/services/roster_import_service.dart
+abstract class RosterImportService {
+  /// Parse raw text (CSV, TSV, or tab-separated paste)
+  Either<ImportFailure, ParsedRoster> parseRawData(String rawData);
+  
+  /// Auto-detect column mappings
+  ColumnMapping detectColumns(List<List<String>> rows);
+  
+  /// Validate and normalize data
+  Either<ImportFailure, List<ParticipantDraft>> validateRoster({
+    required List<List<String>> rows,
+    required ColumnMapping mapping,
+    required String federationId,
+  });
+}
+
+class ColumnMapping {
+  final int? nameColumn;
+  final int? firstNameColumn;
+  final int? lastNameColumn;
+  final int? dojangColumn;
+  final int? ageColumn;
+  final int? dateOfBirthColumn;
+  final int? weightColumn;
+  final int? beltColumn;
+  final int? genderColumn;
+}
+```
+
+**Column Detection Heuristics:**
+
+```dart
+// Detect column by header name patterns
+final _columnPatterns = {
+  'name': RegExp(r'^(name|full.?name|athlete)$', caseSensitive: false),
+  'firstName': RegExp(r'^(first|given|fname)$', caseSensitive: false),
+  'lastName': RegExp(r'^(last|family|surname|lname)$', caseSensitive: false),
+  'dojang': RegExp(r'^(dojang|school|club|team|gym)$', caseSensitive: false),
+  'age': RegExp(r'^(age|years?)$', caseSensitive: false),
+  'weight': RegExp(r'^(weight|wt|kg|lbs?)$', caseSensitive: false),
+  'belt': RegExp(r'^(belt|rank|grade|gup|dan)$', caseSensitive: false),
+  'gender': RegExp(r'^(gender|sex|m.?f)$', caseSensitive: false),
+};
+```
+
+**Belt Normalization:**
+
+```dart
+// Normalize various belt formats to standard
+String normalizeBelt(String input) {
+  final normalized = input.trim().toLowerCase();
+  return switch (normalized) {
+    '1st dan' || 'first dan' || 'black 1' || '1dan' => '1st Dan',
+    '2nd dan' || 'second dan' || 'black 2' || '2dan' => '2nd Dan',
+    'red' || 'red belt' || '1st gup' => 'Red (1st Gup)',
+    // ... pattern matching for all belts
+    _ => input, // Return original if no match
+  };
+}
+```
+
+---
+
+### 20. Smart Division Builder Architecture
+
+**Purpose:** Core differentiator — auto-assign athletes to correct divisions
+
+**Location:** `lib/core/algorithms/division_builder/`
+
+**Algorithm Flow:**
+
+```
+Athletes → Apply Federation Rules → Group by (Age + Weight + Gender + Belt) → 
+Suggest Divisions → Handle Edge Cases → Return Division Assignments
+```
+
+**Service Contract:**
+
+```dart
+// core/algorithms/division_builder/division_builder.dart
+abstract class DivisionBuilder {
+  /// Generate division suggestions from athlete list
+  Either<DivisionBuilderFailure, DivisionSuggestions> buildDivisions({
+    required List<ParticipantEntity> athletes,
+    required FederationTemplate federation,
+    required DivisionBuilderOptions options,
+  });
+}
+
+class DivisionSuggestions {
+  final List<SuggestedDivision> divisions;
+  final List<UnassignedAthlete> unassigned; // Athletes that don't fit
+  final List<DivisionWarning> warnings;     // Small divisions, etc.
+}
+
+class SuggestedDivision {
+  final String name;           // "Junior Boys -45kg"
+  final AgeCategory age;
+  final WeightCategory weight;
+  final Gender gender;
+  final BeltCategory? belt;    // For poomsae
+  final List<ParticipantEntity> athletes;
+}
+```
+
+**Division Assignment Logic:**
+
+```dart
+SuggestedDivision? findDivision(ParticipantEntity athlete, FederationTemplate fed) {
+  // 1. Find age category
+  final age = fed.ageCategories.firstWhereOrNull(
+    (cat) => athlete.age >= cat.minAge && athlete.age <= cat.maxAge
+  );
+  if (age == null) return null;
+  
+  // 2. Find weight category within age
+  final weight = age.weightCategories.firstWhereOrNull(
+    (cat) => athlete.weightKg >= cat.minKg && athlete.weightKg < cat.maxKg
+  );
+  if (weight == null) return null;
+  
+  // 3. Match gender
+  // 4. Return division
+  return SuggestedDivision(
+    name: '${age.name} ${athlete.gender.displayName} ${weight.name}',
+    age: age, weight: weight, gender: athlete.gender,
+    athletes: [athlete],
+  );
+}
+```
+
+---
+
+### 21. Email Templates & Configuration
+
+**Purpose:** Auth magic links and team invitations
+
+**Supabase Email Configuration:**
+
+```sql
+-- supabase/config.toml
+[auth.email]
+enable_signup = true
+double_confirm_changes = false
+enable_confirmations = false  # Magic link doesn't need confirmation
+
+[auth.email.template.magic_link]
+subject = "Sign in to TKD Brackets"
+content_path = "./supabase/templates/magic_link.html"
+
+[auth.email.template.invite]
+subject = "You've been invited to join {{ .SiteURL }}"
+content_path = "./supabase/templates/invite.html"
+```
+
+**Magic Link Template:**
+
+```html
+<!-- supabase/templates/magic_link.html -->
+<!DOCTYPE html>
+<html>
+<head><style>
+  .container { max-width: 600px; margin: 0 auto; font-family: Inter, sans-serif; }
+  .button { background: #1A237E; color: white; padding: 12px 24px; 
+            text-decoration: none; border-radius: 8px; display: inline-block; }
+</style></head>
+<body>
+<div class="container">
+  <h1>Sign in to TKD Brackets</h1>
+  <p>Click the button below to sign in. This link expires in 1 hour.</p>
+  <a href="{{ .ConfirmationURL }}" class="button">Sign In</a>
+  <p style="color: #666; font-size: 12px;">
+    If you didn't request this, you can safely ignore this email.
+  </p>
+</div>
+</body>
+</html>
+```
+
+---
+
+### 22. Federation Templates Seed Data
+
+**Purpose:** Pre-loaded WT/ITF/ATA division rules
+
+**Location:** `supabase/seed.sql` + `lib/core/data/federation_templates.dart`
+
+**WT (World Taekwondo) Categories:**
+
+```dart
+// lib/core/data/federation_templates.dart
+const wtTemplate = FederationTemplate(
+  id: 'wt',
+  name: 'World Taekwondo (WT/Kukkiwon)',
+  ageCategories: [
+    AgeCategory(id: 'cadet', name: 'Cadet', minAge: 12, maxAge: 14,
+      weightCategories: [
+        WeightCategory(name: '-33kg', minKg: 0, maxKg: 33),
+        WeightCategory(name: '-37kg', minKg: 33, maxKg: 37),
+        WeightCategory(name: '-41kg', minKg: 37, maxKg: 41),
+        WeightCategory(name: '-45kg', minKg: 41, maxKg: 45),
+        WeightCategory(name: '-49kg', minKg: 45, maxKg: 49),
+        WeightCategory(name: '-53kg', minKg: 49, maxKg: 53),
+        WeightCategory(name: '-57kg', minKg: 53, maxKg: 57),
+        WeightCategory(name: '+57kg', minKg: 57, maxKg: 999),
+      ]),
+    AgeCategory(id: 'junior', name: 'Junior', minAge: 15, maxAge: 17,
+      weightCategories: [
+        WeightCategory(name: '-45kg', minKg: 0, maxKg: 45),
+        WeightCategory(name: '-48kg', minKg: 45, maxKg: 48),
+        WeightCategory(name: '-51kg', minKg: 48, maxKg: 51),
+        WeightCategory(name: '-55kg', minKg: 51, maxKg: 55),
+        WeightCategory(name: '-59kg', minKg: 55, maxKg: 59),
+        WeightCategory(name: '-63kg', minKg: 59, maxKg: 63),
+        WeightCategory(name: '-68kg', minKg: 63, maxKg: 68),
+        WeightCategory(name: '+68kg', minKg: 68, maxKg: 999),
+      ]),
+    AgeCategory(id: 'senior', name: 'Senior', minAge: 18, maxAge: 99,
+      weightCategories: [
+        WeightCategory(name: '-54kg', minKg: 0, maxKg: 54),
+        WeightCategory(name: '-58kg', minKg: 54, maxKg: 58),
+        WeightCategory(name: '-63kg', minKg: 58, maxKg: 63),
+        WeightCategory(name: '-68kg', minKg: 63, maxKg: 68),
+        WeightCategory(name: '-74kg', minKg: 68, maxKg: 74),
+        WeightCategory(name: '-80kg', minKg: 74, maxKg: 80),
+        WeightCategory(name: '-87kg', minKg: 80, maxKg: 87),
+        WeightCategory(name: '+87kg', minKg: 87, maxKg: 999),
+      ]),
+  ],
+);
+```
+
+**ITF and ATA:** Similar structures with federation-specific weight classes.
+
+---
+
+### 23. Public Bracket Sharing Architecture
+
+**Purpose:** Supports FR47: "Generate shareable public link"
+
+**Database Schema:**
+
+```sql
+ALTER TABLE brackets ADD COLUMN 
+  public_share_token TEXT UNIQUE,
+  public_share_enabled BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- RLS for public access (no auth required)
+CREATE POLICY "public_bracket_view" ON brackets
+  FOR SELECT
+  USING (public_share_enabled = TRUE AND public_share_token IS NOT NULL);
+```
+
+**Share Link Generation:**
+
+```dart
+// features/brackets/domain/usecases/generate_share_link_use_case.dart
+class GenerateShareLinkUseCase {
+  Future<Either<Failure, String>> call(String bracketId) async {
+    // Generate URL-safe token
+    final token = _generateToken();  // nanoid or UUID
+    
+    await _repository.updateBracket(
+      bracketId,
+      publicShareToken: token,
+      publicShareEnabled: true,
+    );
+    
+    return Right('https://tkdbrackets.app/b/$token');
+  }
+}
+```
+
+**Public Route (No Auth):**
+
+```dart
+// core/routing/app_router.dart
+GoRoute(
+  path: '/b/:shareToken',
+  builder: (context, state) => PublicBracketViewPage(
+    shareToken: state.pathParameters['shareToken']!,
+  ),
+),
+```
+
+---
+
+### 24. Demo Data Architecture
+
+**Purpose:** Pre-signup demo with realistic TKD data
+
+**Demo Data Set:**
+
+```dart
+// lib/core/data/demo_data.dart
+const demoTournament = TournamentData(
+  name: 'Spring Championship 2026',
+  date: '2026-03-15',
+  federation: 'wt',
+  divisions: [
+    DivisionData(name: 'Junior Boys -45kg', athletes: [
+      AthleteData(name: 'Jason Kim', dojang: "Kim's TKD Academy", age: 15, weightKg: 44),
+      AthleteData(name: 'Michael Park', dojang: "Dragon Martial Arts", age: 16, weightKg: 43),
+      AthleteData(name: 'David Lee', dojang: "Lee's Taekwondo", age: 15, weightKg: 44.5),
+      AthleteData(name: 'Ryan Cho', dojang: "Kim's TKD Academy", age: 16, weightKg: 42),
+      AthleteData(name: 'Justin Kang', dojang: "Tiger TKD", age: 15, weightKg: 44),
+      AthleteData(name: 'Brandon Yoon', dojang: "Dragon Martial Arts", age: 16, weightKg: 43.5),
+      AthleteData(name: 'Chris Hong', dojang: "Elite Martial Arts", age: 15, weightKg: 44),
+      AthleteData(name: 'Eric Shin', dojang: "Tiger TKD", age: 16, weightKg: 43),
+    ]),
+  ],
+);
+```
+
+**Auto-Load on First Launch:**
+
+```dart
+// features/demo/presentation/bloc/demo_bloc.dart
+Future<void> _onAppStarted(AppStarted event, Emitter emit) async {
+  final isFirstLaunch = await _preferences.isFirstLaunch();
+  final isLoggedIn = _authService.isAuthenticated;
+  
+  if (isFirstLaunch && !isLoggedIn) {
+    await _demoService.loadDemoData();
+    emit(DemoModeActive());
+  }
+}
+```
+
+---
+
+### 25. Keyboard Shortcuts Definition
+
+**Purpose:** Keyboard-first scoring and navigation
+
+**Shortcut Map:**
+
+| Context          | Shortcut                  | Action                 |
+| ---------------- | ------------------------- | ---------------------- |
+| **Global**       | `Ctrl+Z`                  | Undo                   |
+| **Global**       | `Ctrl+Y` / `Ctrl+Shift+Z` | Redo                   |
+| **Global**       | `Ctrl+S`                  | Force save             |
+| **Global**       | `Ctrl+K`                  | Open command palette   |
+| **Scoring**      | `1-9`                     | Add points to selected |
+| **Scoring**      | `R`                       | Red wins match         |
+| **Scoring**      | `B`                       | Blue wins match        |
+| **Scoring**      | `N`                       | Next match             |
+| **Scoring**      | `P`                       | Previous match         |
+| **Scoring**      | `Backspace`               | Remove last point      |
+| **Bracket View** | `+` / `-`                 | Zoom in/out            |
+| **Bracket View** | `Arrow keys`              | Pan                    |
+| **Bracket View** | `Home`                    | Fit to screen          |
+
+**Implementation:**
+
+```dart
+// core/keyboard/keyboard_shortcuts.dart
+final globalShortcuts = <ShortcutActivator, Intent>{
+  LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyZ): UndoIntent(),
+  LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyY): RedoIntent(),
+  LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyK): CommandPaletteIntent(),
+};
+
+final scoringShortcuts = <ShortcutActivator, Intent>{
+  SingleActivator(LogicalKeyboardKey.digit1): AddPointsIntent(1),
+  SingleActivator(LogicalKeyboardKey.digit2): AddPointsIntent(2),
+  SingleActivator(LogicalKeyboardKey.keyR): DeclareWinnerIntent(Corner.red),
+  SingleActivator(LogicalKeyboardKey.keyB): DeclareWinnerIntent(Corner.blue),
+  SingleActivator(LogicalKeyboardKey.keyN): NextMatchIntent(),
+};
+```
+
+---
+
+### 26. Logout & Account Management Architecture
+
+**Purpose:** Complete auth lifecycle
+
+**Logout Flow:**
+
+```dart
+// features/auth/domain/usecases/logout_use_case.dart
+class LogoutUseCase {
+  Future<Either<Failure, Unit>> call() async {
+    // 1. Clear local session
+    await _authLocalDataSource.clearSession();
+    
+    // 2. Sign out from Supabase
+    await _supabase.auth.signOut();
+    
+    // 3. Clear local database (optional - keep for offline)
+    // await _database.clearUserData();
+    
+    // 4. Navigate to login
+    return const Right(unit);
+  }
+}
+```
+
+**Account Deletion (GDPR):**
+
+```dart
+// features/settings/domain/usecases/delete_account_use_case.dart
+class DeleteAccountUseCase {
+  Future<Either<Failure, Unit>> call() async {
+    // 1. Soft-delete all user data (RLS handles cascade)
+    await _supabase.rpc('delete_user_data', params: {'user_id': userId});
+    
+    // 2. Delete Supabase auth user
+    await _supabase.auth.admin.deleteUser(userId);
+    
+    // 3. Clear local storage
+    await _localStorage.clearAll();
+    
+    return const Right(unit);
+  }
+}
+```
+
+---
+
+### 27. Onboarding Hints Architecture
+
+**Purpose:** Contextual first-time-user guidance
+
+**Hint Data Model:**
+
+```dart
+// features/onboarding/domain/entities/onboarding_hint.dart
+enum OnboardingHint {
+  dashboardWelcome(
+    targetKey: 'create_tournament_button',
+    title: 'Create Your First Tournament',
+    message: 'Click here to get started with your first bracket.',
+    position: HintPosition.below,
+  ),
+  rosterPaste(
+    targetKey: 'roster_paste_area',
+    title: 'Paste Your Roster',
+    message: 'Copy athletes from Excel and paste here. Columns are auto-detected.',
+    position: HintPosition.above,
+  ),
+  // ... more hints
+}
+```
+
+**Hint Display Logic:**
+
+```dart
+// features/onboarding/presentation/bloc/onboarding_bloc.dart
+Future<void> _onPageLoaded(PageLoaded event, Emitter emit) async {
+  final hintsShown = await _preferences.getShownHints();
+  final hintsForPage = OnboardingHint.values
+      .where((h) => h.page == event.page && !hintsShown.contains(h.name));
+  
+  if (hintsForPage.isNotEmpty) {
+    emit(ShowHint(hintsForPage.first));
+  }
+}
+```
+
+---
+
+### 28. Loading & Skeleton States
+
+**Skeleton Definitions:**
+
+| Screen                | Skeleton Pattern              |
+| --------------------- | ----------------------------- |
+| **Dashboard**         | 3 card placeholders (shimmer) |
+| **Bracket View**      | Tree structure outline        |
+| **Participants List** | 8 row placeholders            |
+| **Division Cards**    | 4 card placeholders           |
+
+**Skeleton Widget:**
+
+```dart
+// core/widgets/skeleton/dashboard_skeleton.dart
+class DashboardSkeleton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      _SkeletonCard(height: 120),
+      const SizedBox(height: 16),
+      Row(children: [
+        Expanded(child: _SkeletonCard(height: 200)),
+        const SizedBox(width: 16),
+        Expanded(child: _SkeletonCard(height: 200)),
+      ]),
+    ]);
+  }
+}
+
+class _SkeletonCard extends StatelessWidget {
+  final double height;
+  const _SkeletonCard({required this.height});
+  
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(height: height, decoration: BoxDecoration(
+        color: Colors.white, borderRadius: BorderRadius.circular(8),
+      )),
+    );
+  }
+}
+```
+
+---
+
+### 29. Theme Toggle Architecture
+
+**Purpose:** User-selectable dark mode (not just Venue Display)
+
+**Theme State:**
+
+```dart
+// features/settings/presentation/bloc/theme_cubit.dart
+class ThemeCubit extends Cubit<ThemeMode> {
+  ThemeCubit(this._preferences) : super(ThemeMode.system);
+  
+  Future<void> loadTheme() async {
+    final saved = await _preferences.getThemeMode();
+    emit(saved);
+  }
+  
+  Future<void> setTheme(ThemeMode mode) async {
+    await _preferences.setThemeMode(mode);
+    emit(mode);
+  }
+}
+```
+
+**Theme Toggle UI:**
+
+```dart
+// In settings screen
+SegmentedButton<ThemeMode>(
+  segments: const [
+    ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.light_mode)),
+    ButtonSegment(value: ThemeMode.system, icon: Icon(Icons.brightness_auto)),
+    ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.dark_mode)),
+  ],
+  selected: {context.watch<ThemeCubit>().state},
+  onSelectionChanged: (s) => context.read<ThemeCubit>().setTheme(s.first),
+)
+```
+
+---
+
 ## Architecture Validation Results
 
 ### Coherence Validation ✅
@@ -4197,16 +4842,20 @@ class EmergencyExportUseCase {
 
 **Functional Requirements:**
 - FR01-78: All requirements have architectural support
+- FR09 (CSV Import): Supported via Roster Import Architecture (#19)
 - FR34 (Judge scoring): Supported via `match_judge_scores` table
-- FR74 (Webhooks): Supported via Webhook Events Architecture
+- FR47 (Public sharing): Supported via Public Bracket Sharing (#23)
+- FR64 (Stripe): Supported via Stripe Checkout Architecture (#18)
+- FR74 (Webhooks): Supported via Webhook Events Architecture (#16)
 - FR77 (Athlete history): Supported via `athlete_profiles` table
 
 **Non-Functional Requirements:**
 - Performance: Optimistic updates (200ms scoring), Drift caching
-- Security: RLS + Custom Claims, Magic Link auth, Session management
+- Security: RLS + Custom Claims, Magic Link auth, Session management, GDPR deletion
 - Reliability: Offline-first with LWW sync, Recovery architecture
 - Accessibility: Semantics widgets + accessibility_tools
 - Rate Limiting: Multi-layer protection documented
+- UX: Keyboard shortcuts, Onboarding hints, Theme toggle, Skeleton states
 
 ### Implementation Readiness Validation ✅
 
@@ -4259,14 +4908,17 @@ class EmergencyExportUseCase {
 - Comprehensive error handling with Either pattern
 - RLS-based multi-tenancy for security
 - Complete database schemas with soft deletes
-- **17 Foundational Component Specifications** (seeding, PDF, visualization, etc.)
-- **PRD-aligned** technology stack (Supabase + Sentry, no Firebase)
-- **200ms scoring target** with optimistic update pattern
-- **Session management** balancing security and convenience
+- **29 Foundational Component Specifications** — fully ship-ready
+- **PRD-aligned** technology stack (Supabase + Sentry + Stripe)
+- **Smart Division Builder** with federation templates (WT/ITF/ATA)
+- **CSV Import** with auto-column detection
+- **Keyboard-first scoring** with defined shortcuts
+- **Public sharing** via shareable links
+- **Complete auth lifecycle** (magic link, logout, account deletion)
 
 **Areas for Future Enhancement:**
 - CI/CD pipeline configuration (post-MVP)
-- Federation-specific rule engines
+- Additional federation rule engines
 - Advanced caching strategies
 - Performance monitoring and analytics
 - Additional localization (Korean, Spanish, etc.)
