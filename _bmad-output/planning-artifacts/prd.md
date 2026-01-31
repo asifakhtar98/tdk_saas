@@ -14,7 +14,7 @@ classification:
   domain: 'Sports/Recreation Tech (Taekwondo Tournaments)'
   complexity: 'Medium'
   projectContext: 'Greenfield'
-  realtimeRequired: false
+  realtimeRequired: true  # Required for multi-user scoring synchronization
   targetUsers: 'Dojangs, coaches, tournament organizers, federations'
   pricingModel: 'Freemium ($5/month Enterprise)'
 ---
@@ -35,7 +35,7 @@ classification:
 - **Desktop-First:** Optimized for landscape desktop browsers (no mobile editing)
 - **Simple Pricing:** Free tier with limits, $5/month Enterprise for unlimited
 
-**Technology:** Flutter Web + Supabase (Auth, Database, Storage)
+**Technology:** Flutter Web + Supabase (Auth, Database, Storage, Realtime) + Sentry (Error Tracking, Free Tier)
 
 ---
 
@@ -136,7 +136,7 @@ classification:
 | **Export**            | PDF export (clean, no watermark), Shareable bracket links                                 |
 | **Auth**              | Email OTP/Magic link sign-in (Supabase Auth)                                              |
 | **Account**           | Save brackets, Private/public toggle                                                      |
-| **Limits**            | Free: 3 active brackets, 16 participants, 2 tournaments/month                             |
+| **Limits**            | Free: 3 active brackets, 32 participants/bracket, 2 tournaments/month                     |
 
 ### Growth Features (Post-MVP)
 
@@ -946,10 +946,19 @@ TKD Brackets will ship as a fully-featured tournament management platform from D
 
 - **FR59:** User can view current subscription tier and usage
 - **FR60:** User can upgrade from Free to Enterprise tier
-- **FR61:** System enforces Free tier limits (3 brackets, 32 participants, 2 tournaments/month)
+- **FR61:** System enforces Free tier limits (3 brackets, 32 participants/bracket, 2 tournaments/month, 2 scorers)
 - **FR62:** Enterprise user has unlimited brackets, participants, tournaments
 - **FR63:** Enterprise user can upload custom organization logo
 - **FR64:** System integrates with Stripe for payment processing
+
+**Demo Mode vs. Free Tier Clarification:**
+
+| Mode          | Account Required | Limits                                                   | Data Persistence   |
+| ------------- | ---------------- | -------------------------------------------------------- | ------------------ |
+| **Demo Mode** | No account       | 1 tournament, 1 division, 8 participants                 | Local only (Drift) |
+| **Free Tier** | Email signup     | 2 tournaments/month, 3 brackets, 32 participants/bracket | Synced to cloud    |
+
+_Demo Mode enables zero-friction trial. On signup, local demo data migrates to cloud._
 
 ---
 
