@@ -4398,6 +4398,32 @@ SuggestedDivision? findDivision(ParticipantEntity athlete, FederationTemplate fe
 }
 ```
 
+### Federation Template Data Strategy (G01 Resolution)
+
+**Challenge:** Templates must work offline immediately (bundled) but be updatable without app releases.
+
+**Hybrid Strategy:**
+1.  **Bundled Assets:** `assets/templates/initial_templates.json` shipped with binary.
+    *   *Benefit:* Zero-latency, instant utility offline on first run.
+2.  **Remote Override:** `division_templates` table in Supabase.
+3.  **Local Merged State:** Drift database stores the *active* merged set of templates.
+
+**Data Schema (`division_templates`):**
+
+| Column          | Type    | Description                                      |
+| :-------------- | :------ | :----------------------------------------------- |
+| `id`            | UUID    | Primary Key                                      |
+| `federation_id` | String  | 'WT', 'ITF', 'ATA'                               |
+| `name`          | String  | e.g. 'WT Official Packet 2026'                   |
+| `version`       | Integer | Incrementing version for update checks           |
+| `rules_json`    | JSONB   | Complete definition of age/weight/belt structure |
+| `is_active`     | Boolean | Soft delete/disable flag                         |
+
+**Sync Logic:**
+*   **App Start:** Check Drift for templates. If empty, load from `assets/templates/initial_templates.json`.
+*   **Background:** Query Supabase for `version > local_max_version`.
+*   **Update:** If newer found, download and transactional update to Drift.
+
 ---
 
 ### 21. Email Templates & Configuration
