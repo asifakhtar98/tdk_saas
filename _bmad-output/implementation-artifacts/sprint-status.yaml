@@ -48,7 +48,7 @@ development_status:
   # ═══════════════════════════════════════════════════════════════════════════
   epic-1: in-progress
   1-1-project-scaffold-and-clean-architecture-setup: done
-  1-2-dependency-injection-configuration: backlog
+  1-2-dependency-injection-configuration: done
   1-3-router-configuration: backlog
   1-4-error-handling-infrastructure: backlog
   1-5-drift-database-setup-and-core-tables: backlog
