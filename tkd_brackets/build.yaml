@@ -1,0 +1,18 @@
+targets:
+  $default:
+    builders:
+      injectable_generator|injectable_builder:
+        enabled: true
+        generate_for:
+          include:
+            - lib/**
+      go_router_builder|go_router_builder:
+        enabled: true
+        generate_for:
+          include:
+            - lib/**
+      drift_dev|drift_dev:
+        enabled: true
+        generate_for:
+          include:
+            - lib/**
