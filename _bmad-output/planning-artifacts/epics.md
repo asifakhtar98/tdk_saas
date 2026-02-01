@@ -1930,3 +1930,793 @@ lib/features/bracket/
 
 **Epic 5 Complete: 13 stories created**
 
+---
+
+## Epic 6: Live Scoring & Match Management — Stories
+
+### Story 6.1: Scoring Feature Structure
+
+**As a** developer,
+**I want** the scoring feature properly structured with Clean Architecture layers,
+**So that** all scoring-related code follows consistent patterns.
+
+**Acceptance Criteria:**
+
+**Given** the bracket feature exists
+**When** I create the scoring feature structure
+**Then** the following directory structure exists:
+```
+lib/features/scoring/
+├── data/
+│   ├── datasources/
+│   ├── models/
+│   └── repositories/
+├── domain/
+│   ├── entities/
+│   ├── repositories/
+│   └── usecases/
+└── presentation/
+    ├── bloc/
+    ├── pages/
+    └── widgets/
+```
+**And** the feature is registered in the DI container
+
+---
+
+### Story 6.2: Score Entity & Repository
+
+**As a** developer,
+**I want** the Score entity and repository implemented,
+**So that** match results and audit history can be tracked.
+
+**Acceptance Criteria:**
+
+**Given** the scoring feature structure exists
+**When** I implement the Score entity and repository
+**Then** `ScoreEntity` contains: `matchId`, `participant1Score`, `participant2Score`, `scoreDetails` (JSONB), `scoredBy`, `previousScoreId`, `isCurrent`
+**And** `scores` table is created in Drift
+**And** `ScoreRepository` handles versioned scores with `is_current` flag
+**And** unit tests verify score CRUD and version chain
+
+---
+
+### Story 6.3: Enter Match Score Use Case
+
+**As a** scorer,
+**I want** to enter the final score for a match,
+**So that** the winner is determined and the bracket progresses (FR33).
+
+**Acceptance Criteria:**
+
+**Given** a match is in 'ready' or 'in_progress' status
+**When** I enter scores for both participants
+**Then** `EnterScoreUseCase`:
+  - Creates a Score record with `is_current = true`
+  - Updates match `status = 'completed'`
+  - Sets match `winner_id` based on score comparison
+  - Returns `Either<Failure, Score>`
+**And** validation ensures scores are non-negative
+**And** unit tests verify score entry flow
+
+---
+
+### Story 6.4: Keyboard-First Score Entry
+
+**As a** scorer,
+**I want** to enter scores using keyboard shortcuts,
+**So that** I can quickly record results without mouse clicks (FR33, NFR6).
+
+**Acceptance Criteria:**
+
+**Given** a match is selected for scoring
+**When** I use keyboard shortcuts
+**Then** the following shortcuts work:
+  - `1-9, 0`: Enter score digit for focused participant
+  - `Tab`: Switch focus between participants
+  - `Enter`: Submit score
+  - `Escape`: Cancel and close
+  - Arrow keys: Navigate between matches
+**And** keyboard response time is < 100ms (NFR6)
+**And** focus indicators are clearly visible
+**And** unit tests verify shortcut handling
+
+---
+
+### Story 6.5: Forms Event Scoring
+
+**As a** scorer,
+**I want** to enter component scores for forms events,
+**So that** accuracy, power, and presentation are captured (FR34).
+
+**Acceptance Criteria:**
+
+**Given** a division has `event_type = 'forms'`
+**When** I score a forms match
+**Then** `FormsScoreUseCase` captures:
+  - Accuracy score (0.0 - 4.0)
+  - Power score (0.0 - 4.0)
+  - Presentation score (0.0 - 2.0)
+  - Deductions (0.0 - 1.0)
+  - Total = Accuracy + Power + Presentation - Deductions
+**And** breakdown is stored in `participant1_breakdown` / `participant2_breakdown` JSONB
+**And** unit tests verify forms scoring calculation
+
+---
+
+### Story 6.6: Multi-Judge Score Aggregation
+
+**As an** organizer,
+**I want** scores from multiple judges to be aggregated,
+**So that** forms results are fair (FR35).
+
+**Acceptance Criteria:**
+
+**Given** a division has `judge_count = 3` (or 5, 7)
+**When** all judges have submitted scores
+**Then** `JudgeScoreAggregator` calculates final score:
+  - `standard`: Average of all judge scores
+  - `drop_high_low`: Drop highest and lowest, average remaining
+**And** individual judge scores are stored in `judge_scores` table
+**And** aggregated score is stored in main `scores` table
+**And** unit tests verify aggregation methods
+
+---
+
+### Story 6.7: Match Winner Determination
+
+**As a** scorer,
+**I want** the winner to be automatically determined based on scores,
+**So that** I don't have to manually select the winner (FR36).
+
+**Acceptance Criteria:**
+
+**Given** a match score is entered
+**When** the score is saved
+**Then** `DetermineWinnerService`:
+  - Higher score wins for sparring
+  - Higher total wins for forms
+  - Handles tie-breakers per federation rules
+  - Sets `winner_id` on the match
+**And** tie-breaker rules are configurable per tournament
+**And** unit tests verify winner determination for all cases
+
+---
+
+### Story 6.8: Bracket Progression Service
+
+**As an** organizer,
+**I want** the bracket to automatically progress when matches complete,
+**So that** winners advance without manual intervention (FR37).
+
+**Acceptance Criteria:**
+
+**Given** a match is completed with a winner
+**When** the winner is determined
+**Then** `BracketProgressionService`:
+  - Finds `next_match_id` from the completed match
+  - Assigns winner to `participant1_id` or `participant2_id` based on `next_match_slot`
+  - Updates next match `status = 'ready'` if both participants are set
+  - For losers bracket (double elim): routes loser to correct consolation position
+**And** progression handles finals and grand finals correctly
+**And** unit tests verify progression for all bracket types
+
+---
+
+### Story 6.9: Undo Score with Audit Trail
+
+**As an** organizer,
+**I want** to undo a score entry and see the change history,
+**So that** mistakes can be corrected with accountability (FR38).
+
+**Acceptance Criteria:**
+
+**Given** a match has a score entered
+**When** I undo the score
+**Then** `UndoScoreUseCase`:
+  - Sets current score `is_current = false`
+  - Restores previous score (if exists) to `is_current = true`
+  - Creates audit log entry with old and new data
+  - Reverses bracket progression (removes winner from next match)
+**And** match status returns to 'in_progress' or 'ready'
+**And** unit tests verify undo and audit trail
+
+---
+
+### Story 6.10: Supabase Realtime Score Sync
+
+**As a** spectator or scorer on another device,
+**I want** to see score updates in real-time,
+**So that** brackets reflect live competition status (FR39, NFR3).
+
+**Acceptance Criteria:**
+
+**Given** Realtime is enabled for matches and scores tables
+**When** a score is entered on one device
+**Then** `RealtimeSyncService`:
+  - Publishes score changes via Supabase Realtime
+  - Other connected clients receive updates within 500ms (NFR3)
+  - BLoC states are updated reactively
+**And** reconnection is handled gracefully on network loss
+**And** unit tests verify Realtime subscription setup (mocked)
+
+---
+
+### Story 6.11: Multi-Ring View (Venue Display)
+
+**As an** organizer running a multi-ring event,
+**I want** to see all rings side-by-side,
+**So that** I can monitor the entire venue at once (FR40, FR41).
+
+**Acceptance Criteria:**
+
+**Given** a tournament has multiple rings configured
+**When** I open the Venue Display mode
+**Then** `VenueDisplayBloc` shows:
+  - Grid layout with one column per ring
+  - Current match for each ring with participants and scores
+  - Up-next queue for each ring
+  - Division name and round information
+**And** display auto-scrolls to active rings
+**And** optimized for large monitors in landscape mode
+
+---
+
+### Story 6.12: Call Next Match Service
+
+**As a** ring coordinator,
+**I want** to call the next match to a specific ring,
+**So that** athletes know when to report (FR42).
+
+**Acceptance Criteria:**
+
+**Given** a division has pending matches
+**When** I call the next match
+**Then** `CallNextMatchUseCase`:
+  - Updates match `ring_number` if not already set
+  - Sets match `status = 'ready'`
+  - Optionally sends notification (future feature)
+**And** the Venue Display updates to show the called match
+**And** unit tests verify call flow
+
+---
+
+### Story 6.13: Match Timer Service
+
+**As a** scorer,
+**I want** a match timer for sparring rounds,
+**So that** I can track round duration (FR43).
+
+**Acceptance Criteria:**
+
+**Given** a sparring match is in progress
+**When** I start the timer
+**Then** `MatchTimerService` provides:
+  - Configurable round duration (default: 2 minutes)
+  - Configurable rest period (default: 30 seconds)
+  - Pause/resume functionality
+  - Audible alerts at 30 seconds and round end
+**And** timer state is local only (not synced)
+**And** unit tests verify timer logic
+
+---
+
+### Story 6.14: Score Correction After Completion
+
+**As an** organizer,
+**I want** to correct a score after a match is completed,
+**So that** errors can be fixed even late in the event (FR44).
+
+**Acceptance Criteria:**
+
+**Given** a match is completed and bracket has progressed
+**When** I correct the score
+**Then** `CorrectScoreUseCase`:
+  - Creates new score record with `previous_score_id` linked
+  - If winner changes, undoes bracket progression
+  - Recalculates affected matches
+  - Creates detailed audit log
+**And** correction requires confirmation due to cascade impact
+**And** unit tests verify correction with cascade
+
+---
+
+### Story 6.15: Live Scoring UI
+
+**As a** scorer,
+**I want** a dedicated scoring interface optimized for speed,
+**So that** I can enter scores efficiently during live competition.
+
+**Acceptance Criteria:**
+
+**Given** the scoring domain logic is complete
+**When** I build the scoring presentation layer
+**Then** the following views exist:
+  - Ring Scoring View: Current match with large score display
+  - Match Queue: List of pending matches for the ring
+  - Score Pad: Keyboard or number pad for score entry
+  - Timer Display: Visible during sparring matches
+**And** `ScoringBloc` manages current match state
+**And** keyboard shortcuts work as specified
+**And** UI optimized for tablet-sized screens
+
+---
+
+**Epic 6 Complete: 15 stories created**
+
+---
+
+## Epic 7: Export, Sharing & Public View — Stories
+
+### Story 7.1: Export Feature Structure
+
+**As a** developer,
+**I want** the export feature properly structured with Clean Architecture layers,
+**So that** all export-related code follows consistent patterns.
+
+**Acceptance Criteria:**
+
+**Given** the scoring feature exists
+**When** I create the export feature structure
+**Then** the following directory structure exists:
+```
+lib/features/export/
+├── data/
+│   ├── datasources/
+│   ├── models/
+│   └── repositories/
+├── domain/
+│   ├── entities/
+│   ├── repositories/
+│   └── usecases/
+└── presentation/
+    ├── bloc/
+    ├── pages/
+    └── widgets/
+```
+**And** the feature is registered in the DI container
+
+---
+
+### Story 7.2: PDF Generation Service
+
+**As a** developer,
+**I want** a PDF generation service using the `pdf` package,
+**So that** brackets and results can be exported to PDF format.
+
+**Acceptance Criteria:**
+
+**Given** the export feature structure exists
+**When** I implement the PDF generation service
+**Then** `PdfGenerationService` provides:
+  - `generatePdf(Document document)` returns PDF bytes
+  - Web-safe implementation using `universal_html`
+  - `printing` package integration for print dialog
+**And** PDF generation completes in < 3 seconds for 64-participant bracket (NFR7)
+**And** PDF quality is print-ready (300 DPI equivalent)
+**And** unit tests verify PDF generation (mocked output)
+
+---
+
+### Story 7.3: Bracket PDF Export
+
+**As an** organizer,
+**I want** to export the bracket to a printable PDF,
+**So that** I can post it at the venue or share offline (FR45).
+
+**Acceptance Criteria:**
+
+**Given** a bracket is generated
+**When** I export to PDF
+**Then** `ExportBracketPdfUseCase` generates a PDF containing:
+  - Tournament name and date header
+  - Division name
+  - Visual bracket tree with participant names
+  - Match numbers and round labels
+  - Empty score boxes for manual entry (if not completed)
+  - Completed scores if matches are finished
+**And** PDF fits on standard paper sizes (Letter, A4)
+**And** large brackets span multiple pages appropriately
+**And** unit tests verify PDF content structure
+
+---
+
+### Story 7.4: Results PDF Export
+
+**As an** organizer,
+**I want** to export final results to PDF,
+**So that** I can distribute or archive results (FR46).
+
+**Acceptance Criteria:**
+
+**Given** a division is completed
+**When** I export results to PDF
+**Then** `ExportResultsPdfUseCase` generates a PDF containing:
+  - Tournament name and date header
+  - Division name and event type
+  - Final placements (1st, 2nd, 3rd) with names and dojangs
+  - Full results table with all participants
+  - Match-by-match results (optional)
+**And** PDF can be configured for brief (placements only) or detailed (all matches)
+**And** unit tests verify results PDF content
+
+---
+
+### Story 7.5: Public Link Generation
+
+**As an** organizer,
+**I want** to generate a shareable public link for my tournament,
+**So that** spectators can view brackets without logging in (FR47).
+
+**Acceptance Criteria:**
+
+**Given** a tournament is active
+**When** I create a public link
+**Then** `CreatePublicLinkUseCase`:
+  - Generates a unique token
+  - Creates record in `public_links` table
+  - Supports link types: full tournament, single division, single bracket
+  - Optional expiration date
+**And** link format: `https://app.tkdbrackets.com/public/{token}`
+**And** links can be activated/deactivated without deletion
+**And** unit tests verify link generation and storage
+
+---
+
+### Story 7.6: Public Bracket Viewer
+
+**As a** spectator,
+**I want** to view a tournament bracket via a public link,
+**So that** I can follow competition progress without an account (FR48).
+
+**Acceptance Criteria:**
+
+**Given** a valid public link exists
+**When** I open the URL
+**Then** `PublicViewerPage` displays:
+  - Tournament name and date (no organization info for privacy)
+  - Division selector (if full tournament link)
+  - Read-only bracket visualization
+  - Live score updates via Supabase Realtime
+  - No edit controls or login prompts
+**And** expired or invalid links show a friendly error message
+**And** page is SEO-optimized with meta tags
+**And** unit tests verify public data retrieval (no auth required)
+
+---
+
+### Story 7.7: Embeddable Widget
+
+**As an** organizer,
+**I want** an embeddable iframe widget for my website,
+**So that** I can display brackets on my dojang's site (FR49).
+
+**Acceptance Criteria:**
+
+**Given** a public link exists
+**When** I request the embed code
+**Then** `GenerateEmbedCodeUseCase` provides:
+  - `<iframe>` HTML snippet
+  - Configurable dimensions (responsive or fixed)
+  - Auto-refresh parameter for live updates
+  - Light/dark theme parameter
+**And** embed URL format: `https://app.tkdbrackets.com/embed/{token}`
+**And** embed view has minimal UI (no header/footer)
+**And** CORS headers allow embedding on any domain
+
+---
+
+### Story 7.8: Athlete Certificate Generation
+
+**As an** organizer,
+**I want** to generate placement certificates for winners,
+**So that** athletes receive recognition (FR50).
+
+**Acceptance Criteria:**
+
+**Given** a division is completed
+**When** I generate certificates
+**Then** `GenerateCertificateUseCase` creates PDFs containing:
+  - Organization logo (if uploaded)
+  - Tournament name and date
+  - Division name
+  - Athlete name
+  - Placement (1st Place, 2nd Place, 3rd Place)
+  - Optional signature line
+**And** certificates are generated in batch for all placements
+**And** certificate design is customizable (template selection)
+**And** unit tests verify certificate generation
+
+---
+
+### Story 7.9: Export UI & Sharing Page
+
+**As an** organizer,
+**I want** a UI to manage exports and public links,
+**So that** I can easily share my tournament.
+
+**Acceptance Criteria:**
+
+**Given** the export domain logic is complete
+**When** I build the export presentation layer
+**Then** the following UI exists:
+  - Export menu with PDF/Share options
+  - Public Links management page (list, create, activate/deactivate)
+  - Embed code copy button
+  - PDF preview before download
+**And** `ExportBloc` manages export state
+**And** PDF downloads work correctly in Chrome
+**And** copy-to-clipboard works for share links
+
+---
+
+**Epic 7 Complete: 9 stories created**
+
+---
+
+## Epic 8: Subscription & Billing — Stories
+
+### Story 8.1: Billing Feature Structure
+
+**As a** developer,
+**I want** the billing feature properly structured with Clean Architecture layers,
+**So that** all billing-related code follows consistent patterns.
+
+**Acceptance Criteria:**
+
+**Given** the auth feature exists
+**When** I create the billing feature structure
+**Then** the following directory structure exists:
+```
+lib/features/billing/
+├── data/
+│   ├── datasources/
+│   ├── models/
+│   └── repositories/
+├── domain/
+│   ├── entities/
+│   ├── repositories/
+│   └── usecases/
+└── presentation/
+    ├── bloc/
+    ├── pages/
+    └── widgets/
+```
+**And** the feature is registered in the DI container
+**And** this epic can be developed in parallel with Epics 3-7
+
+---
+
+### Story 8.2: Stripe Customer & Subscription Entities
+
+**As a** developer,
+**I want** entities to track Stripe customer and subscription data,
+**So that** billing information is properly stored.
+
+**Acceptance Criteria:**
+
+**Given** the billing feature structure exists
+**When** I implement the entities
+**Then** `SubscriptionEntity` contains: `organizationId`, `stripeCustomerId`, `stripeSubscriptionId`, `status`, `planType`, `currentPeriodStart`, `currentPeriodEnd`, `cancelAtPeriodEnd`
+**And** `organizations` table already has `stripe_customer_id` and `stripe_subscription_id` columns
+**And** `OrganizationRepository` updated to include subscription fields
+**And** unit tests verify entity mapping
+
+---
+
+### Story 8.3: Stripe Checkout Session Integration
+
+**As an** organizer,
+**I want** to upgrade to Enterprise tier via Stripe Checkout,
+**So that** I can access premium features (FR51).
+
+**Acceptance Criteria:**
+
+**Given** user is authenticated as organization owner
+**When** they initiate an upgrade
+**Then** `CreateCheckoutSessionUseCase`:
+  - Calls Supabase Edge Function to create Stripe Checkout Session
+  - Passes organization ID and plan selection
+  - Redirects user to Stripe-hosted checkout page
+  - Handles success and cancel URLs
+**And** Stripe Checkout Session created with correct price ID
+**And** unit tests verify checkout flow (mocked Stripe)
+
+---
+
+### Story 8.4: Webhook Handler for Stripe Events
+
+**As a** developer,
+**I want** Stripe webhooks to update subscription status,
+**So that** billing changes are reflected in real-time (FR52).
+
+**Acceptance Criteria:**
+
+**Given** Stripe sends a webhook event
+**When** the Edge Function receives it
+**Then** `StripeWebhookHandler` (Supabase Edge Function) handles:
+  - `checkout.session.completed`: Activate subscription
+  - `invoice.paid`: Extend subscription period
+  - `invoice.payment_failed`: Mark subscription as past_due
+  - `customer.subscription.updated`: Update plan details
+  - `customer.subscription.deleted`: Cancel subscription
+**And** webhook signature is verified using Stripe secret
+**And** idempotency keys prevent duplicate processing
+**And** unit tests verify event handling logic
+
+---
+
+### Story 8.5: Subscription Status Service
+
+**As a** developer,
+**I want** a service to check subscription status,
+**So that** feature access can be gated appropriately (FR53).
+
+**Acceptance Criteria:**
+
+**Given** an organization exists
+**When** I check subscription status
+**Then** `SubscriptionStatusService` returns:
+  - `isActive`: Boolean (subscription in good standing)
+  - `planType`: 'free' | 'enterprise'
+  - `daysRemaining`: null or number
+  - `isInGracePeriod`: Boolean
+**And** status is cached locally for offline access
+**And** cache is invalidated on subscription change events
+**And** unit tests verify status determination
+
+---
+
+### Story 8.6: Free Tier Limits Enforcement
+
+**As a** product owner,
+**I want** free tier limitations enforced automatically,
+**So that** users are incentivized to upgrade (FR54).
+
+**Acceptance Criteria:**
+
+**Given** an organization is on the Free tier
+**When** they attempt to use premium features
+**Then** `LimitsEnforcementService` enforces:
+  - Maximum 1 active tournament at a time
+  - Maximum 50 participants per tournament
+  - No white-labeling / custom branding
+  - No API access / webhooks
+  - No priority support
+**And** clear upgrade prompts shown when limits reached
+**And** unit tests verify limit checks
+
+---
+
+### Story 8.7: Subscription Management Portal
+
+**As an** organizer,
+**I want** to manage my subscription (update payment, cancel, view invoices),
+**So that** I have full control over my billing (FR55).
+
+**Acceptance Criteria:**
+
+**Given** an organization has an active subscription
+**When** the owner accesses billing settings
+**Then** `CreateBillingPortalSessionUseCase`:
+  - Calls Supabase Edge Function to create Stripe Billing Portal session
+  - User is redirected to Stripe-hosted portal
+**And** portal allows: update payment method, cancel subscription, view invoices
+**And** return URL brings user back to app
+**And** unit tests verify portal session creation
+
+---
+
+### Story 8.8: Grace Period & Downgrade Logic
+
+**As an** organization,
+**I want** a grace period if my payment fails,
+**So that** my tournament isn't disrupted mid-event (FR56).
+
+**Acceptance Criteria:**
+
+**Given** a subscription payment fails
+**When** the invoice is past due
+**Then** `GracePeriodService`:
+  - Sets `isInGracePeriod = true`
+  - Grace period: 7 days from payment failure
+  - Existing tournaments remain accessible
+  - New tournament creation blocked
+  - Warning banner shown throughout app
+**And** after grace period, subscription moves to 'canceled'
+**And** data is retained but read-only until renewed
+**And** unit tests verify grace period logic
+
+---
+
+### Story 8.9: Billing UI & Upgrade Flow
+
+**As an** organizer,
+**I want** a clear UI to understand my plan and upgrade,
+**So that** I can make informed purchasing decisions.
+
+**Acceptance Criteria:**
+
+**Given** the billing domain logic is complete
+**When** I build the billing presentation layer
+**Then** the following UI exists:
+  - Plan Comparison page (Free vs Enterprise features)
+  - Current Plan status card
+  - Upgrade button with clear pricing
+  - Billing history (link to Stripe portal)
+  - Limit warnings when approaching thresholds
+**And** `BillingBloc` manages subscription state
+**And** upgrade flow feels smooth and trustworthy
+**And** UI renders correctly in Chrome
+
+---
+
+**Epic 8 Complete: 9 stories created**
+
+---
+
+# 📊 Final Summary: TKD Brackets — Epics & Stories
+
+## Completion Status
+
+| Epic  | Title                            | Stories | FRs Covered   | Status     |
+| ----- | -------------------------------- | ------- | ------------- | ---------- |
+| **1** | Foundation & Demo Mode           | 12      | Setup, NFR1-9 | ✅ Complete |
+| **2** | Authentication & Organization    | 10      | FR61-66       | ✅ Complete |
+| **3** | Tournament & Division Management | 14      | FR1-FR12      | ✅ Complete |
+| **4** | Participant Management           | 12      | FR13-FR22     | ✅ Complete |
+| **5** | Bracket Generation & Seeding     | 13      | FR23-FR32     | ✅ Complete |
+| **6** | Live Scoring & Match Management  | 15      | FR33-FR44     | ✅ Complete |
+| **7** | Export, Sharing & Public View    | 9       | FR45-FR50     | ✅ Complete |
+| **8** | Subscription & Billing           | 9       | FR51-FR56     | ✅ Complete |
+
+## Total Metrics
+
+| Metric                                    | Count        |
+| ----------------------------------------- | ------------ |
+| **Total Epics**                           | 8            |
+| **Total Stories**                         | 94           |
+| **Functional Requirements Covered**       | 56/56 (100%) |
+| **Non-Functional Requirements Addressed** | 11/11 (100%) |
+
+## Supabase Database Schema
+
+All **17 tables** have been created in the Supabase project `tdk_fixer`:
+
+| Table                   | Purpose                            |
+| ----------------------- | ---------------------------------- |
+| `users`                 | User profiles linked to auth.users |
+| `organizations`         | Multi-tenancy root entity          |
+| `invitations`           | Team invitation management         |
+| `tournaments`           | Tournament configuration           |
+| `divisions`             | Smart Division Builder data        |
+| `participants`          | Athlete records                    |
+| `division_participants` | Many-to-many junction              |
+| `brackets`              | Bracket structure                  |
+| `matches`               | Match tree with progression        |
+| `scores`                | Score history with versioning      |
+| `judge_scores`          | Multi-judge forms scoring          |
+| `audit_logs`            | Change tracking                    |
+| `sync_queue`            | Offline-first sync                 |
+| `athlete_profiles`      | Cross-tournament profiles          |
+| `public_links`          | Spectator access tokens            |
+| `federation_templates`  | WT/ITF/ATA presets                 |
+| `webhook_endpoints`     | API integrations                   |
+
+## Development Strategy
+
+- **Approach**: Logic-First, UI-Last
+- **Testing**: Unit Tests Only
+- **Architecture**: Clean Architecture with BLoC
+- **Offline-First**: Drift (local) + Supabase (remote)
+
+## Next Steps
+
+1. **Sprint Planning**: Run `/sprint-planning` to create `sprint-status.yaml`
+2. **Story Creation**: Run `/create-story` for Epic 1, Story 1.1
+3. **Development**: Begin implementation following the story sequence
+
+---
+
+**🎉 All epics and stories have been successfully generated!**
+
