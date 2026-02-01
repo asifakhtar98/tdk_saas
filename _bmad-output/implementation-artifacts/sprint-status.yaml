@@ -1,0 +1,208 @@
+# generated: 2026-02-01
+# project: TKD Brackets
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: /Users/asak/Documents/dev/proj/personal/taekwondo_fix/_bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - backlog: Can be completed
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-02-01
+project: TKD Brackets
+project_key: NOKEY
+tracking_system: file-system
+story_location: "{project-root}/_bmad-output/implementation-artifacts"
+
+development_status:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Epic 1: Foundation & Demo Mode
+  # Goal: Users can explore the app without creating an account
+  # FRs: FR65-FR69 (autosave, offline, sync)
+  # Dependencies: None - this is the foundation
+  # ═══════════════════════════════════════════════════════════════════════════
+  epic-1: backlog
+  1-1-project-scaffold-and-clean-architecture-setup: backlog
+  1-2-dependency-injection-configuration: backlog
+  1-3-router-configuration: backlog
+  1-4-error-handling-infrastructure: backlog
+  1-5-drift-database-setup-and-core-tables: backlog
+  1-6-supabase-client-initialization: backlog
+  1-7-sentry-error-tracking-integration: backlog
+  1-8-connectivity-monitoring-service: backlog
+  1-9-autosave-service: backlog
+  1-10-sync-service-foundation: backlog
+  1-11-demo-mode-data-seeding: backlog
+  1-12-foundation-ui-shell: backlog
+  epic-1-retrospective: backlog
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Epic 2: Authentication & Organization
+  # Goal: Users can sign up, create organization, invite team members
+  # FRs: FR51-FR58
+  # Dependencies: Epic 1 (Foundation)
+  # ═══════════════════════════════════════════════════════════════════════════
+  epic-2: backlog
+  2-1-auth-feature-structure-and-domain-layer: backlog
+  2-2-user-entity-and-repository: backlog
+  2-3-email-magic-link-sign-up: backlog
+  2-4-email-magic-link-sign-in: backlog
+  2-5-auth-state-management-authbloc: backlog
+  2-6-organization-entity-and-repository: backlog
+  2-7-create-organization-use-case: backlog
+  2-8-invitation-entity-and-send-invite: backlog
+  2-9-rbac-permission-service: backlog
+  2-10-demo-to-production-migration: backlog
+  epic-2-retrospective: backlog
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Epic 3: Tournament & Division Management
+  # Goal: Users can create tournaments, configure divisions with Smart Builder
+  # FRs: FR1-FR12
+  # Dependencies: Epic 2 (Auth & Organization)
+  # ═══════════════════════════════════════════════════════════════════════════
+  epic-3: backlog
+  3-1-tournament-feature-structure: backlog
+  3-2-tournament-entity-and-repository: backlog
+  3-3-create-tournament-use-case: backlog
+  3-4-tournament-settings-configuration: backlog
+  3-5-duplicate-tournament-as-template: backlog
+  3-6-archive-and-delete-tournament: backlog
+  3-7-division-entity-and-repository: backlog
+  3-8-smart-division-builder-algorithm: backlog
+  3-9-federation-template-registry: backlog
+  3-10-custom-division-creation: backlog
+  3-11-division-merge-and-split: backlog
+  3-12-ring-assignment-service: backlog
+  3-13-scheduling-conflict-detection: backlog
+  3-14-tournament-management-ui: backlog
+  epic-3-retrospective: backlog
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Epic 4: Participant Management
+  # Goal: Users can add participants, import CSV, auto-assign to divisions
+  # FRs: FR13-FR19
+  # Dependencies: Epic 3 (Tournament & Division Management)
+  # ═══════════════════════════════════════════════════════════════════════════
+  epic-4: backlog
+  4-1-participant-feature-structure: backlog
+  4-2-participant-entity-and-repository: backlog
+  4-3-manual-participant-entry: backlog
+  4-4-csv-import-parser: backlog
+  4-5-duplicate-detection-algorithm: backlog
+  4-6-bulk-import-with-validation: backlog
+  4-7-participant-status-management: backlog
+  4-8-assign-participants-to-divisions: backlog
+  4-9-auto-assignment-algorithm: backlog
+  4-10-division-participant-view: backlog
+  4-11-participant-edit-and-transfer: backlog
+  4-12-participant-management-ui: backlog
+  epic-4-retrospective: backlog
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Epic 5: Bracket Generation & Seeding
+  # Goal: Generate brackets with intelligent dojang separation seeding
+  # FRs: FR20-FR31
+  # Dependencies: Epic 4 (Participant Management)
+  # ═══════════════════════════════════════════════════════════════════════════
+  epic-5: backlog
+  5-1-bracket-feature-structure: backlog
+  5-2-bracket-entity-and-repository: backlog
+  5-3-match-entity-and-repository: backlog
+  5-4-single-elimination-bracket-generator: backlog
+  5-5-double-elimination-bracket-generator: backlog
+  5-6-round-robin-bracket-generator: backlog
+  5-7-dojang-separation-seeding-algorithm: backlog
+  5-8-regional-separation-seeding: backlog
+  5-9-manual-seed-override: backlog
+  5-10-bye-assignment-algorithm: backlog
+  5-11-bracket-regeneration: backlog
+  5-12-bracket-lock-and-unlock: backlog
+  5-13-bracket-visualization-renderer: backlog
+  epic-5-retrospective: backlog
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Epic 6: Live Scoring & Match Management
+  # Goal: Scorers can enter results in real-time with auto-advancement
+  # FRs: FR32-FR44
+  # Dependencies: Epic 5 (Bracket Generation)
+  # ═══════════════════════════════════════════════════════════════════════════
+  epic-6: backlog
+  6-1-scoring-feature-structure: backlog
+  6-2-score-entity-and-repository: backlog
+  6-3-enter-match-score-use-case: backlog
+  6-4-keyboard-first-score-entry: backlog
+  6-5-forms-event-scoring: backlog
+  6-6-multi-judge-score-aggregation: backlog
+  6-7-match-winner-determination: backlog
+  6-8-bracket-progression-service: backlog
+  6-9-undo-score-with-audit-trail: backlog
+  6-10-supabase-realtime-score-sync: backlog
+  6-11-multi-ring-view-venue-display: backlog
+  6-12-call-next-match-service: backlog
+  6-13-match-timer-service: backlog
+  6-14-score-correction-after-completion: backlog
+  6-15-live-scoring-ui: backlog
+  epic-6-retrospective: backlog
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Epic 7: Export, Sharing & Public View
+  # Goal: Export PDFs, share public links, spectator mobile view
+  # FRs: FR45-FR50
+  # Dependencies: Epic 5/6 (Brackets with scores)
+  # ═══════════════════════════════════════════════════════════════════════════
+  epic-7: backlog
+  7-1-export-feature-structure: backlog
+  7-2-pdf-generation-service: backlog
+  7-3-bracket-pdf-export: backlog
+  7-4-results-pdf-export: backlog
+  7-5-public-link-generation: backlog
+  7-6-public-bracket-viewer: backlog
+  7-7-embeddable-widget: backlog
+  7-8-athlete-certificate-generation: backlog
+  7-9-export-ui-and-sharing-page: backlog
+  epic-7-retrospective: backlog
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Epic 8: Subscription & Billing
+  # Goal: Upgrade to Enterprise, Stripe integration, limit enforcement
+  # FRs: FR59-FR64, FR70-FR78
+  # Dependencies: Epic 2 (Organization for billing)
+  # Note: Can be developed in parallel with Epics 3-7
+  # ═══════════════════════════════════════════════════════════════════════════
+  epic-8: backlog
+  8-1-billing-feature-structure: backlog
+  8-2-stripe-customer-and-subscription-entities: backlog
+  8-3-stripe-checkout-session-integration: backlog
+  8-4-webhook-handler-for-stripe-events: backlog
+  8-5-subscription-status-service: backlog
+  8-6-free-tier-limits-enforcement: backlog
+  8-7-subscription-management-portal: backlog
+  8-8-grace-period-and-downgrade-logic: backlog
+  8-9-billing-ui-and-upgrade-flow: backlog
+  epic-8-retrospective: backlog
