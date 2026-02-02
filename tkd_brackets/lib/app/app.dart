@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:tkd_brackets/core/di/injection.dart';
+import 'package:tkd_brackets/core/router/app_router.dart';
 import 'package:tkd_brackets/core/theme/app_theme.dart';
 
 /// Root application widget.
-/// Configures MaterialApp with theming and routing.
 class App extends StatelessWidget {
-  /// Creates the root App widget.
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final appRouter = getIt<AppRouter>();
+
+    return MaterialApp.router(
       title: 'TKD Brackets',
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      // TODO(story-1.3): Replace with GoRouter.
-      home: const Scaffold(
-        body: Center(
-          child: Text('TKD Brackets - Foundation Setup Complete'),
-        ),
-      ),
+      themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: false,
+      routerConfig: appRouter.router,
     );
   }
 }
