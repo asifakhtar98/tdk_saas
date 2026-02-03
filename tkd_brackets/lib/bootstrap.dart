@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tkd_brackets/app/app.dart';
+import 'package:tkd_brackets/core/config/supabase_config.dart';
 import 'package:tkd_brackets/core/di/injection.dart';
 
 /// Shared initialization for all flavors.
@@ -11,11 +12,16 @@ Future<void> bootstrap({
 }) async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize DI container FIRST (sync call per injectable pattern)
-  configureDependencies(environment);
+  // Initialize Supabase FIRST (before DI so client is available for injection)
+  // Debug mode enabled only in development for network request logging.
+  await SupabaseConfig.initialize(
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
+    debug: environment == 'development',
+  );
 
-  // TODO(story-1.6): Initialize Supabase.
-  // await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  // Initialize DI container (can now inject SupabaseClient)
+  configureDependencies(environment);
 
   // TODO(story-1.7): Initialize Sentry.
   // await SentryFlutter.init((options) => ...);
