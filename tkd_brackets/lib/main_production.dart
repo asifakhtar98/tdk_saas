@@ -5,5 +5,6 @@ void main() {
     environment: 'production',
     supabaseUrl: const String.fromEnvironment('SUPABASE_URL'),
     supabaseAnonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
+    sentryDsn: const String.fromEnvironment('SENTRY_DSN'),
   );
 }

@@ -53,7 +53,7 @@ development_status:
   1-4-error-handling-infrastructure: done
   1-5-drift-database-setup-and-core-tables: done
   1-6-supabase-client-initialization: done
-  1-7-sentry-error-tracking-integration: backlog
+  1-7-sentry-error-tracking-integration: in-progress
   1-8-connectivity-monitoring-service: backlog
   1-9-autosave-service: backlog
   1-10-sync-service-foundation: backlog

@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/error_reporting_service.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
+import 'package:tkd_brackets/core/monitoring/sentry_service.dart';
 import 'package:tkd_brackets/core/services/logger_service.dart';
 
 class MockLoggerService extends Mock implements LoggerService {}
@@ -11,6 +12,9 @@ void main() {
   late MockLoggerService mockLoggerService;
 
   setUp(() {
+    // CRITICAL: Reset SentryService to ensure clean state between tests
+    SentryService.resetForTesting();
+
     mockLoggerService = MockLoggerService();
     errorReportingService = ErrorReportingService(mockLoggerService);
   });
