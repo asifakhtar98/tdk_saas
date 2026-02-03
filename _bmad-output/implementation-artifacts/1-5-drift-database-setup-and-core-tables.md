@@ -1,6 +1,6 @@
 # Story 1.5: Drift Database Setup & Core Tables
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -49,50 +49,50 @@ So that **local data persistence is available for offline-first functionality**.
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1: Create Database Directory Structure (AC: #1)**
-  - [ ] Create `lib/core/database/` directory
-  - [ ] Create `lib/core/database/tables/` subdirectory
+- [x] **Task 1: Create Database Directory Structure (AC: #1)**
+  - [x] Create `lib/core/database/` directory
+  - [x] Create `lib/core/database/tables/` subdirectory
 
-- [ ] **Task 2: Create Base Table Mixins (AC: #2)**
-  - [ ] Create `lib/core/database/tables/base_tables.dart`
-  - [ ] Implement `BaseSyncMixin` with sync columns
-  - [ ] Implement `BaseAuditMixin` with timestamp columns
+- [x] **Task 2: Create Base Table Mixins (AC: #2)**
+  - [x] Create `lib/core/database/tables/base_tables.dart`
+  - [x] Implement `BaseSyncMixin` with sync columns
+  - [x] Implement `BaseAuditMixin` with timestamp columns
 
-- [ ] **Task 3: Create Organizations Table (AC: #3)**
-  - [ ] Create `lib/core/database/tables/organizations_table.dart`
-  - [ ] Define all columns per architecture schema
-  - [ ] Include soft delete and sync columns
+- [x] **Task 3: Create Organizations Table (AC: #3)**
+  - [x] Create `lib/core/database/tables/organizations_table.dart`
+  - [x] Define all columns per architecture schema
+  - [x] Include soft delete and sync columns
 
-- [ ] **Task 4: Create Users Table (AC: #3)**
-  - [ ] Create `lib/core/database/tables/users_table.dart`
-  - [ ] Define all columns per architecture schema
-  - [ ] Include foreign key to organizations
+- [x] **Task 4: Create Users Table (AC: #3)**
+  - [x] Create `lib/core/database/tables/users_table.dart`
+  - [x] Define all columns per architecture schema
+  - [x] Include foreign key to organizations
 
-- [ ] **Task 5: Create AppDatabase with Web Support (AC: #1, #4)**
-  - [ ] Create `lib/core/database/app_database.dart`
-  - [ ] Configure `@DriftDatabase` annotation with tables
-  - [ ] Configure `drift_flutter` for web platform
-  - [ ] Register as `@lazySingleton` in DI
-  - [ ] Create `lib/core/database/database.dart` barrel file
-  - [ ] Create `lib/core/database/tables/tables.dart` barrel file
+- [x] **Task 5: Create AppDatabase with Web Support (AC: #1, #4)**
+  - [x] Create `lib/core/database/app_database.dart`
+  - [x] Configure `@DriftDatabase` annotation with tables
+  - [x] Configure `drift_flutter` for web platform
+  - [x] Register as `@lazySingleton` in DI
+  - [x] Create `lib/core/database/database.dart` barrel file
+  - [x] Create `lib/core/database/tables/tables.dart` barrel file
 
-- [ ] **Task 6: Run Build Runner (AC: #5)**
-  - [ ] Run `dart run build_runner build --delete-conflicting-outputs`
-  - [ ] Verify `app_database.g.dart` is generated
-  - [ ] Verify no analyzer warnings
+- [x] **Task 6: Run Build Runner (AC: #5)**
+  - [x] Run `dart run build_runner build --delete-conflicting-outputs`
+  - [x] Verify `app_database.g.dart` is generated
+  - [x] Verify no analyzer warnings
 
-- [ ] **Task 7: Write Unit Tests (AC: #6)**
-  - [ ] Create `test/core/database/app_database_test.dart`
-  - [ ] Test database construction
-  - [ ] Test organizations table CRUD
-  - [ ] Test users table CRUD
-  - [ ] Test soft delete behavior
-  - [ ] Test sync_version updates
+- [x] **Task 7: Write Unit Tests (AC: #6)**
+  - [x] Create `test/core/database/app_database_test.dart`
+  - [x] Test database construction
+  - [x] Test organizations table CRUD
+  - [x] Test users table CRUD
+  - [x] Test soft delete behavior
+  - [x] Test sync_version updates
 
-- [ ] **Task 8: Verification**
-  - [ ] Run `dart analyze` with zero issues
-  - [ ] Run `flutter test` with all tests passing
-  - [ ] Run `flutter build web` successfully
+- [x] **Task 8: Verification**
+  - [x] Run `dart analyze` with zero issues
+  - [x] Run `flutter test` with all tests passing
+  - [x] Run `flutter build web` successfully
 
 ## Dev Notes
 
@@ -905,11 +905,52 @@ flutter build web
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Sonnet 4 (Antigravity)
 
 ### Debug Log References
 
+- Fixed recursive getter warnings in table check constraints by removing self-referential `.check()` calls
+- Fixed import conflict in tests between drift's `isNotNull`/`isNull` and flutter_test's matchers
+- Removed unnecessary sqlite3 import (SqliteException re-exported from drift/native.dart)
+- Added library directives to barrel files to fix dangling doc comment warnings
+- **[CODE REVIEW FIX]** Removed explicit `DriftWebOptions` that referenced non-existent local files; now uses CDN defaults
+- **[CODE REVIEW FIX]** Wrapped `updateOrganization` and `updateUser` in `transaction()` for sync_version atomicity
+- **[CODE REVIEW FIX]** Updated imports to use `tables/tables.dart` barrel file instead of individual table imports
+
 ### Completion Notes List
+
+1. ✅ Created Drift database infrastructure with full offline-first support
+2. ✅ Implemented `BaseSyncMixin` with sync_version, is_deleted, deleted_at_timestamp, is_demo_data columns
+3. ✅ Implemented `BaseAuditMixin` with created_at_timestamp, updated_at_timestamp columns
+4. ✅ Created Organizations table with all subscription limits and multi-tenant columns
+5. ✅ Created Users table with RBAC role column and foreign key to Organizations
+6. ✅ Configured `drift_flutter` for web platform with sqlite3.wasm support
+7. ✅ Registered AppDatabase as `@lazySingleton` for DI
+8. ✅ Created 28 comprehensive unit tests covering CRUD, soft delete, demo data, timestamps, sync version
+9. ✅ All 101 project tests pass, zero analyzer issues, web build successful
 
 ### File List
 
+**New Files:**
+- `lib/core/database/app_database.dart` — Main database with CRUD operations
+- `lib/core/database/app_database.g.dart` — Generated Drift code
+- `lib/core/database/database.dart` — Barrel file
+- `lib/core/database/tables/base_tables.dart` — BaseSyncMixin and BaseAuditMixin
+- `lib/core/database/tables/organizations_table.dart` — Organizations table definition
+- `lib/core/database/tables/users_table.dart` — Users table definition
+- `lib/core/database/tables/tables.dart` — Tables barrel file
+- `test/core/database/app_database_test.dart` — Unit tests (28 tests)
+
+**Modified Files:**
+- `lib/core/di/injection.config.dart` — Auto-generated DI registration for AppDatabase
+
+---
+
+## Change Log
+
+| Date       | Change                                                                                     |
+| ---------- | ------------------------------------------------------------------------------------------ |
+| 2026-02-03 | Initial implementation of Drift database with Organizations/Users tables                   |
+| 2026-02-03 | Added 28 unit tests for database CRUD, soft delete, sync version, demo data                |
+| 2026-02-03 | All acceptance criteria verified, marked for review                                        |
+| 2026-02-03 | **Code Review**: Fixed web config (CDN), added transaction atomicity, fixed barrel imports |

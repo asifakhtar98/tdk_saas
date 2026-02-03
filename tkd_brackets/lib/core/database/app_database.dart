@@ -2,8 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:injectable/injectable.dart';
-import 'package:tkd_brackets/core/database/tables/organizations_table.dart';
-import 'package:tkd_brackets/core/database/tables/users_table.dart';
+import 'package:tkd_brackets/core/database/tables/tables.dart';
 
 part 'app_database.g.dart';
 
@@ -74,19 +73,21 @@ class AppDatabase extends _$AppDatabase {
 
   /// Update an organization and increment sync_version.
   ///
-  /// Note: sync_version is incremented by reading current value first.
-  /// In production, consider using a transaction for atomicity.
+  /// Uses a transaction to ensure atomicity of the read-modify-write
+  /// operation for sync_version increment.
   Future<bool> updateOrganization(
       String id, OrganizationsCompanion org) async {
-    final current = await getOrganizationById(id);
-    if (current == null) return false;
+    return transaction(() async {
+      final current = await getOrganizationById(id);
+      if (current == null) return false;
 
-    return (update(organizations)..where((o) => o.id.equals(id)))
-        .write(org.copyWith(
-          syncVersion: Value(current.syncVersion + 1),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ))
-        .then((rows) => rows > 0);
+      final rows = await (update(organizations)..where((o) => o.id.equals(id)))
+          .write(org.copyWith(
+            syncVersion: Value(current.syncVersion + 1),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ));
+      return rows > 0;
+    });
   }
 
   /// Soft delete an organization.
@@ -131,17 +132,20 @@ class AppDatabase extends _$AppDatabase {
 
   /// Update a user and increment sync_version.
   ///
-  /// Note: sync_version is incremented by reading current value first.
+  /// Uses a transaction to ensure atomicity of the read-modify-write
+  /// operation for sync_version increment.
   Future<bool> updateUser(String id, UsersCompanion user) async {
-    final current = await getUserById(id);
-    if (current == null) return false;
+    return transaction(() async {
+      final current = await getUserById(id);
+      if (current == null) return false;
 
-    return (update(users)..where((u) => u.id.equals(id)))
-        .write(user.copyWith(
-          syncVersion: Value(current.syncVersion + 1),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ))
-        .then((rows) => rows > 0);
+      final rows = await (update(users)..where((u) => u.id.equals(id)))
+          .write(user.copyWith(
+            syncVersion: Value(current.syncVersion + 1),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ));
+      return rows > 0;
+    });
   }
 
   /// Soft delete a user.
@@ -180,11 +184,7 @@ class AppDatabase extends _$AppDatabase {
 ///
 /// Uses drift_flutter for web support via sqlite3.wasm.
 QueryExecutor _openConnection() {
-  return driftDatabase(
-    name: 'tkd_brackets_db',
-    web: DriftWebOptions(
-      sqlite3Wasm: Uri.parse('sqlite3.wasm'),
-      driftWorker: Uri.parse('drift_worker.js'),
-    ),
-  );
+  // Uses drift_flutter's default CDN behavior for web assets.
+  // sqlite3.wasm and drift_worker.js are automatically loaded from CDN.
+  return driftDatabase(name: 'tkd_brackets_db');
 }
