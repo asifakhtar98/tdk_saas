@@ -17,7 +17,7 @@ part 'app_database.g.dart';
 /// final orgs = await db.select(db.organizations).get();
 /// ```
 @lazySingleton
-@DriftDatabase(tables: [Organizations, Users])
+@DriftDatabase(tables: [Organizations, Users, SyncQueueTable])
 class AppDatabase extends _$AppDatabase {
   /// Creates database with platform-appropriate connection.
   ///
@@ -29,7 +29,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -38,8 +38,10 @@ class AppDatabase extends _$AppDatabase {
         await m.createAll();
       },
       onUpgrade: (Migrator m, int from, int to) async {
-        // Future migrations go here
-        // if (from < 2) { await m.addColumn(...); }
+        // Version 2: Add sync_queue table for pending sync operations
+        if (from < 2) {
+          await m.createTable(syncQueueTable);
+        }
       },
       beforeOpen: (details) async {
         // Enable foreign key constraints

@@ -3,4 +3,6 @@ library;
 
 export 'base_tables.dart';
 export 'organizations_table.dart';
+export 'sync_queue_table.dart';
 export 'users_table.dart';
+

@@ -7,7 +7,8 @@ import 'package:drift/drift.dart';
 mixin BaseSyncMixin on Table {
   /// For Last-Write-Wins sync conflict resolution.
   /// Increment on every local update.
-  IntColumn get syncVersion => integer().withDefault(const Constant(1))();
+  IntColumn get syncVersion =>
+      integer().named('sync_version').withDefault(const Constant(1))();
 
   /// Soft delete flag. Never physically delete synced data.
   BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
