@@ -7,6 +7,18 @@ import 'package:tkd_brackets/core/services/logger_service.dart';
 
 class MockLoggerService extends Mock implements LoggerService {}
 
+/// Tests for [ErrorReportingService].
+///
+/// **Testing Strategy:**
+/// - These tests verify [LoggerService] integration via mocks.
+/// - [SentryService] uses static methods with an `isEnabled` guard, making
+///   traditional mocking impractical without architectural changes.
+/// - SentryService integration is tested separately in
+///   `sentry_service_test.dart` which verifies guard logic and disabled-mode
+///   behavior.
+/// - When `SentryService.isEnabled` is false (default), all Sentry calls are
+///   no-ops, so these tests run safely without Sentry SDK initialization.
+
 void main() {
   late ErrorReportingService errorReportingService;
   late MockLoggerService mockLoggerService;

@@ -1,6 +1,6 @@
 # Story 1.7: Sentry Error Tracking Integration
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -49,54 +49,54 @@ So that **production errors are automatically captured and reported**.
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1: Create SentryService (AC: #1, #4, #5)**
-  - [ ] Create `lib/core/monitoring/` directory
-  - [ ] Create `lib/core/monitoring/sentry_service.dart`
-  - [ ] Implement `SentryService.initialize()` static method
-  - [ ] Load DSN from `SENTRY_DSN` dart-define
-  - [ ] Set environment from `ENVIRONMENT` dart-define
-  - [ ] Configure `tracesSampleRate = 0.2` for performance monitoring
-  - [ ] Disable Sentry when DSN is empty (development mode)
+- [x] **Task 1: Create SentryService (AC: #1, #4, #5)**
+  - [x] Create `lib/core/monitoring/` directory
+  - [x] Create `lib/core/monitoring/sentry_service.dart`
+  - [x] Implement `SentryService.initialize()` static method
+  - [x] Load DSN from `SENTRY_DSN` dart-define
+  - [x] Set environment from `ENVIRONMENT` dart-define
+  - [x] Configure `tracesSampleRate = 0.2` for performance monitoring
+  - [x] Disable Sentry when DSN is empty (development mode)
 
-- [ ] **Task 2: Update Bootstrap for Sentry Init (AC: #4, #5)**
-  - [ ] Update `lib/bootstrap.dart` to call `SentryService.initialize()`
-  - [ ] Use `SentryFlutter.init` with `appRunner` callback pattern
-  - [ ] Initialize Sentry AFTER Supabase, BEFORE DI
-  - [ ] Pass `sentryDsn` parameter (can be empty for dev)
+- [x] **Task 2: Update Bootstrap for Sentry Init (AC: #4, #5)**
+  - [x] Update `lib/bootstrap.dart` to call `SentryService.initialize()`
+  - [x] Use `SentryFlutter.init` with `appRunner` callback pattern
+  - [x] Initialize Sentry AFTER Supabase, BEFORE DI
+  - [x] Pass `sentryDsn` parameter (can be empty for dev)
 
-- [ ] **Task 3: Update ErrorReportingService (AC: #2)**
-  - [ ] Remove all TODO(story-1.7) markers
-  - [ ] Implement `Sentry.captureException()` in `reportException()`
-  - [ ] Implement `Sentry.captureMessage()` in `reportFailure()` and `reportError()`
-  - [ ] Implement `Sentry.addBreadcrumb()` in `addBreadcrumb()`
-  - [ ] Implement `Sentry.configureScope()` in `setUserContext()` and `clearUserContext()`
-  - [ ] Guard all Sentry calls to check if initialized (no-op when disabled)
+- [x] **Task 3: Update ErrorReportingService (AC: #2)**
+  - [x] Remove all TODO(story-1.7) markers
+  - [x] Implement `Sentry.captureException()` in `reportException()`
+  - [x] Implement `Sentry.captureMessage()` in `reportFailure()` and `reportError()`
+  - [x] Implement `Sentry.addBreadcrumb()` in `addBreadcrumb()`
+  - [x] Implement `Sentry.configureScope()` in `setUserContext()` and `clearUserContext()`
+  - [x] Guard all Sentry calls to check if initialized (no-op when disabled)
 
-- [ ] **Task 4: Add SentryNavigatorObserver (AC: #3)**
-  - [ ] Update `lib/core/router/app_router.dart`
-  - [ ] Add `SentryNavigatorObserver()` to GoRouter observers list
-  - [ ] Ensure observer only added when Sentry is enabled
-  - [ ] **TIMING NOTE:** DI runs AFTER Sentry.init(), so `isEnabled` is set correctly when AppRouter instantiates
+- [x] **Task 4: Add SentryNavigatorObserver (AC: #3)**
+  - [x] Update `lib/core/router/app_router.dart`
+  - [x] Add `SentryNavigatorObserver()` to GoRouter observers list
+  - [x] Ensure observer only added when Sentry is enabled
+  - [x] **TIMING NOTE:** DI runs AFTER Sentry.init(), so `isEnabled` is set correctly when AppRouter instantiates
 
-- [ ] **Task 5: Update Main Entry Points (AC: #4)**
-  - [ ] Update `lib/main_development.dart` — pass empty DSN (disabled)
-  - [ ] Update `lib/main_staging.dart` — pass DSN from dart-define
-  - [ ] Update `lib/main_production.dart` — pass DSN from dart-define
+- [x] **Task 5: Update Main Entry Points (AC: #4)**
+  - [x] Update `lib/main_development.dart` — pass empty DSN (disabled)
+  - [x] Update `lib/main_staging.dart` — pass DSN from dart-define
+  - [x] Update `lib/main_production.dart` — pass DSN from dart-define
 
-- [ ] **Task 6: Write Unit Tests (AC: #6)**
-  - [ ] Create `test/core/monitoring/sentry_service_test.dart`
-  - [ ] Test initialization with valid DSN
-  - [ ] Test initialization with empty DSN (disabled mode)
-  - [ ] Test `isEnabled` property
-  - [ ] Update `test/core/error/error_reporting_service_test.dart`
-  - [ ] Add `SentryService.resetForTesting()` to `setUp()` (**CRITICAL**)
-  - [ ] Existing tests will pass because SentryService calls are no-op when disabled
+- [x] **Task 6: Write Unit Tests (AC: #6)**
+  - [x] Create `test/core/monitoring/sentry_service_test.dart`
+  - [x] Test initialization with valid DSN
+  - [x] Test initialization with empty DSN (disabled mode)
+  - [x] Test `isEnabled` property
+  - [x] Update `test/core/error/error_reporting_service_test.dart`
+  - [x] Add `SentryService.resetForTesting()` to `setUp()` (**CRITICAL**)
+  - [x] Existing tests will pass because SentryService calls are no-op when disabled
 
-- [ ] **Task 7: Verification**
-  - [ ] Run `dart analyze` with zero issues
-  - [ ] Run `flutter test` with all tests passing
-  - [ ] Run `flutter build web` successfully
-  - [ ] Verify Sentry disabled in dev (no console errors about DSN)
+- [x] **Task 7: Verification**
+  - [x] Run `dart analyze` with zero issues
+  - [x] Run `flutter test` with all tests passing
+  - [x] Run `flutter build web` successfully
+  - [x] Verify Sentry disabled in dev (no console errors about DSN)
 
 ## Dev Notes
 
@@ -1002,21 +1002,62 @@ ErrorReportingService.setUserContext(
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude (Anthropic)
 
 ### Debug Log References
 
+- Initial implementation completed in session dated 2026-02-03
+- All lint issues resolved (cascade notation, parameter ordering, unnecessary lambdas)
+- All 118 tests passing
+
 ### Completion Notes List
+
+- ✅ Created `SentryService` with static initialization pattern matching `SupabaseConfig`
+- ✅ Implemented `isEnabled` guard pattern - all Sentry calls are no-op when DSN is empty
+- ✅ Used cascade notation for Sentry options configuration per lint rules
+- ✅ Added `resetForTesting()` method for test isolation
+- ✅ Updated bootstrap with `appRunner` callback pattern for proper Sentry initialization
+- ✅ Replaced all `TODO(story-1.7)` markers in ErrorReportingService with actual SentryService calls
+- ✅ Added `SentryNavigatorObserver` conditionally based on `SentryService.isEnabled`
+- ✅ Updated all main entry points: dev uses empty DSN, staging/prod use dart-define
+- ✅ Added 9 new unit tests for SentryService covering initialization and disabled-mode behavior
+- ✅ Updated existing ErrorReportingService tests with `SentryService.resetForTesting()` in setUp
+
+### Change Log
+
+- 2026-02-05: Story implementation complete - all 7 tasks done, all ACs satisfied
+- 2026-02-05: Code review completed - 2 issues fixed, 1 documented limitation
+
+### Senior Developer Review (AI)
+
+**Reviewer:** Claude (Anthropic) | **Date:** 2026-02-05
+
+**Findings:**
+
+| Severity | Issue                                                                                                                                  | Resolution                                                                                                                                                                                                                                                                      |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MEDIUM   | `ErrorReportingService` tests don't verify `SentryService` method calls. If Sentry integration accidentally removed, tests still pass. | Documented as architectural limitation. `SentryService` uses static methods with `isEnabled` guard, making mocking impractical. Added documentation in test file explaining the testing strategy. SentryService integration is tested separately in `sentry_service_test.dart`. |
+| LOW      | Redundant `tracesSampleRate: 0.2` in `bootstrap.dart` duplicates default value in `SentryService.initialize`.                          | **Fixed:** Removed redundant parameter.                                                                                                                                                                                                                                         |
+| LOW      | `environment` parameter is raw `String` with no validation. Typos pass silently.                                                       | Accepted as-is. Fixing requires architectural change (Environment enum, validation). Low risk given environment comes from controlled entry points.                                                                                                                             |
+
+**Verification:**
+- ✅ `dart analyze` - No issues
+- ✅ `flutter test` - 118 tests passing
+- ✅ All ACs verified implemented
+
+**Recommendation:** APPROVED ✅
 
 ### File List
 
-| File                                          | Action   |
-| --------------------------------------------- | -------- |
-| lib/core/monitoring/sentry_service.dart       | Created  |
-| lib/bootstrap.dart                            | Modified |
-| lib/main_development.dart                     | Modified |
-| lib/main_staging.dart                         | Modified |
-| lib/main_production.dart                      | Modified |
-| lib/core/error/error_reporting_service.dart   | Modified |
-| lib/core/router/app_router.dart               | Modified |
-| test/core/monitoring/sentry_service_test.dart | Created  |
+| File                                              | Action   |
+| ------------------------------------------------- | -------- |
+| lib/core/monitoring/sentry_service.dart           | Created  |
+| lib/bootstrap.dart                                | Modified |
+| lib/main_development.dart                         | Modified |
+| lib/main_staging.dart                             | Modified |
+| lib/main_production.dart                          | Modified |
+| lib/core/error/error_reporting_service.dart       | Modified |
+| lib/core/router/app_router.dart                   | Modified |
+| test/core/monitoring/sentry_service_test.dart     | Created  |
+| test/core/error/error_reporting_service_test.dart | Modified |
+

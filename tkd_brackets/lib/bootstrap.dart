@@ -33,6 +33,5 @@ Future<void> bootstrap({
 
       runApp(const App());
     },
-    tracesSampleRate: 0.2,
   );
 }

@@ -1,4 +1,6 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:injectable/injectable.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tkd_brackets/core/config/supabase_config.dart';
 
@@ -13,7 +15,12 @@ abstract class RegisterModule {
   @lazySingleton
   SupabaseClient get supabaseClient => SupabaseConfig.client;
 
-  // Placeholder for future third-party registrations:
-  // - Sentry service (Story 1.7)
-  // - Other external services as needed
+  /// Provides a [Connectivity] instance for network interface monitoring.
+  @lazySingleton
+  Connectivity get connectivity => Connectivity();
+
+  /// Provides an [InternetConnection] instance for internet reachability
+  /// checks.
+  @lazySingleton
+  InternetConnection get internetConnection => InternetConnection();
 }
