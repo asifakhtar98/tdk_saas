@@ -9,7 +9,7 @@ project_name: 'TKD Brackets'
 user_name: 'Asak'
 date: '2026-01-31'
 developmentStrategy: 'Logic-First, UI-Last'
-testingScope: 'Unit Tests + Bloc Tests Only'
+testingScope: 'Unit Tests Mostly, BLoC Tests (Where Applicable)'
 packagesVerified: true
 ---
 
