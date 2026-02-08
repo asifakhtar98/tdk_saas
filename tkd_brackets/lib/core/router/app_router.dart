@@ -37,8 +37,10 @@ class AppRouter {
       createAppShellRoute(
         shellNavigatorKey: _shellNavigatorKey,
         routes: [
+          $dashboardRoute,
           $tournamentListRoute,
           $tournamentDetailsRoute,
+          $settingsRoute,
         ],
       ),
     ],
@@ -53,8 +55,14 @@ class AppRouter {
     ];
   }
 
-  /// Redirect guard placeholder. Full implementation in Story 2.5.
+  /// Redirect guard with shell route handling.
+  /// Full auth implementation in Story 2.5.
   String? _redirectGuard(BuildContext context, GoRouterState state) {
+    // Redirect /app routes to dashboard for shell entry
+    final location = state.matchedLocation;
+    if (location == '/app' || location == '/app/') {
+      return '/dashboard';
+    }
     // TODO(story-2.5): Implement auth redirect logic
     return null;
   }

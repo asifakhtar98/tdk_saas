@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tkd_brackets/features/dashboard/dashboard.dart';
 import 'package:tkd_brackets/features/demo/presentation/pages/demo_page.dart';
 import 'package:tkd_brackets/features/home/presentation/pages/home_page.dart';
+import 'package:tkd_brackets/features/settings/settings.dart';
+import 'package:tkd_brackets/features/tournament/tournament.dart';
 
 part 'routes.g.dart';
 
@@ -28,8 +31,28 @@ class DemoRoute extends GoRouteData {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Placeholder Routes (Will be moved to feature modules in Epic 3+)
+// Shell Routes (Inside AppShellScaffold)
 // ═══════════════════════════════════════════════════════════════════════════
+
+/// Dashboard route - main app landing page within shell.
+@TypedGoRoute<DashboardRoute>(path: '/dashboard')
+class DashboardRoute extends GoRouteData {
+  const DashboardRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const DashboardPage();
+}
+
+/// Settings route - app configuration.
+@TypedGoRoute<SettingsRoute>(path: '/settings')
+class SettingsRoute extends GoRouteData {
+  const SettingsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const SettingsPage();
+}
 
 /// Tournament list route - placeholder for Epic 3.
 @TypedGoRoute<TournamentListRoute>(path: '/tournaments')
@@ -37,12 +60,8 @@ class TournamentListRoute extends GoRouteData {
   const TournamentListRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => Scaffold(
-        appBar: AppBar(title: const Text('Tournaments')),
-        body: const Center(
-          child: Text('Tournament List - Coming in Epic 3'),
-        ),
-      );
+  Widget build(BuildContext context, GoRouterState state) =>
+      const TournamentListPage();
 }
 
 /// Tournament details route - demonstrates route parameters.

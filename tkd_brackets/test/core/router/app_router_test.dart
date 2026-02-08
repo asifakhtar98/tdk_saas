@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tkd_brackets/core/router/app_router.dart';
 import 'package:tkd_brackets/core/router/routes.dart';
+import 'package:tkd_brackets/core/sync/sync_service.dart';
+
+import '../../mocks/mock_sync_service.dart';
 
 void main() {
   group('AppRouter', () {
@@ -91,6 +95,74 @@ void main() {
 
       // Verify error page
       expect(find.text('Go Home'), findsOneWidget);
+    });
+  });
+
+  group('Redirect Guard', () {
+    setUp(() {
+      final (mock, _) = createMockSyncService();
+      GetIt.instance.registerSingleton<SyncService>(mock);
+    });
+
+    tearDown(() async {
+      await GetIt.instance.reset();
+    });
+
+    testWidgets('redirects /app to /dashboard', (tester) async {
+      final router = AppRouter();
+
+      await tester.pumpWidget(
+        MaterialApp.router(routerConfig: router.router),
+      );
+      await tester.pumpAndSettle();
+
+      // Navigate to /app
+      router.router.go('/app');
+      await tester.pumpAndSettle();
+
+      // Should be redirected to /dashboard
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/dashboard'),
+      );
+    });
+
+    testWidgets('redirects /app/ to /dashboard', (tester) async {
+      final router = AppRouter();
+
+      await tester.pumpWidget(
+        MaterialApp.router(routerConfig: router.router),
+      );
+      await tester.pumpAndSettle();
+
+      // Navigate to /app/
+      router.router.go('/app/');
+      await tester.pumpAndSettle();
+
+      // Should be redirected to /dashboard
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/dashboard'),
+      );
+    });
+
+    testWidgets('does not redirect normal shell routes', (tester) async {
+      final router = AppRouter();
+
+      await tester.pumpWidget(
+        MaterialApp.router(routerConfig: router.router),
+      );
+      await tester.pumpAndSettle();
+
+      // Navigate to /settings
+      router.router.go('/settings');
+      await tester.pumpAndSettle();
+
+      // Should stay on /settings
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/settings'),
+      );
     });
   });
 }
