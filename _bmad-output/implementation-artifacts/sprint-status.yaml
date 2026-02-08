@@ -57,7 +57,7 @@ development_status:
   1-8-connectivity-monitoring-service: done
   1-9-autosave-service: done
   1-10-sync-service-foundation: done
-  1-11-demo-mode-data-seeding: pending
+  1-11-demo-mode-data-seeding: done
   1-12-foundation-ui-shell: backlog
   epic-1-retrospective: backlog
 

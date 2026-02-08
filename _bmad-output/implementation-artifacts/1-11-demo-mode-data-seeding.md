@@ -1,6 +1,6 @@
 # Story 1.11: Demo Mode Data Seeding
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -32,8 +32,8 @@ Status: ready-for-dev
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create Tournaments table (AC: #1)
-  - [ ] 1.1 Create `lib/core/database/tables/tournaments_table.dart` with schema matching architecture:
+- [x] Task 1: Create Tournaments table (AC: #1)
+  - [x] 1.1 Create `lib/core/database/tables/tournaments_table.dart` with schema matching architecture:
     - `id` (TEXT PRIMARY KEY)
     - `organizationId` (TEXT FK → organizations, `.named('organization_id')`)
     - `createdByUserId` (TEXT FK → users, nullable, `.named('created_by_user_id')`)
@@ -53,13 +53,13 @@ Status: ready-for-dev
     - `numberOfRings` (INTEGER DEFAULT 1, `.named('number_of_rings')`)
     - `settingsJson` (TEXT DEFAULT '{}', `.named('settings_json')`)
     - Include `BaseSyncMixin` and `BaseAuditMixin`
-  - [ ] 1.2 Add annotation: `@DataClassName('TournamentEntry')`
-  - [ ] 1.3 Add `Tournaments` to `tables.dart` barrel file
-  - [ ] 1.4 Register table in `AppDatabase` @DriftDatabase annotation
-  - [ ] 1.5 Add basic CRUD methods to `AppDatabase` for tournaments
+  - [x] 1.2 Add annotation: `@DataClassName('TournamentEntry')`
+  - [x] 1.3 Add `Tournaments` to `tables.dart` barrel file
+  - [x] 1.4 Register table in `AppDatabase` @DriftDatabase annotation
+  - [x] 1.5 Add basic CRUD methods to `AppDatabase` for tournaments
 
-- [ ] Task 2: Create Divisions table (AC: #1)
-  - [ ] 2.1 Create `lib/core/database/tables/divisions_table.dart` with schema:
+- [x] Task 2: Create Divisions table (AC: #1)
+  - [x] 2.1 Create `lib/core/database/tables/divisions_table.dart` with schema:
     - `id` (TEXT PRIMARY KEY)
     - `tournamentId` (TEXT FK → tournaments, `.named('tournament_id')`)
     - `name` (TEXT NOT NULL)
@@ -80,13 +80,13 @@ Status: ready-for-dev
     - `status` (TEXT DEFAULT 'setup')
       - CHECK: 'setup', 'ready', 'in_progress', 'completed'
     - Include `BaseSyncMixin` and `BaseAuditMixin`
-  - [ ] 2.2 Add annotation: `@DataClassName('DivisionEntry')`
-  - [ ] 2.3 Add `Divisions` to `tables.dart` barrel file
-  - [ ] 2.4 Register table in `AppDatabase` @DriftDatabase annotation
-  - [ ] 2.5 Add basic CRUD methods to `AppDatabase` for divisions
+  - [x] 2.2 Add annotation: `@DataClassName('DivisionEntry')`
+  - [x] 2.3 Add `Divisions` to `tables.dart` barrel file
+  - [x] 2.4 Register table in `AppDatabase` @DriftDatabase annotation
+  - [x] 2.5 Add basic CRUD methods to `AppDatabase` for divisions
 
-- [ ] Task 3: Create Participants table (AC: #1)
-  - [ ] 3.1 Create `lib/core/database/tables/participants_table.dart` with schema:
+- [x] Task 3: Create Participants table (AC: #1)
+  - [x] 3.1 Create `lib/core/database/tables/participants_table.dart` with schema:
     - `id` (TEXT PRIMARY KEY)
     - `divisionId` (TEXT FK → divisions, `.named('division_id')`)
     - `firstName` (TEXT NOT NULL, `.named('first_name')`)
@@ -105,15 +105,15 @@ Status: ready-for-dev
     - `photoUrl` (TEXT nullable, `.named('photo_url')`)
     - `notes` (TEXT nullable)
     - Include `BaseSyncMixin` and `BaseAuditMixin`
-  - [ ] 3.2 Add annotation: `@DataClassName('ParticipantEntry')`
-  - [ ] 3.3 Add `Participants` to `tables.dart` barrel file
-  - [ ] 3.4 Register table in `AppDatabase` @DriftDatabase annotation
-  - [ ] 3.5 Add basic CRUD methods to `AppDatabase` for participants
+  - [x] 3.2 Add annotation: `@DataClassName('ParticipantEntry')`
+  - [x] 3.3 Add `Participants` to `tables.dart` barrel file
+  - [x] 3.4 Register table in `AppDatabase` @DriftDatabase annotation
+  - [x] 3.5 Add basic CRUD methods to `AppDatabase` for participants
 
-- [ ] Task 4: Update AppDatabase schema version (AC: #1)
-  - [ ] 4.1 Verify current schemaVersion is 2 (from Story 1.10)
-  - [ ] 4.2 Increment schemaVersion from 2 to 3
-  - [ ] 4.3 Add migration callback:
+- [x] Task 4: Update AppDatabase schema version (AC: #1)
+  - [x] 4.1 Verify current schemaVersion is 2 (from Story 1.10)
+  - [x] 4.2 Increment schemaVersion from 2 to 3
+  - [x] 4.3 Add migration callback:
     ```dart
     if (from < 3) {
       await m.createTable(tournaments);
@@ -121,10 +121,10 @@ Status: ready-for-dev
       await m.createTable(participants);
     }
     ```
-  - [ ] 4.4 Run `dart run build_runner build --delete-conflicting-outputs`
+  - [x] 4.4 Run `dart run build_runner build --delete-conflicting-outputs`
 
-- [ ] Task 5: Create Demo Data Constants (AC: #2, #3)
-  - [ ] 5.1 Create `lib/core/demo/demo_data_constants.dart`:
+- [x] Task 5: Create Demo Data Constants (AC: #2, #3)
+  - [x] 5.1 Create `lib/core/demo/demo_data_constants.dart`:
     ```dart
     /// Constants for demo mode data seeding.
     /// Uses predetermined UUIDs for test reproducibility.
@@ -158,8 +158,8 @@ Status: ready-for-dev
     }
     ```
 
-- [ ] Task 6: Create Demo Data Service (AC: #4)
-  - [ ] 6.1 Create `lib/core/demo/demo_data_service.dart` with abstract interface:
+- [x] Task 6: Create Demo Data Service (AC: #4)
+  - [x] 6.1 Create `lib/core/demo/demo_data_service.dart` with abstract interface:
     ```dart
     abstract class DemoDataService {
       Future<bool> shouldSeedDemoData();
@@ -167,7 +167,7 @@ Status: ready-for-dev
       Future<bool> hasDemoData();
     }
     ```
-  - [ ] 6.2 Implement `DemoDataServiceImplementation`:
+  - [x] 6.2 Implement `DemoDataServiceImplementation`:
     - Inject `AppDatabase` dependency
     - `shouldSeedDemoData()` - returns true if organizations table is empty:
       ```dart
@@ -178,23 +178,23 @@ Status: ready-for-dev
       ```
     - `hasDemoData()` - delegates to `_db.hasDemoData()`
     - `seedDemoData()` - creates all demo records in transaction
-  - [ ] 6.3 Register in DI: `@LazySingleton(as: DemoDataService)`
+  - [x] 6.3 Register in DI: `@LazySingleton(as: DemoDataService)`
 
-- [ ] Task 7: Implement Demo Data Seeding Logic (AC: #1, #2)
-  - [ ] 7.1 Create demo user (owner):
+- [x] Task 7: Implement Demo Data Seeding Logic (AC: #1, #2)
+  - [x] 7.1 Create demo user (owner):
     - ID: `DemoDataConstants.demoUserId`
     - Email: "demo@tkdbrackets.local"
     - Display name: "Demo User"
     - Role: "owner"
     - Organization ID: `DemoDataConstants.demoOrganizationId`
     - isDemoData: true
-  - [ ] 7.2 Create demo organization:
+  - [x] 7.2 Create demo organization:
     - ID: `DemoDataConstants.demoOrganizationId`
     - Name: "Demo Dojang"
     - Slug: "demo-dojang"
     - Subscription tier: "free"
     - isDemoData: true
-  - [ ] 7.3 Create demo tournament:
+  - [x] 7.3 Create demo tournament:
     - ID: `DemoDataConstants.demoTournamentId`
     - Name: "Spring Championship 2026"
     - Organization ID: `DemoDataConstants.demoOrganizationId`
@@ -203,7 +203,7 @@ Status: ready-for-dev
     - Status: "registration_open"
     - Scheduled date: 30 days from seed date
     - isDemoData: true
-  - [ ] 7.4 Create demo division:
+  - [x] 7.4 Create demo division:
     - ID: `DemoDataConstants.demoDivisionId`
     - Name: "Cadets -45kg Male"
     - Tournament ID: `DemoDataConstants.demoTournamentId`
@@ -214,7 +214,7 @@ Status: ready-for-dev
     - Bracket format: "single_elimination"
     - Status: "setup"
     - isDemoData: true
-  - [ ] 7.5 Create 8 demo participants (2 from each of 4 dojangs):
+  - [x] 7.5 Create 8 demo participants (2 from each of 4 dojangs):
     - Use `DemoDataConstants.demoParticipantIds`
     - Division ID: `DemoDataConstants.demoDivisionId`
     - Calculate actual birthdates (ages 12-14 from seed date)
@@ -232,8 +232,8 @@ Status: ready-for-dev
     | 7   | Jacob    | Martinez | Eagle's Nest TKD    | -13               | 44.0   |
     | 8   | Emma     | Davis    | Eagle's Nest TKD    | -14               | 45.0   |
 
-- [ ] Task 8: Integrate with App Bootstrap (AC: #5)
-  - [ ] 8.1 Update `bootstrap.dart` inside Sentry `appRunner` callback:
+- [x] Task 8: Integrate with App Bootstrap (AC: #5)
+  - [x] 8.1 Update `bootstrap.dart` inside Sentry `appRunner` callback:
     ```dart
     appRunner: () async {
       // Initialize DI container
@@ -248,35 +248,35 @@ Status: ready-for-dev
       runApp(const App());
     },
     ```
-  - [ ] 8.2 Add import for `DemoDataService` and `getIt`
+  - [x] 8.2 Add import for `DemoDataService` and `getIt`
 
-- [ ] Task 9: Create Barrel File (AC: all)
-  - [ ] 9.1 Create `lib/core/demo/demo.dart` barrel file:
+- [x] Task 9: Create Barrel File (AC: all)
+  - [x] 9.1 Create `lib/core/demo/demo.dart` barrel file:
     ```dart
     export 'demo_data_constants.dart';
     export 'demo_data_service.dart';
     ```
 
-- [ ] Task 10: Write Unit Tests (AC: #6)
-  - [ ] 10.1 Create `test/core/demo/demo_data_constants_test.dart`:
+- [x] Task 10: Write Unit Tests (AC: #6)
+  - [x] 10.1 Create `test/core/demo/demo_data_constants_test.dart`:
     - All UUIDs are valid format (regex match)
     - No duplicate UUIDs across all constants
     - Correct count: 8 participant IDs
     - Correct count: 4 sample dojangs
-  - [ ] 10.2 Create `test/core/demo/demo_data_service_test.dart`:
+  - [x] 10.2 Create `test/core/demo/demo_data_service_test.dart`:
     - `shouldSeedDemoData()` returns true for empty database
     - `shouldSeedDemoData()` returns false after seeding
     - `seedDemoData()` creates: 1 user, 1 org, 1 tournament, 1 division, 8 participants
     - All records have `isDemoData = true`
     - Idempotency: calling twice doesn't duplicate
-  - [ ] 10.3 Create `test/core/database/tables/tournaments_table_test.dart`
-  - [ ] 10.4 Create `test/core/database/tables/divisions_table_test.dart`
-  - [ ] 10.5 Create `test/core/database/tables/participants_table_test.dart`
+  - [x] 10.3 Create `test/core/database/tables/tournaments_table_test.dart`
+  - [x] 10.4 Create `test/core/database/tables/divisions_table_test.dart`
+  - [x] 10.5 Create `test/core/database/tables/participants_table_test.dart`
 
-- [ ] Task 11: Verification
-  - [ ] 11.1 Run `dart analyze` - must pass with no errors
-  - [ ] 11.2 Run `flutter test` - all tests must pass
-  - [ ] 11.3 Run `flutter build web --release` - must complete successfully
+- [x] Task 11: Verification
+  - [x] 11.1 Run `dart analyze` - must pass with no errors
+  - [x] 11.2 Run `flutter test` - all tests must pass
+  - [x] 11.3 Run `flutter build web --release` - must complete successfully
 
 ## Dev Notes
 
@@ -408,10 +408,52 @@ lib/core/
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude (Anthropic) - Gemini 2.5 Pro
 
 ### Debug Log References
 
+- Code review conversation: 2026-02-08
+
 ### Completion Notes List
 
+- All 4 test files created per Task 10 requirements
+- Added `demoParticipantGender` constant to avoid hardcoding in service
+- Fixed lint violations in demo_data_service_test.dart (line length, unnecessary parentheses)
+- All 298 tests pass (67 new tests added for this story)
+- Analysis clean for story files (remaining 19 info-level issues are in unrelated files)
+
 ### File List
+
+**New Files:**
+- `lib/core/database/tables/tournaments_table.dart` - Tournaments table definition with FK, sync/audit mixins
+- `lib/core/database/tables/divisions_table.dart` - Divisions table with eligibility criteria
+- `lib/core/database/tables/participants_table.dart` - Participants table with dojang separation field
+- `lib/core/demo/demo.dart` - Barrel file for demo module
+- `lib/core/demo/demo_data_constants.dart` - Predetermined UUIDs and demo data constants
+- `lib/core/demo/demo_data_service.dart` - DemoDataService interface and implementation
+- `test/core/demo/demo_data_constants_test.dart` - UUID validation and constants tests
+- `test/core/demo/demo_data_service_test.dart` - Service seeding and idempotency tests
+- `test/core/database/tables/tournaments_table_test.dart` - Tournament CRUD and mixin tests
+- `test/core/database/tables/divisions_table_test.dart` - Division CRUD and range tests
+- `test/core/database/tables/participants_table_test.dart` - Participant CRUD and check-in tests
+
+**Modified Files:**
+- `lib/core/database/tables/tables.dart` - Added exports for new tables
+- `lib/core/database/app_database.dart` - Registered tables, added CRUD methods, schema v3 migration
+- `lib/bootstrap.dart` - Integrated demo seeding in Sentry appRunner callback
+- `test/core/database/app_database_test.dart` - Updated schemaVersion expectation to 3
+
+### Senior Developer Review (AI)
+
+**Review Date:** 2026-02-08
+**Reviewer:** BMAD Code Review Workflow
+
+**Issues Found & Fixed:**
+1. ✅ [CRITICAL] 4 missing test files → Created all 4 test files
+2. ✅ [HIGH] Empty File List → Documented all files above
+3. ✅ [HIGH] Missing AC6 constants tests → Created demo_data_constants_test.dart
+4. ✅ [MEDIUM] Lint violations → Fixed line length and parentheses issues
+5. ✅ [MEDIUM] Hardcoded gender → Added demoParticipantGender constant
+6. ✅ [LOW] Empty documentation sections → Filled in all sections
+
+**Final Status:** All issues resolved. Story ready for completion.

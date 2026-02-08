@@ -17,7 +17,14 @@ part 'app_database.g.dart';
 /// final orgs = await db.select(db.organizations).get();
 /// ```
 @lazySingleton
-@DriftDatabase(tables: [Organizations, Users, SyncQueueTable])
+@DriftDatabase(tables: [
+  Organizations,
+  Users,
+  SyncQueueTable,
+  Tournaments,
+  Divisions,
+  Participants,
+])
 class AppDatabase extends _$AppDatabase {
   /// Creates database with platform-appropriate connection.
   ///
@@ -29,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -41,6 +48,12 @@ class AppDatabase extends _$AppDatabase {
         // Version 2: Add sync_queue table for pending sync operations
         if (from < 2) {
           await m.createTable(syncQueueTable);
+        }
+        // Version 3: Add tournament-related tables for demo mode
+        if (from < 3) {
+          await m.createTable(tournaments);
+          await m.createTable(divisions);
+          await m.createTable(participants);
         }
       },
       beforeOpen: (details) async {
@@ -116,6 +129,11 @@ class AppDatabase extends _$AppDatabase {
         .get();
   }
 
+  /// Get all active users (for testing).
+  Future<List<UserEntry>> getActiveUsers() {
+    return (select(users)..where((u) => u.isDeleted.equals(false))).get();
+  }
+
   /// Get user by ID.
   Future<UserEntry?> getUserById(String id) {
     return (select(users)..where((u) => u.id.equals(id))).getSingleOrNull();
@@ -162,6 +180,183 @@ class AppDatabase extends _$AppDatabase {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
+  // Tournaments CRUD
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Get all active tournaments for an organization.
+  Future<List<TournamentEntry>> getTournamentsForOrganization(
+      String organizationId) {
+    return (select(tournaments)
+          ..where((t) => t.organizationId.equals(organizationId))
+          ..where((t) => t.isDeleted.equals(false))
+          ..orderBy([(t) => OrderingTerm.desc(t.scheduledDate)]))
+        .get();
+  }
+
+  /// Get tournament by ID.
+  Future<TournamentEntry?> getTournamentById(String id) {
+    return (select(tournaments)..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
+  }
+
+  /// Insert a new tournament.
+  Future<int> insertTournament(TournamentsCompanion tournament) {
+    return into(tournaments).insert(tournament);
+  }
+
+  /// Update a tournament and increment sync_version.
+  Future<bool> updateTournament(
+      String id, TournamentsCompanion tournament) async {
+    return transaction(() async {
+      final current = await getTournamentById(id);
+      if (current == null) return false;
+
+      final rows =
+          await (update(tournaments)..where((t) => t.id.equals(id))).write(
+        tournament.copyWith(
+          syncVersion: Value(current.syncVersion + 1),
+          updatedAtTimestamp: Value(DateTime.now()),
+        ),
+      );
+      return rows > 0;
+    });
+  }
+
+  /// Soft delete a tournament.
+  Future<bool> softDeleteTournament(String id) {
+    return (update(tournaments)..where((t) => t.id.equals(id)))
+        .write(TournamentsCompanion(
+          isDeleted: const Value(true),
+          deletedAtTimestamp: Value(DateTime.now()),
+          updatedAtTimestamp: Value(DateTime.now()),
+        ))
+        .then((rows) => rows > 0);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Divisions CRUD
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Get all active divisions for a tournament.
+  Future<List<DivisionEntry>> getDivisionsForTournament(String tournamentId) {
+    return (select(divisions)
+          ..where((d) => d.tournamentId.equals(tournamentId))
+          ..where((d) => d.isDeleted.equals(false))
+          ..orderBy([(d) => OrderingTerm.asc(d.displayOrder)]))
+        .get();
+  }
+
+  /// Get division by ID.
+  Future<DivisionEntry?> getDivisionById(String id) {
+    return (select(divisions)..where((d) => d.id.equals(id))).getSingleOrNull();
+  }
+
+  /// Insert a new division.
+  Future<int> insertDivision(DivisionsCompanion division) {
+    return into(divisions).insert(division);
+  }
+
+  /// Update a division and increment sync_version.
+  Future<bool> updateDivision(String id, DivisionsCompanion division) async {
+    return transaction(() async {
+      final current = await getDivisionById(id);
+      if (current == null) return false;
+
+      final rows =
+          await (update(divisions)..where((d) => d.id.equals(id))).write(
+        division.copyWith(
+          syncVersion: Value(current.syncVersion + 1),
+          updatedAtTimestamp: Value(DateTime.now()),
+        ),
+      );
+      return rows > 0;
+    });
+  }
+
+  /// Soft delete a division.
+  Future<bool> softDeleteDivision(String id) {
+    return (update(divisions)..where((d) => d.id.equals(id)))
+        .write(DivisionsCompanion(
+          isDeleted: const Value(true),
+          deletedAtTimestamp: Value(DateTime.now()),
+          updatedAtTimestamp: Value(DateTime.now()),
+        ))
+        .then((rows) => rows > 0);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Participants CRUD
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Get all active participants for a division.
+  Future<List<ParticipantEntry>> getParticipantsForDivision(String divisionId) {
+    return (select(participants)
+          ..where((p) => p.divisionId.equals(divisionId))
+          ..where((p) => p.isDeleted.equals(false))
+          ..orderBy([
+            (p) => OrderingTerm.asc(p.seedNumber),
+            (p) => OrderingTerm.asc(p.lastName),
+          ]))
+        .get();
+  }
+
+  /// Get participant by ID.
+  Future<ParticipantEntry?> getParticipantById(String id) {
+    return (select(participants)..where((p) => p.id.equals(id)))
+        .getSingleOrNull();
+  }
+
+  /// Insert a new participant.
+  Future<int> insertParticipant(ParticipantsCompanion participant) {
+    return into(participants).insert(participant);
+  }
+
+  /// Update a participant and increment sync_version.
+  Future<bool> updateParticipant(
+      String id, ParticipantsCompanion participant) async {
+    return transaction(() async {
+      final current = await getParticipantById(id);
+      if (current == null) return false;
+
+      final rows =
+          await (update(participants)..where((p) => p.id.equals(id))).write(
+        participant.copyWith(
+          syncVersion: Value(current.syncVersion + 1),
+          updatedAtTimestamp: Value(DateTime.now()),
+        ),
+      );
+      return rows > 0;
+    });
+  }
+
+  /// Soft delete a participant.
+  Future<bool> softDeleteParticipant(String id) {
+    return (update(participants)..where((p) => p.id.equals(id)))
+        .write(ParticipantsCompanion(
+          isDeleted: const Value(true),
+          deletedAtTimestamp: Value(DateTime.now()),
+          updatedAtTimestamp: Value(DateTime.now()),
+        ))
+        .then((rows) => rows > 0);
+  }
+
+  /// Get all active tournaments (for testing).
+  Future<List<TournamentEntry>> getActiveTournaments() {
+    return (select(tournaments)..where((t) => t.isDeleted.equals(false))).get();
+  }
+
+  /// Get all active divisions (for testing).
+  Future<List<DivisionEntry>> getActiveDivisions() {
+    return (select(divisions)..where((d) => d.isDeleted.equals(false))).get();
+  }
+
+  /// Get all active participants (for testing).
+  Future<List<ParticipantEntry>> getActiveParticipants() {
+    return (select(participants)..where((p) => p.isDeleted.equals(false)))
+        .get();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
   // Demo Data Operations
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -175,10 +370,13 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// Delete all demo data (for migration to production).
+  /// Deletes in reverse FK order to respect constraints.
   Future<void> clearDemoData() async {
+    await (delete(participants)..where((p) => p.isDemoData.equals(true))).go();
+    await (delete(divisions)..where((d) => d.isDemoData.equals(true))).go();
+    await (delete(tournaments)..where((t) => t.isDemoData.equals(true))).go();
     await (delete(users)..where((u) => u.isDemoData.equals(true))).go();
-    await (delete(organizations)..where((o) => o.isDemoData.equals(true)))
-        .go();
+    await (delete(organizations)..where((o) => o.isDemoData.equals(true))).go();
   }
 }
 
