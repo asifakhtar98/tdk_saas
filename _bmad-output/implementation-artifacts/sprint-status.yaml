@@ -67,8 +67,8 @@ development_status:
   # FRs: FR51-FR58
   # Dependencies: Epic 1 (Foundation)
   # ═══════════════════════════════════════════════════════════════════════════
-  epic-2: backlog
-  2-1-auth-feature-structure-and-domain-layer: backlog
+  epic-2: in-progress
+  2-1-auth-feature-structure-and-domain-layer: done
   2-2-user-entity-and-repository: backlog
   2-3-email-magic-link-sign-up: backlog
   2-4-email-magic-link-sign-in: backlog

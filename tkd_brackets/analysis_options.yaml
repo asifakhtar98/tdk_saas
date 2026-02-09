@@ -12,3 +12,4 @@ linter:
   rules:
     public_member_api_docs: false  # Disable for MVP velocity
     avoid_redundant_argument_values: false
+    one_member_abstracts: false  # UseCases have single call() method by design
