@@ -21,5 +21,9 @@ export 'domain/repositories/auth_repository.dart';
 export 'domain/repositories/user_repository.dart';
 
 // Domain - Use Cases
+export 'domain/usecases/sign_in_with_email_params.dart';
+export 'domain/usecases/sign_in_with_email_use_case.dart';
 export 'domain/usecases/sign_up_with_email_params.dart';
 export 'domain/usecases/sign_up_with_email_use_case.dart';
+export 'domain/usecases/verify_magic_link_params.dart';
+export 'domain/usecases/verify_magic_link_use_case.dart';

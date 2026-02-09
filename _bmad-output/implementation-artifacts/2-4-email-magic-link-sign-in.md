@@ -1,6 +1,6 @@
 # Story 2.4: Email Magic Link Sign In
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -12,14 +12,14 @@ Status: ready-for-dev
 
 ## Acceptance Criteria
 
-- [ ] **AC1**: `SignInWithEmailUseCase` exists in `domain/usecases/` and verifies OTP via `AuthRepository`
-- [ ] **AC2**: User session is established and persisted after successful OTP verification
-- [ ] **AC3**: User profile is fetched from Supabase and cached locally in Drift database
-- [ ] **AC4**: Error cases are handled: expired link, invalid token, user not found, network error
-- [ ] **AC5**: `Either<Failure, UserEntity>` is returned (success returns the authenticated user)
-- [ ] **AC6**: Unit tests verify sign-in flow (mocked Supabase)
-- [ ] **AC7**: `flutter analyze` passes with zero errors for auth feature
-- [ ] **AC8**: `dart run build_runner build` completes successfully
+- [x] **AC1**: `SignInWithEmailUseCase` exists in `domain/usecases/` and verifies OTP via `AuthRepository`
+- [x] **AC2**: User session is established and persisted after successful OTP verification
+- [x] **AC3**: User profile is fetched from Supabase and cached locally in Drift database
+- [x] **AC4**: Error cases are handled: expired link, invalid token, user not found, network error
+- [x] **AC5**: `Either<Failure, UserEntity>` is returned (success returns the authenticated user)
+- [x] **AC6**: Unit tests verify sign-in flow (mocked Supabase)
+- [x] **AC7**: `flutter analyze` passes with zero errors for auth feature
+- [x] **AC8**: `dart run build_runner build` completes successfully
 
 ---
 
