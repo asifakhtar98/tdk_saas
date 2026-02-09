@@ -26,12 +26,7 @@ Tournament bracket management for Taekwondo competitions with offline-first capa
    flutter run -d chrome -t lib/main_development.dart
    ```
 
-6. Test locally — Run with Supabase credentials:
-```bash
-flutter run -d chrome \
-  --dart-define=SUPABASE_URL=https://your-project.supabase.co \
-  --dart-define=SUPABASE_ANON_KEY=your-anon-key
-```
+
 
 ## Architecture
 
@@ -61,7 +56,9 @@ flutter test
 ### Building for Web
 
 ```bash
-flutter build web
+flutter build web -t lib/main_development.dart
+flutter build web -t lib/main_production.dart
+flutter build web -t lib/main_staging.dart
 ```
 
 ### Code Generation

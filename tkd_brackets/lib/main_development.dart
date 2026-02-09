@@ -1,10 +1,11 @@
 import 'package:tkd_brackets/bootstrap.dart';
+import 'package:tkd_brackets/core/config/env.dart';
 
 void main() {
   bootstrap(
     environment: 'development',
-    supabaseUrl: const String.fromEnvironment('SUPABASE_URL'),
-    supabaseAnonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
+    supabaseUrl: Env.supabaseUrl,
+    supabaseAnonKey: Env.supabaseAnonKey,
     // Empty string = Sentry disabled in development
     sentryDsn: '',
   );

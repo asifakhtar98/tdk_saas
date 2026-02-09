@@ -14,10 +14,7 @@
             "type": "dart",
             "program": "lib/main_development.dart",
             "args": [
-                "-d", "chrome",
-                "--dart-define=SUPABASE_URL=https://rxhowklmwzfwururzqon.supabase.co",
-                "--dart-define=SUPABASE_ANON_KEY=sb_publishable_7Ii5nmEzfL6diddK3rHHPQ_91GDOev_",
-                "--dart-define=SENTRY_DSN=https://a8a5b341b8336507726bc171af941ae9@o4510809303220224.ingest.us.sentry.io/4510809307480064"
+                "-d", "chrome"
             ]
         },
         // ============================================================
@@ -30,10 +27,7 @@
             "type": "dart",
             "program": "lib/main_staging.dart",
             "args": [
-                "-d", "chrome",
-                "--dart-define=SUPABASE_URL=https://rxhowklmwzfwururzqon.supabase.co",
-                "--dart-define=SUPABASE_ANON_KEY=sb_publishable_7Ii5nmEzfL6diddK3rHHPQ_91GDOev_",
-                "--dart-define=SENTRY_DSN=https://a8a5b341b8336507726bc171af941ae9@o4510809303220224.ingest.us.sentry.io/4510809307480064"
+                "-d", "chrome"
             ]
         },
         // ============================================================
@@ -46,10 +40,7 @@
             "type": "dart",
             "program": "lib/main_production.dart",
             "args": [
-                "-d", "chrome",
-                "--dart-define=SUPABASE_URL=https://rxhowklmwzfwururzqon.supabase.co",
-                "--dart-define=SUPABASE_ANON_KEY=sb_publishable_7Ii5nmEzfL6diddK3rHHPQ_91GDOev_",
-                "--dart-define=SENTRY_DSN=https://a8a5b341b8336507726bc171af941ae9@o4510809303220224.ingest.us.sentry.io/4510809307480064"
+                "-d", "chrome"
             ],
             "flutterMode": "release"
         },
@@ -64,10 +55,7 @@
             "program": "lib/main_development.dart",
             "flutterMode": "profile",
             "args": [
-                "-d", "chrome",
-                "--dart-define=SUPABASE_URL=https://rxhowklmwzfwururzqon.supabase.co",
-                "--dart-define=SUPABASE_ANON_KEY=sb_publishable_7Ii5nmEzfL6diddK3rHHPQ_91GDOev_",
-                "--dart-define=SENTRY_DSN=https://a8a5b341b8336507726bc171af941ae9@o4510809303220224.ingest.us.sentry.io/4510809307480064"
+                "-d", "chrome"
             ]
         },
         // ============================================================

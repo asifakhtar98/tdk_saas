@@ -51,7 +51,7 @@ class SupabaseConfig {
         url,
         'url',
         'Supabase URL cannot be empty. '
-            'Ensure --dart-define=SUPABASE_URL is provided.',
+            'Ensure .env has SUPABASE_URL defined.',
       );
     }
     if (anonKey.isEmpty) {
@@ -59,7 +59,7 @@ class SupabaseConfig {
         anonKey,
         'anonKey',
         'Supabase anon key cannot be empty. '
-            'Ensure --dart-define=SUPABASE_ANON_KEY is provided.',
+            'Ensure .env has SUPABASE_ANON_KEY is provided.',
       );
     }
 
@@ -102,7 +102,7 @@ class SupabaseConfig {
     if (!_initialized) {
       throw StateError(
         'SupabaseConfig.client accessed before initialization. '
-            'Call SupabaseConfig.initialize() first.',
+        'Call SupabaseConfig.initialize() first.',
       );
     }
     return Supabase.instance.client;
