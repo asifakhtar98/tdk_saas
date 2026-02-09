@@ -384,7 +384,11 @@ class AppDatabase extends _$AppDatabase {
 ///
 /// Uses drift_flutter for web support via sqlite3.wasm.
 QueryExecutor _openConnection() {
-  // Uses drift_flutter's default CDN behavior for web assets.
-  // sqlite3.wasm and drift_worker.js are automatically loaded from CDN.
-  return driftDatabase(name: 'tkd_brackets_db');
+  return driftDatabase(
+    name: 'tkd_brackets_db',
+    web: DriftWebOptions(
+      sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+      driftWorker: Uri.parse('drift_worker.dart.js'),
+    ),
+  );
 }

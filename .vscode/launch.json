@@ -1,0 +1,83 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        // ============================================================
+        // DEVELOPMENT (Quick Launch - Most Common)
+        // ============================================================
+        {
+            "name": "🚀 Dev (Chrome)",
+            "cwd": "tkd_brackets",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_development.dart",
+            "args": [
+                "-d", "chrome",
+                "--dart-define=SUPABASE_URL=https://rxhowklmwzfwururzqon.supabase.co",
+                "--dart-define=SUPABASE_ANON_KEY=sb_publishable_7Ii5nmEzfL6diddK3rHHPQ_91GDOev_",
+                "--dart-define=SENTRY_DSN=https://a8a5b341b8336507726bc171af941ae9@o4510809303220224.ingest.us.sentry.io/4510809307480064"
+            ]
+        },
+        // ============================================================
+        // STAGING
+        // ============================================================
+        {
+            "name": "🧪 Staging (Chrome)",
+            "cwd": "tkd_brackets",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_staging.dart",
+            "args": [
+                "-d", "chrome",
+                "--dart-define=SUPABASE_URL=https://rxhowklmwzfwururzqon.supabase.co",
+                "--dart-define=SUPABASE_ANON_KEY=sb_publishable_7Ii5nmEzfL6diddK3rHHPQ_91GDOev_",
+                "--dart-define=SENTRY_DSN=https://a8a5b341b8336507726bc171af941ae9@o4510809303220224.ingest.us.sentry.io/4510809307480064"
+            ]
+        },
+        // ============================================================
+        // PRODUCTION
+        // ============================================================
+        {
+            "name": "🏭 Production (Chrome)",
+            "cwd": "tkd_brackets",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_production.dart",
+            "args": [
+                "-d", "chrome",
+                "--dart-define=SUPABASE_URL=https://rxhowklmwzfwururzqon.supabase.co",
+                "--dart-define=SUPABASE_ANON_KEY=sb_publishable_7Ii5nmEzfL6diddK3rHHPQ_91GDOev_",
+                "--dart-define=SENTRY_DSN=https://a8a5b341b8336507726bc171af941ae9@o4510809303220224.ingest.us.sentry.io/4510809307480064"
+            ],
+            "flutterMode": "release"
+        },
+        // ============================================================
+        // PROFILE MODE (Performance Testing)
+        // ============================================================
+        {
+            "name": "📊 Profile (Chrome)",
+            "cwd": "tkd_brackets",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_development.dart",
+            "flutterMode": "profile",
+            "args": [
+                "-d", "chrome",
+                "--dart-define=SUPABASE_URL=https://rxhowklmwzfwururzqon.supabase.co",
+                "--dart-define=SUPABASE_ANON_KEY=sb_publishable_7Ii5nmEzfL6diddK3rHHPQ_91GDOev_",
+                "--dart-define=SENTRY_DSN=https://a8a5b341b8336507726bc171af941ae9@o4510809303220224.ingest.us.sentry.io/4510809307480064"
+            ]
+        },
+        // ============================================================
+        // ATTACH MODE (Connect to Running App)
+        // ============================================================
+        {
+            "name": "🔌 Attach to Flutter",
+            "cwd": "tkd_brackets",
+            "request": "attach",
+            "type": "dart"
+        }
+    ]
+}
