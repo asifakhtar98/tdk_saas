@@ -71,7 +71,7 @@ development_status:
   2-1-auth-feature-structure-and-domain-layer: done
   2-2-user-entity-and-repository: done
   2-3-email-magic-link-sign-up: done
-  2-4-email-magic-link-sign-in: backlog
+  2-4-email-magic-link-sign-in: ready-for-dev
   2-5-auth-state-management-authbloc: backlog
   2-6-organization-entity-and-repository: backlog
   2-7-create-organization-use-case: backlog
