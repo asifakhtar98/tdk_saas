@@ -19,7 +19,7 @@ import 'package:tkd_brackets/features/auth/domain/usecases/verify_magic_link_par
 /// - Session establishment
 /// - User profile fetching
 /// - Local caching
-/// - lastLoginAt update
+/// - lastSignInAt update
 @injectable
 class VerifyMagicLinkUseCase
     extends UseCase<UserEntity, VerifyMagicLinkParams> {

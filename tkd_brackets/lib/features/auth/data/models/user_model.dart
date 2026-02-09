@@ -76,7 +76,7 @@ class UserModel with _$UserModel {
       role: entity.role.value,
       avatarUrl: entity.avatarUrl,
       isActive: entity.isActive,
-      lastSignInAtTimestamp: entity.lastLoginAt,
+      lastSignInAtTimestamp: entity.lastSignInAt,
       createdAtTimestamp: entity.createdAt,
       updatedAtTimestamp: updatedAtTimestamp ?? now,
       syncVersion: syncVersion,
@@ -112,7 +112,7 @@ class UserModel with _$UserModel {
       role: UserRole.fromString(role),
       avatarUrl: avatarUrl,
       isActive: isActive,
-      lastLoginAt: lastSignInAtTimestamp,
+      lastSignInAt: lastSignInAtTimestamp,
       createdAt: createdAtTimestamp,
     );
   }

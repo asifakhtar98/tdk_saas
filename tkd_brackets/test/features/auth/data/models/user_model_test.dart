@@ -25,7 +25,7 @@ void main() {
       expect(entity.id, 'test-id');
       expect(entity.email, 'test@example.com');
       expect(entity.role, UserRole.admin);
-      expect(entity.lastLoginAt, DateTime(2024, 1, 15));
+      expect(entity.lastSignInAt, DateTime(2024, 1, 15));
     });
 
     test('converts from entity correctly', () {

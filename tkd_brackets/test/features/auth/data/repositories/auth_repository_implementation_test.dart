@@ -498,7 +498,7 @@ void main() {
         // Assert
         expect(result.isLeft(), isTrue);
         result.fold(
-          (failure) => expect(failure, isA<MagicLinkSendFailure>()),
+          (failure) => expect(failure, isA<SignOutFailure>()),
           (_) => fail('Expected Left'),
         );
       });

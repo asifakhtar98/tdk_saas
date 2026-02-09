@@ -26,7 +26,7 @@ void main() {
     role: UserRole.owner,
     isActive: true,
     createdAt: DateTime.now(),
-    lastLoginAt: DateTime.now(),
+    lastSignInAt: DateTime.now(),
   );
 
   group('VerifyMagicLinkUseCase', () {
@@ -71,6 +71,21 @@ void main() {
         // Act
         final result = await useCase(
           const VerifyMagicLinkParams(email: validEmail, token: emptyToken),
+        );
+
+        // Assert
+        expect(result.isLeft(), isTrue);
+        result.fold(
+          (failure) => expect(failure, isA<InvalidTokenFailure>()),
+          (_) => fail('Expected Left'),
+        );
+        verifyZeroInteractions(mockAuthRepository);
+      });
+
+      test('returns InvalidTokenFailure for whitespace-only token', () async {
+        // Act
+        final result = await useCase(
+          const VerifyMagicLinkParams(email: validEmail, token: '   '),
         );
 
         // Assert

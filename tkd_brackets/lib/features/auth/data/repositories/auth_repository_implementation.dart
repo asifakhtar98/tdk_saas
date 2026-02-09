@@ -121,7 +121,7 @@ class AuthRepositoryImplementation implements AuthRepository {
         userModel = await _userRemoteDatasource.insertUser(newUser);
       } else {
         // Existing user: Update lastSignInAtTimestamp
-        // NOTE: Field is lastSignInAtTimestamp, NOT lastLoginAt
+        // Update lastSignInAtTimestamp for existing user
         userModel = existingUser.copyWith(
           lastSignInAtTimestamp: DateTime.now(),
           updatedAtTimestamp: DateTime.now(),
@@ -225,7 +225,11 @@ class AuthRepositoryImplementation implements AuthRepository {
       await _authDatasource.signOut();
       return const Right(unit);
     } on AuthException catch (e) {
-      return Left(_mapAuthException(e));
+      return Left(
+        SignOutFailure(
+          technicalDetails: 'AuthException: ${e.message}',
+        ),
+      );
     } on Exception catch (e) {
       return Left(
         ServerConnectionFailure(

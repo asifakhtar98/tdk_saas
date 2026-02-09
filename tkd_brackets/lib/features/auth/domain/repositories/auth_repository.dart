@@ -40,7 +40,7 @@ abstract class AuthRepository {
   /// 2. Establishes the user session
   /// 3. Fetches user profile from Supabase
   /// 4. Caches user locally
-  /// 5. Updates lastLoginAt
+  /// 5. Updates lastSignInAt
   ///
   /// Returns:
   /// - [Right(UserEntity)] on success - authenticated user

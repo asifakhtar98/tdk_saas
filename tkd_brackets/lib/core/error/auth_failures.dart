@@ -59,3 +59,11 @@ class OtpVerificationFailure extends Failure {
     super.technicalDetails,
   });
 }
+
+/// Failure when sign-out operation fails.
+class SignOutFailure extends Failure {
+  const SignOutFailure({
+    super.userFriendlyMessage = 'Unable to sign out. Please try again.',
+    super.technicalDetails,
+  });
+}

@@ -33,8 +33,8 @@ class UserEntity with _$UserEntity {
     /// Optional avatar URL.
     String? avatarUrl,
 
-    /// Last successful login timestamp.
-    DateTime? lastLoginAt,
+    /// Last successful sign-in timestamp.
+    DateTime? lastSignInAt,
   }) = _UserEntity;
 }
 
