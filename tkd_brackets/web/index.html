@@ -1,39 +1,172 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
-
   <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Tournament bracket management for Taekwondo">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  
+  <!-- SEO Meta Tags -->
+  <title>TKD Brackets - Tournament Bracket Maker for Taekwondo</title>
+  <meta name="description" content="Create professional tournament brackets for Taekwondo competitions. Smart Division Builder, WT/ITF/ATA templates, dojang separation seeding, and instant PDF export. Free to use.">
+  <meta name="keywords" content="taekwondo, tournament brackets, bracket maker, sparring tournament, poomsae, WT, ITF, ATA, martial arts, competition, dojang">
+  <meta name="author" content="TKD Brackets">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="TKD Brackets - Tournament Bracket Maker for Taekwondo">
+  <meta property="og:description" content="Create professional tournament brackets in minutes. Free for small tournaments.">
+  <meta property="og:image" content="icons/Icon-512.png">
+  
+  <!-- Theme & Icons -->
   <meta name="theme-color" content="#1E3A5F">
-
-  <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="TKD Brackets">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>TKD Brackets</title>
   <link rel="manifest" href="manifest.json">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Landing Page Styles -->
+  <link rel="stylesheet" href="landing.css">
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "TKD Brackets",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "Web Browser",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Tournament bracket management software for Taekwondo competitions."
+  }
+  </script>
 </head>
-<body>
-  <script src="flutter_bootstrap.js" async></script>
+<body class="landing-page">
+  <!-- Background -->
+  <div class="bg-animation"></div>
+  
+  <!-- Landing Page -->
+  <div class="landing-container" id="landing-container">
+    
+    <!-- Header -->
+    <header class="landing-header">
+      <a href="#" class="logo">
+        <div class="logo-icon">🥋</div>
+        <span>TKD Brackets</span>
+      </a>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-text">
+          <div class="hero-badge">🏆 Built for Taekwondo</div>
+          <h1 class="hero-title">
+            Create Tournament Brackets in <span>Minutes, Not Hours</span>
+          </h1>
+          <p class="hero-subtitle">
+            The only bracket maker designed specifically for Taekwondo. Smart Division Builder for age, belt, and weight classes. Dojang separation seeding. WT, ITF, and ATA templates built-in.
+          </p>
+          <button onclick="launchApp()" class="btn btn-cta" id="hero-cta-btn">
+            Get Started — It's Free
+          </button>
+        </div>
+        <div class="hero-visual">
+          <div class="bracket-preview">
+            <div class="bracket-header">
+              <span class="bracket-title">Juniors -45kg Sparring</span>
+              <span class="bracket-badge">Live</span>
+            </div>
+            <div class="bracket-mockup">
+              <div class="bracket-round">
+                <div class="bracket-match">
+                  <div class="match-player winner">
+                    <span>J. Kim</span>
+                    <span class="match-score">12</span>
+                  </div>
+                  <div class="match-player">
+                    <span>M. Park</span>
+                    <span class="match-score">8</span>
+                  </div>
+                </div>
+                <div class="bracket-match">
+                  <div class="match-player">
+                    <span>S. Lee</span>
+                    <span class="match-score">6</span>
+                  </div>
+                  <div class="match-player winner">
+                    <span>D. Cho</span>
+                    <span class="match-score">9</span>
+                  </div>
+                </div>
+              </div>
+              <div class="bracket-round" style="margin-top: 2rem;">
+                <div class="bracket-match">
+                  <div class="match-player">
+                    <span>J. Kim</span>
+                    <span class="match-score">—</span>
+                  </div>
+                  <div class="match-player">
+                    <span>D. Cho</span>
+                    <span class="match-score">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+  </div>
+  
+  <!-- Loading Overlay -->
+  <div class="flutter-loading" id="flutter-loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading TKD Brackets...</div>
+  </div>
+  
+  <script>
+    let appRequested = false;
+    
+    function launchApp() {
+      if (appRequested) return;
+      appRequested = true;
+      document.getElementById('flutter-loading').classList.add('active');
+      
+      const script = document.createElement('script');
+      script.src = 'flutter_bootstrap.js';
+      script.onerror = function() {
+        document.getElementById('flutter-loading').innerHTML = `
+          <div style="text-align: center; color: #F87171;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+            <div>Failed to load. Please refresh and try again.</div>
+            <button onclick="location.reload()" class="btn btn-cta" style="margin-top: 1.5rem;">Refresh</button>
+          </div>
+        `;
+      };
+      document.body.appendChild(script);
+    }
+    
+    window.addEventListener('flutter-initialized', function() {
+      document.body.classList.add('flutter-loaded');
+    });
+    
+    window.addEventListener('flutter-first-frame', function() {
+      document.body.classList.add('flutter-loaded');
+    });
+    
+    if (window.location.hash === '#app' || window.location.search.includes('launch=true')) {
+      launchApp();
+    }
+  </script>
 </body>
 </html>
