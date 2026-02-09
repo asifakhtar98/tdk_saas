@@ -230,8 +230,66 @@ lib/
 └── database/
     ├── app_database.dart
     ├── app_database.g.dart
-    └── tables/
 ```
+
+**🚨 CRITICAL: Clean Architecture Layer Dependency Rules:**
+
+The following dependency rules MUST be enforced. Violations cause tight coupling and testability issues.
+
+| Layer            | Can Depend On            | CANNOT Depend On                  |
+| ---------------- | ------------------------ | --------------------------------- |
+| **Presentation** | Domain                   | Data                              |
+| **Domain**       | Nothing (core only)      | Data, Presentation, External SDKs |
+| **Data**         | Domain (interfaces only) | Presentation                      |
+
+**Domain Layer Isolation Rules:**
+
+1. **Use Cases depend on Repository INTERFACES (domain), NOT Datasources (data)**
+   - ✅ `UseCase → AuthRepository` (interface in `domain/repositories/`)
+   - ❌ `UseCase → SupabaseAuthDatasource` (implementation in `data/datasources/`)
+
+2. **Domain layer MUST NOT import infrastructure/framework packages**
+   - ❌ `import 'package:supabase_flutter/supabase_flutter.dart'` in domain
+   - ❌ `import 'package:drift/drift.dart'` in domain
+   - ❌ Catching `AuthException`, `PostgrestException` in domain
+   - ✅ Domain only uses: `fpdart`, `freezed`, `equatable`, core Dart/Flutter
+
+3. **Exception → Failure mapping happens in DATA layer, not Domain**
+   - Repository implementations (data) catch infrastructure exceptions
+   - Repository implementations map exceptions to domain `Failure` types
+   - Use cases receive already-mapped `Either<Failure, T>` from repositories
+
+**Correct Dependency Flow:**
+```
+Presentation (BLoC)
+      ↓ depends on
+Domain (UseCase → Repository Interface)
+      ↑ implements
+Data (RepositoryImpl → Datasource → Supabase/Drift)
+```
+
+**Example - Correct vs Incorrect Structure:**
+```dart
+// ✅ CORRECT: Use case depends on domain repository interface
+// domain/usecases/create_entity_use_case.dart
+class CreateEntityUseCase extends UseCase<Entity, CreateEntityParams> {
+  CreateEntityUseCase(this._repository); // Domain interface
+  final EntityRepository _repository;   // from domain/repositories/
+  
+  @override
+  Future<Either<Failure, Entity>> call(CreateEntityParams params) async {
+    // Domain logic only - no infrastructure concerns
+    return _repository.create(params);
+  }
+}
+
+// ❌ WRONG: Use case depends on data layer datasource
+class CreateEntityUseCase extends UseCase<Entity, CreateEntityParams> {
+  final EntityRemoteDatasource _datasource; // Data layer - WRONG!
+  // Catching AuthException/PostgrestException here - infrastructure leak!
+}
+```
+
 
 **Build Configuration (`.build.yaml`):**
 
