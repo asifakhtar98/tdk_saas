@@ -30,6 +30,7 @@ Key FR clusters requiring significant architectural attention:
 - **Offline Sync (FR65-69)**: Full offline capability with conflict resolution
 - **Scoring System (FR32-39)**: Real-time updates, undo/redo, audit trail
 - **Multi-Ring (FR40-44)**: Concurrent multi-user access
+- **Landing Page**: Lightweight HTML entry point for SEO and deferred app loading
 
 **Non-Functional Requirements:**
 Performance, reliability, and offline capability are the driving NFRs:

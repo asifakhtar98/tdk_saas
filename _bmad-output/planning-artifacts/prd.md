@@ -137,6 +137,7 @@ classification:
 | **Auth**              | Email OTP/Magic link sign-in (Supabase Auth)                                              |
 | **Account**           | Save brackets, Private/public toggle                                                      |
 | **Limits**            | Free: 3 active brackets, 32 participants/bracket, 2 tournaments/month                     |
+| **Landing Page**      | Lightweight HTML entry page for SEO with deferred app loading                             |
 
 ### Growth Features (Post-MVP)
 
