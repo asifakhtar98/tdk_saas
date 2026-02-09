@@ -105,6 +105,8 @@ Performance, reliability, and offline capability are the driving NFRs:
 | **Local Database**   | `drift`                           | Type-safe SQLite for offline-first            |
 | **Error Handling**   | `fpdart`                          | Functional Either<Failure, T> pattern         |
 | **Architecture**     | Clean Architecture                | 3-layer separation (data/domain/presentation) |
+| **Data Classes**     | `freezed`                         | Immutable data, unions, pattern matching      |
+| **Serialization**    | `json_serializable`               | JSON serialization (via freezed)              |
 
 ### Starter Options Considered
 
@@ -546,6 +548,16 @@ Future<void> main() async {
 
 15 potential conflict areas where AI agents could make different choices have been standardized.
 
+### State Management & Data Class Rules
+
+| Requirement          | Implementation Rule                                              |
+| -------------------- | ---------------------------------------------------------------- |
+| **Data Classes**     | MUST use `freezed` for all Models, BLoC Events, and States       |
+| **Pattern Matching** | MUST use `freezed` union types/sealed classes                    |
+| **Value Equality**   | Use `freezed` generated equality. Do NOT use `Equatable`.        |
+| **JSON**             | Use `json_serializable` integration via `freezed`                |
+| **Entities**         | `freezed` is preferred, but PODO with `Equatable` is acceptable. |
+
 ### Naming Patterns
 
 #### Database Naming Conventions (Supabase/PostgreSQL)
@@ -658,24 +670,23 @@ test/
 
 ```dart
 // models/tournament_model.dart
-class TournamentModel {
-  final String id;
-  final String name;
-  final DateTime createdAtTimestamp;
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/foundation.dart';
+
+part 'tournament_model.freezed.dart';
+part 'tournament_model.g.dart';
+
+@freezed
+class TournamentModel with _$TournamentModel {
+  const TournamentModel._(); // Allow methods
+
+  const factory TournamentModel({
+    required String id,
+    required String name,
+    @JsonKey(name: 'created_at_timestamp') required DateTime createdAtTimestamp,
+  }) = _TournamentModel;
   
-  factory TournamentModel.fromJson(Map<String, dynamic> json) {
-    return TournamentModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      createdAtTimestamp: DateTime.parse(json['created_at_timestamp'] as String),
-    );
-  }
-  
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'created_at_timestamp': createdAtTimestamp.toIso8601String(),
-  };
+  factory TournamentModel.fromJson(Map<String, dynamic> json) => _$TournamentModelFromJson(json);
   
   TournamentEntity convertToEntity() {
     return TournamentEntity(
@@ -701,37 +712,22 @@ class TournamentModel {
 
 ```dart
 // presentation/bloc/tournament_management_event.dart
-abstract class TournamentManagementEvent extends Equatable {
-  const TournamentManagementEvent();
-}
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class TournamentListLoadRequested extends TournamentManagementEvent {
-  const TournamentListLoadRequested();
-  
-  @override
-  List<Object?> get props => [];
-}
+part 'tournament_management_event.freezed.dart';
 
-class TournamentCreationRequested extends TournamentManagementEvent {
-  final String name;
-  final DateTime scheduledDate;
+@freezed
+class TournamentManagementEvent with _$TournamentManagementEvent {
+  const factory TournamentManagementEvent.listLoadRequested() = TournamentListLoadRequested;
   
-  const TournamentCreationRequested({
-    required this.name,
-    required this.scheduledDate,
-  });
+  const factory TournamentManagementEvent.creationRequested({
+    required String name,
+    required DateTime scheduledDate,
+  }) = TournamentCreationRequested;
   
-  @override
-  List<Object?> get props => [name, scheduledDate];
-}
-
-class TournamentDeletionRequested extends TournamentManagementEvent {
-  final String tournamentId;
-  
-  const TournamentDeletionRequested({required this.tournamentId});
-  
-  @override
-  List<Object?> get props => [tournamentId];
+  const factory TournamentManagementEvent.deletionRequested({
+    required String tournamentId,
+  }) = TournamentDeletionRequested;
 }
 ```
 
@@ -739,40 +735,16 @@ class TournamentDeletionRequested extends TournamentManagementEvent {
 
 ```dart
 // presentation/bloc/tournament_management_state.dart
-abstract class TournamentManagementState extends Equatable {
-  const TournamentManagementState();
-}
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class TournamentManagementInitial extends TournamentManagementState {
-  const TournamentManagementInitial();
-  
-  @override
-  List<Object?> get props => [];
-}
+part 'tournament_management_state.freezed.dart';
 
-class TournamentListLoadInProgress extends TournamentManagementState {
-  const TournamentListLoadInProgress();
-  
-  @override
-  List<Object?> get props => [];
-}
-
-class TournamentListLoadSuccess extends TournamentManagementState {
-  final List<TournamentEntity> tournaments;
-  
-  const TournamentListLoadSuccess({required this.tournaments});
-  
-  @override
-  List<Object?> get props => [tournaments];
-}
-
-class TournamentListLoadFailure extends TournamentManagementState {
-  final Failure failure;
-  
-  const TournamentListLoadFailure({required this.failure});
-  
-  @override
-  List<Object?> get props => [failure];
+@freezed
+class TournamentManagementState with _$TournamentManagementState {
+  const factory TournamentManagementState.initial() = TournamentManagementInitial;
+  const factory TournamentManagementState.loadInProgress() = TournamentListLoadInProgress;
+  const factory TournamentManagementState.loadSuccess(List<TournamentEntity> tournaments) = TournamentListLoadSuccess;
+  const factory TournamentManagementState.loadFailure(Failure failure) = TournamentListLoadFailure;
 }
 ```
 

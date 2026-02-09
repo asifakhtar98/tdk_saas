@@ -60,7 +60,7 @@ class UserModel with _$UserModel {
   }
 
   /// Create [UserModel] from domain [UserEntity].
-  factory UserModel.fromEntity(
+  factory UserModel.convertFromEntity(
     UserEntity entity, {
     int syncVersion = 1,
     bool isDeleted = false,
@@ -103,7 +103,7 @@ class UserModel with _$UserModel {
   }
 
   /// Convert [UserModel] to domain [UserEntity].
-  UserEntity toEntity() {
+  UserEntity convertToEntity() {
     return UserEntity(
       id: id,
       email: email,

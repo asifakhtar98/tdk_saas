@@ -20,7 +20,7 @@ void main() {
     );
 
     test('converts to entity correctly', () {
-      final entity = testModel.toEntity();
+      final entity = testModel.convertToEntity();
 
       expect(entity.id, 'test-id');
       expect(entity.email, 'test@example.com');
@@ -39,7 +39,7 @@ void main() {
         createdAt: DateTime(2024, 2, 1),
       );
 
-      final model = UserModel.fromEntity(entity);
+      final model = UserModel.convertFromEntity(entity);
 
       expect(model.id, 'entity-id');
       expect(model.role, 'scorer');
@@ -79,7 +79,7 @@ void main() {
       expect(json['sync_version'], 1);
     });
 
-    test('fromEntity with custom sync version', () {
+    test('convertFromEntity with custom sync version', () {
       final entity = UserEntity(
         id: 'entity-id',
         email: 'entity@example.com',
@@ -90,7 +90,7 @@ void main() {
         createdAt: DateTime(2024, 2, 1),
       );
 
-      final model = UserModel.fromEntity(entity, syncVersion: 5);
+      final model = UserModel.convertFromEntity(entity, syncVersion: 5);
 
       expect(model.syncVersion, 5);
     });

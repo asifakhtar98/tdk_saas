@@ -15,7 +15,7 @@
 - [x] **AC3**: `UserRepository` interface exists in `domain/repositories/`
 - [x] **AC4**: `UserRepositoryImplementation` implements local (Drift) and remote (Supabase) operations
 - [x] **AC5**: `UserModel` handles JSON serialization and entity conversion
-- [x] **AC6**: Unit tests verify CRUD operations (mocked datasources) - 32 auth tests passing
+- [x] **AC6**: Unit tests verify CRUD operations (mocked datasources) - 49 auth tests passing
 - [x] **AC7**: `flutter analyze` passes with zero errors for auth feature
 - [x] **AC8**: `dart run build_runner build` completes successfully
 
@@ -1265,6 +1265,46 @@ import 'package:drift/drift.dart' hide JsonKey;
 
 ---
 
+## File List
+
+### Created Files
+
+| File Path                                                                       | Purpose                                      |
+| ------------------------------------------------------------------------------- | -------------------------------------------- |
+| `lib/features/auth/domain/entities/user_entity.dart`                            | Immutable domain entity using freezed        |
+| `lib/features/auth/domain/repositories/user_repository.dart`                    | Abstract repository interface                |
+| `lib/features/auth/data/models/user_model.dart`                                 | Data model with JSON/Drift/Entity conversion |
+| `lib/features/auth/data/datasources/user_local_datasource.dart`                 | Local Drift database wrapper                 |
+| `lib/features/auth/data/datasources/user_remote_datasource.dart`                | Remote Supabase operations                   |
+| `lib/features/auth/data/repositories/user_repository_implementation.dart`       | Offline-first repository implementation      |
+| `test/features/auth/domain/entities/user_entity_test.dart`                      | UserEntity unit tests                        |
+| `test/features/auth/data/models/user_model_test.dart`                           | UserModel conversion tests                   |
+| `test/features/auth/data/repositories/user_repository_implementation_test.dart` | Repository offline-first logic tests         |
+| `test/features/auth/data/datasources/user_local_datasource_test.dart`           | Local datasource tests                       |
+| `test/features/auth/data/datasources/user_remote_datasource_test.dart`          | Remote datasource tests                      |
+
+### Modified Files
+
+| File Path                     | Changes                                 |
+| ----------------------------- | --------------------------------------- |
+| `lib/features/auth/auth.dart` | Added barrel exports for new components |
+| `pubspec.yaml`                | Updated freezed/json dependencies       |
+| `analysis_options.yaml`       | No functional changes                   |
+
+---
+
+## Change Log
+
+| Date       | Change                                                                                                                                        |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-02-09 | Initial implementation of all tasks                                                                                                           |
+| 2026-02-09 | Code review fix: Renamed `toEntity()` → `convertToEntity()` and `fromEntity()` → `convertFromEntity()` per architecture.md naming conventions |
+| 2026-02-09 | Code review fix: Added missing datasource tests (user_local_datasource_test.dart, user_remote_datasource_test.dart)                           |
+| 2026-02-09 | Code review fix: Added missing getCurrentUser and watchCurrentUser tests                                                                      |
+| 2026-02-09 | Total tests now: 49 (up from 32)                                                                                                              |
+
+---
+
 ## Agent Record
 
 | Field        | Value                                 |
@@ -1272,6 +1312,7 @@ import 'package:drift/drift.dart' hide JsonKey;
 | Created By   | create-story workflow                 |
 | Created At   | 2026-02-09                            |
 | Completed At | 2026-02-09                            |
+| Reviewed At  | 2026-02-09                            |
 | Source Epic  | Epic 2: Authentication & Organization |
 | Story Points | 3                                     |
 

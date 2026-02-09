@@ -31,7 +31,7 @@ class UserRepositoryImplementation implements UserRepository {
       // Try local first
       final localUser = await _localDatasource.getUserById(id);
       if (localUser != null) {
-        return Right(localUser.toEntity());
+        return Right(localUser.convertToEntity());
       }
 
       // Fallback to remote if online
@@ -40,7 +40,7 @@ class UserRepositoryImplementation implements UserRepository {
         if (remoteUser != null) {
           // Cache locally
           await _localDatasource.insertUser(remoteUser);
-          return Right(remoteUser.toEntity());
+          return Right(remoteUser.convertToEntity());
         }
       }
 
@@ -67,7 +67,7 @@ class UserRepositoryImplementation implements UserRepository {
       // Try local first
       final localUser = await _localDatasource.getUserByEmail(email);
       if (localUser != null) {
-        return Right(localUser.toEntity());
+        return Right(localUser.convertToEntity());
       }
 
       // Fallback to remote if online
@@ -76,7 +76,7 @@ class UserRepositoryImplementation implements UserRepository {
         if (remoteUser != null) {
           // Cache locally
           await _localDatasource.insertUser(remoteUser);
-          return Right(remoteUser.toEntity());
+          return Right(remoteUser.convertToEntity());
         }
       }
 
@@ -126,7 +126,7 @@ class UserRepositoryImplementation implements UserRepository {
         }
       }
 
-      return Right(users.map((m) => m.toEntity()).toList());
+      return Right(users.map((m) => m.convertToEntity()).toList());
     } on Exception catch (e) {
       return Left(
         LocalCacheAccessFailure(
@@ -140,7 +140,7 @@ class UserRepositoryImplementation implements UserRepository {
   @override
   Future<Either<Failure, UserEntity>> createUser(UserEntity user) async {
     try {
-      final model = UserModel.fromEntity(user);
+      final model = UserModel.convertFromEntity(user);
 
       // Always save locally first
       await _localDatasource.insertUser(model);
@@ -172,7 +172,7 @@ class UserRepositoryImplementation implements UserRepository {
       final existing = await _localDatasource.getUserById(user.id);
       final newSyncVersion = (existing?.syncVersion ?? 0) + 1;
 
-      final model = UserModel.fromEntity(
+      final model = UserModel.convertFromEntity(
         user,
         syncVersion: newSyncVersion,
         updatedAtTimestamp: DateTime.now(),

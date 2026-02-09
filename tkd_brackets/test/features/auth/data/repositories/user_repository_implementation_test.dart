@@ -2,12 +2,15 @@
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tkd_brackets/core/network/connectivity_service.dart';
 import 'package:tkd_brackets/features/auth/data/datasources/user_local_datasource.dart';
 import 'package:tkd_brackets/features/auth/data/datasources/user_remote_datasource.dart';
 import 'package:tkd_brackets/features/auth/data/models/user_model.dart';
 import 'package:tkd_brackets/features/auth/data/repositories/user_repository_implementation.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 
 class MockUserLocalDatasource extends Mock implements UserLocalDatasource {}
 
@@ -147,7 +150,7 @@ void main() {
       when(() => mockRemoteDatasource.insertUser(any()))
           .thenAnswer((_) async => testModel);
 
-      final entity = testModel.toEntity();
+      final entity = testModel.convertToEntity();
       final result = await repository.createUser(entity);
 
       expect(result.isRight(), true);
@@ -161,7 +164,7 @@ void main() {
       when(() => mockConnectivityService.hasInternetConnection())
           .thenAnswer((_) async => false);
 
-      final entity = testModel.toEntity();
+      final entity = testModel.convertToEntity();
       final result = await repository.createUser(entity);
 
       expect(result.isRight(), true);
@@ -181,7 +184,7 @@ void main() {
       when(() => mockRemoteDatasource.updateUser(any()))
           .thenAnswer((_) async => testModel);
 
-      final entity = testModel.toEntity();
+      final entity = testModel.convertToEntity();
       final result = await repository.updateUser(entity);
 
       expect(result.isRight(), true);
@@ -197,7 +200,7 @@ void main() {
       when(() => mockConnectivityService.hasInternetConnection())
           .thenAnswer((_) async => false);
 
-      final entity = testModel.toEntity();
+      final entity = testModel.convertToEntity();
       await repository.updateUser(entity);
 
       final captured =
@@ -272,6 +275,102 @@ void main() {
       result.fold(
         (failure) => fail('Expected Right'),
         (users) => expect(users.length, 1),
+      );
+    });
+  });
+
+  group('getCurrentUser', () {
+    final mockUser = User(
+      id: 'test-id',
+      appMetadata: const {},
+      userMetadata: const {},
+      aud: 'authenticated',
+      createdAt: '2024-01-01T00:00:00.000Z',
+    );
+
+    test('returns user from local when auth user exists and local has data',
+        () async {
+      when(() => mockRemoteDatasource.currentAuthUser).thenReturn(mockUser);
+      when(() => mockLocalDatasource.getUserById('test-id'))
+          .thenAnswer((_) async => testModel);
+
+      final result = await repository.getCurrentUser();
+
+      expect(result.isRight(), true);
+      result.fold(
+        (failure) => fail('Expected Right'),
+        (user) => expect(user.id, 'test-id'),
+      );
+    });
+
+    test('returns failure when no auth user', () async {
+      when(() => mockRemoteDatasource.currentAuthUser).thenReturn(null);
+
+      final result = await repository.getCurrentUser();
+
+      expect(result.isLeft(), true);
+    });
+
+    test('fetches from remote when local returns null', () async {
+      when(() => mockRemoteDatasource.currentAuthUser).thenReturn(mockUser);
+      when(() => mockLocalDatasource.getUserById('test-id'))
+          .thenAnswer((_) async => null);
+      when(() => mockConnectivityService.hasInternetConnection())
+          .thenAnswer((_) async => true);
+      when(() => mockRemoteDatasource.getUserById('test-id'))
+          .thenAnswer((_) async => testModel);
+      when(() => mockLocalDatasource.insertUser(any()))
+          .thenAnswer((_) async {});
+
+      final result = await repository.getCurrentUser();
+
+      expect(result.isRight(), true);
+    });
+  });
+
+  group('watchCurrentUser', () {
+    test('emits Right with user entity when session has user', () async {
+      final mockUser = User(
+        id: 'test-id',
+        appMetadata: const {},
+        userMetadata: const {},
+        aud: 'authenticated',
+        createdAt: '2024-01-01T00:00:00.000Z',
+      );
+      final mockSession = Session(
+        accessToken: 'token',
+        tokenType: 'bearer',
+        user: mockUser,
+      );
+      final authState = AuthState(
+        AuthChangeEvent.signedIn,
+        mockSession,
+      );
+
+      when(() => mockRemoteDatasource.authStateChanges)
+          .thenAnswer((_) => Stream.value(authState));
+      when(() => mockLocalDatasource.getUserById('test-id'))
+          .thenAnswer((_) async => testModel);
+
+      final stream = repository.watchCurrentUser();
+
+      await expectLater(
+        stream.take(1),
+        emits(isA<Right<dynamic, UserEntity>>()),
+      );
+    });
+
+    test('emits Left with failure when no session', () async {
+      final authState = AuthState(AuthChangeEvent.signedOut, null);
+
+      when(() => mockRemoteDatasource.authStateChanges)
+          .thenAnswer((_) => Stream.value(authState));
+
+      final stream = repository.watchCurrentUser();
+
+      await expectLater(
+        stream.take(1),
+        emits(isA<Left<dynamic, UserEntity>>()),
       );
     });
   });
