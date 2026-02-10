@@ -1,6 +1,6 @@
 # Story 2.5: Auth State Management (AuthBloc)
 
-Status: backlog
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -12,20 +12,20 @@ Status: backlog
 
 ## Acceptance Criteria
 
-- [ ] **AC1**: `AuthenticationBloc` handles events: `AuthenticationCheckRequested`, `AuthenticationUserChanged` (internal), `AuthenticationSignOutRequested`
-- [ ] **AC2**: `AuthenticationState` includes: `initial`, `checkInProgress`, `authenticated(UserEntity)`, `unauthenticated`, `signOutInProgress`, `authenticationFailure(Failure)`
-- [ ] **AC3**: Auth state persists across app restarts (session recovery via `getCurrentAuthenticatedUser`)
-- [ ] **AC4**: Logout clears Supabase session but preserves local demo data
-- [ ] **AC5**: `GetCurrentUserUseCase` exists and wraps `AuthRepository.getCurrentAuthenticatedUser()`
-- [ ] **AC6**: `SignOutUseCase` exists and wraps `AuthRepository.signOut()`
-- [ ] **AC7**: `AuthenticationBloc` subscribes to `AuthRepository.authStateChanges` stream
-- [ ] **AC8**: `AuthenticationBloc` is registered as `@lazySingleton` in DI
-- [ ] **AC9**: `App` widget wraps with `BlocProvider.value` for `AuthenticationBloc` and dispatches initial check in `initState`
-- [ ] **AC10**: Router redirect guard uses `AuthenticationBloc` state for auth-based navigation with `refreshListenable`
-- [ ] **AC11**: Unit tests verify all state transitions using `bloc_test`
-- [ ] **AC12**: `flutter analyze` passes with zero errors
-- [ ] **AC13**: `dart run build_runner build` completes successfully
-- [ ] **AC14**: Auth barrel file updated with all new exports
+- [x] **AC1**: `AuthenticationBloc` handles events: `AuthenticationCheckRequested`, `AuthenticationUserChanged` (internal), `AuthenticationSignOutRequested`
+- [x] **AC2**: `AuthenticationState` includes: `initial`, `checkInProgress`, `authenticated(UserEntity)`, `unauthenticated`, `signOutInProgress`, `authenticationFailure(Failure)`
+- [x] **AC3**: Auth state persists across app restarts (session recovery via `getCurrentAuthenticatedUser`)
+- [x] **AC4**: Logout clears Supabase session but preserves local demo data
+- [x] **AC5**: `GetCurrentUserUseCase` exists and wraps `AuthRepository.getCurrentAuthenticatedUser()`
+- [x] **AC6**: `SignOutUseCase` exists and wraps `AuthRepository.signOut()`
+- [x] **AC7**: `AuthenticationBloc` subscribes to `AuthRepository.authStateChanges` stream
+- [x] **AC8**: `AuthenticationBloc` is registered as `@lazySingleton` in DI
+- [x] **AC9**: `App` widget wraps with `BlocProvider.value` for `AuthenticationBloc` and dispatches initial check in `initState`
+- [x] **AC10**: Router redirect guard uses `AuthenticationBloc` state for auth-based navigation with `refreshListenable`
+- [x] **AC11**: Unit tests verify all state transitions using `bloc_test`
+- [x] **AC12**: `flutter analyze` passes with zero errors
+- [x] **AC13**: `dart run build_runner build` completes successfully
+- [x] **AC14**: Auth barrel file updated with all new exports
 
 > **⚠️ EPIC AC DEVIATION:** The epics (Story 2.5 AC) list events `AuthSignUpRequested` and `AuthSignInRequested`, but these are **intentionally omitted**. The `AuthenticationBloc` manages *global auth state observation*, NOT auth *flows*. Sign-up/sign-in are per-screen flows handled by their own BLoCs (e.g., `SignInBloc`) in the presentation layer. The `AuthenticationBloc` reacts to the *outcome* of those flows via the `authStateChanges` stream subscription. This separation follows Clean Architecture — the `AuthenticationBloc` is a *state observer*, not a *flow orchestrator*.
 
@@ -1406,30 +1406,30 @@ The `AuthenticationBloc` imports `AuthRepository` directly for the `authStateCha
 ## Checklist
 
 ### Pre-Implementation
-- [ ] Verify Stories 2.1-2.4 are complete
-- [ ] Review existing `AuthRepository` interface
-- [ ] Check `auth_failures.dart` for available failure classes
-- [ ] Confirm `bloc`, `flutter_bloc`, `bloc_test` are in pubspec.yaml
-- [ ] Review `app.dart` and `app_router.dart` for modification points
+- [x] Verify Stories 2.1-2.4 are complete
+- [x] Review existing `AuthRepository` interface
+- [x] Check `auth_failures.dart` for available failure classes
+- [x] Confirm `bloc`, `flutter_bloc`, `bloc_test` are in pubspec.yaml
+- [x] Review `app.dart` and `app_router.dart` for modification points
 
 ### Implementation
-- [ ] Task 1: Create `GetCurrentUserUseCase`
-- [ ] Task 2: Create `SignOutUseCase`
-- [ ] Task 3: Create `AuthenticationEvent` with freezed
-- [ ] Task 4: Create `AuthenticationState` with freezed
-- [ ] Task 5: Create `AuthenticationBloc`
-- [ ] Task 6: Update `App` widget with `BlocProvider.value` + `initState` dispatch
-- [ ] Task 7: Update router auth redirect guard + `GoRouterRefreshStream` + `refreshListenable`
-- [ ] Task 8: Update auth barrel file with exports
-- [ ] Task 9: Delete `.gitkeep` from BLoC directory
-- [ ] Task 10: Write `GetCurrentUserUseCase` tests
-- [ ] Task 11: Write `SignOutUseCase` tests
-- [ ] Task 12: Write `AuthenticationBloc` tests (incl. constructor subscription verification)
-- [ ] Task 13: Run build_runner, analyze, and tests
+- [x] Task 1: Create `GetCurrentUserUseCase`
+- [x] Task 2: Create `SignOutUseCase`
+- [x] Task 3: Create `AuthenticationEvent` with freezed
+- [x] Task 4: Create `AuthenticationState` with freezed
+- [x] Task 5: Create `AuthenticationBloc`
+- [x] Task 6: Update `App` widget with `BlocProvider.value` + `initState` dispatch
+- [x] Task 7: Update router auth redirect guard + `GoRouterRefreshStream` + `refreshListenable`
+- [x] Task 8: Update auth barrel file with exports
+- [x] Task 9: Delete `.gitkeep` from BLoC directory
+- [x] Task 10: Write `GetCurrentUserUseCase` tests
+- [x] Task 11: Write `SignOutUseCase` tests
+- [x] Task 12: Write `AuthenticationBloc` tests (incl. constructor subscription verification)
+- [x] Task 13: Run build_runner, analyze, and tests
 
 ### Post-Implementation
-- [ ] `flutter analyze` - zero errors in auth feature
-- [ ] `flutter test test/features/auth/` - all pass
+- [x] `flutter analyze` - zero errors in auth feature
+- [x] `flutter test test/features/auth/` - all pass
 - [ ] `flutter build web --release -t lib/main_development.dart` - succeeds
 - [ ] Update story status to `done` (after code review)
 
@@ -1494,12 +1494,56 @@ The `AuthenticationBloc` imports `AuthRepository` directly for the `authStateCha
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude (Antigravity)
 
 ### Debug Log References
 
+- `dart run build_runner build --delete-conflicting-outputs` — 47 outputs generated, zero errors
+- `flutter analyze lib/features/auth/ lib/app/app.dart lib/core/router/app_router.dart` — No issues found
+- `flutter test test/features/auth/` — 118 tests passed, zero failures
+
 ### Completion Notes List
+
+- ✅ Task 1: Created `GetCurrentUserUseCase` — wraps `AuthRepository.getCurrentAuthenticatedUser()`
+- ✅ Task 2: Created `SignOutUseCase` — wraps `AuthRepository.signOut()`
+- ✅ Task 3: Created `AuthenticationEvent` — freezed events: `checkRequested`, `userChanged` (internal), `signOutRequested`
+- ✅ Task 4: Created `AuthenticationState` — freezed states: `initial`, `checkInProgress`, `authenticated`, `unauthenticated`, `signOutInProgress`, `failure`
+- ✅ Task 5: Created `AuthenticationBloc` — `@lazySingleton`, subscribes to `authStateChanges` stream, calls use cases for business logic, cancels subscription in `close()`
+- ✅ Task 6: Updated `App` widget — `BlocProvider.value` (not `create:` for singleton), dispatches `AuthenticationCheckRequested` in `initState`
+- ✅ Task 7: Updated router — `GoRouterRefreshStream` adapter, `refreshListenable`, auth redirect guard with public/protected route logic
+- ✅ Task 8: Updated auth barrel file — added exports for 2 new use cases + 3 BLoC files
+- ✅ Task 9: Deleted `.gitkeep` from `presentation/bloc/`
+- ✅ Task 10: Unit tests for `GetCurrentUserUseCase` — 2 tests (success + failure)
+- ✅ Task 11: Unit tests for `SignOutUseCase` — 2 tests (success + failure)
+- ✅ Task 12: Unit tests for `AuthenticationBloc` — 9 tests covering all state transitions, stream subscription, stream errors, lifecycle management
+- ✅ Task 13: Integration verification — build_runner, analyze, and all tests pass
+- ✅ Fixed `comment_references` lint in event/state files (replaced `[AuthenticationBloc]` doc reference with plain text)
 
 ### File List
 
+**Created:**
+- `lib/features/auth/domain/usecases/get_current_user_use_case.dart`
+- `lib/features/auth/domain/usecases/sign_out_use_case.dart`
+- `lib/features/auth/presentation/bloc/authentication_event.dart`
+- `lib/features/auth/presentation/bloc/authentication_state.dart`
+- `lib/features/auth/presentation/bloc/authentication_bloc.dart`
+- `test/features/auth/domain/usecases/get_current_user_use_case_test.dart`
+- `test/features/auth/domain/usecases/sign_out_use_case_test.dart`
+- `test/features/auth/presentation/bloc/authentication_bloc_test.dart`
+
+**Modified:**
+- `lib/app/app.dart` — Added `BlocProvider<AuthenticationBloc>.value`, dispatch in `initState`
+- `lib/core/router/app_router.dart` — Added `GoRouterRefreshStream`, auth redirect guard, `refreshListenable`
+- `lib/features/auth/auth.dart` — Added exports for new use cases and BLoC files
+
+**Deleted:**
+- `lib/features/auth/presentation/bloc/.gitkeep`
+
+**Auto-generated (build_runner):**
+- `lib/features/auth/presentation/bloc/authentication_event.freezed.dart`
+- `lib/features/auth/presentation/bloc/authentication_state.freezed.dart`
+- `lib/core/di/injection.config.dart` (updated with new registrations)
+
 ### Change Log
+
+- **2026-02-10**: Implemented Story 2.5 — Auth State Management (AuthenticationBloc). Created domain use cases (GetCurrentUserUseCase, SignOutUseCase), presentation BLoC layer (AuthenticationBloc with freezed events/states), updated App widget with BlocProvider.value, implemented router auth redirect guard with GoRouterRefreshStream, updated barrel file. 13 new tests added, all 118 auth tests pass.
