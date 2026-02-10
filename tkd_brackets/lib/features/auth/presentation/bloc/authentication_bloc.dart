@@ -40,8 +40,13 @@ class AuthenticationBloc
         .authStateChanges
         .listen((either) {
       either.fold(
-        // On error from stream, we don't crash — just
-        // log and keep current state
+        // Stream errors are deliberately ignored to
+        // prevent transient auth state disruptions
+        // (e.g., brief network blips). The last known
+        // auth state is preserved until a definitive
+        // change arrives. This avoids unexpected
+        // redirects or UI flicker from temporary
+        // connectivity issues.
         (_) {},
         (user) => add(AuthenticationUserChanged(user)),
       );
