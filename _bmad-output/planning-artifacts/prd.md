@@ -10,7 +10,7 @@ documentCounts:
   projectDocs: 0
 classification:
   projectType: 'SaaS B2B Web App'
-  technology: 'Flutter Web (Desktop-only)'
+  technology: 'Flutter Web (not mobile & Landscape Desktop only mode for most features)'
   domain: 'Sports/Recreation Tech (Taekwondo Tournaments)'
   complexity: 'Medium'
   projectContext: 'Greenfield'
@@ -28,14 +28,14 @@ classification:
 
 ## Executive Summary
 
-**TKD Brackets** is a Flutter Web-based SaaS tournament bracket creator designed specifically for Taekwondo. It enables dojangs, coaches, tournament organizers, and federations to build and customize brackets with proper TKD-specific seeding, manage divisions by weight/belt/age, submit match scores, and export professional results.
+**TKD Brackets** is a Flutter Web (not mobile) SaaS tournament bracket creator designed specifically for Taekwondo. It enables dojangs, coaches, tournament organizers, and federations to build and customize brackets with proper TKD-specific seeding, manage divisions by weight/belt/age, submit match scores, and export professional results.
 
 **Key Differentiators:**
 - **TKD-Specific:** Smart Division Builder, dojang separation seeding, WT/ITF/ATA templates
 - **Desktop-First:** Optimized for landscape desktop browsers (no mobile editing)
 - **Simple Pricing:** Free tier with limits, $5/month Enterprise for unlimited
 
-**Technology:** Flutter Web + Supabase (Auth, Database, Storage, Realtime) + Sentry (Error Tracking, Free Tier)
+**Technology:** Flutter Web (not mobile) + Supabase (Auth, Database, Storage, Realtime) + Sentry (Error Tracking, Free Tier)
 
 ---
 

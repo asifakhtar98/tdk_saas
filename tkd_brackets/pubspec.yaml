@@ -1,7 +1,7 @@
 name: tkd_brackets
-description: Tournament bracket management for Taekwondo competitions with offline-first capability.
+description: Flutter Web (not mobile) tournament bracket management Saas for Taekwondo competitions with offline-first capability and b2b mostly.
 version: 0.1.0+1
-repository: https://github.com/YOUR_ORG/tkd_brackets
+repository: https://github.com/asifakhtar98/tdk_saas
 publish_to: none
 
 environment:

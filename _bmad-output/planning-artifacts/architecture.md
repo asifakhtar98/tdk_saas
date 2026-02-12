@@ -40,20 +40,20 @@ Performance, reliability, and offline capability are the driving NFRs:
 - WCAG 2.1 AA accessibility compliance
 
 **Scale & Complexity:**
-- Primary domain: Full-Stack SaaS (Flutter Web + Supabase)
+- Primary domain: Full-Stack SaaS (Flutter Web (not mobile) + Supabase)
 - Complexity level: Medium-High
 - Estimated architectural components: 15-20 major components
 
 ### Technical Constraints & Dependencies
 
-| Constraint                 | Source  | Impact                                                   |
-| -------------------------- | ------- | -------------------------------------------------------- |
-| **Flutter Web**            | PRD     | Desktop-first, specific rendering considerations         |
-| **Supabase**               | PRD     | Auth, Database, Storage — BaaS dependency                |
-| **Desktop-Only Editing**   | UX Spec | Mobile is view-only, reduces cross-platform complexity   |
-| **Offline-First**          | PRD/UX  | Requires local storage, sync engine, conflict resolution |
-| **Keyboard-First Scoring** | UX Spec | Specific input handling architecture                     |
-| **Pre-Signup Demo**        | UX Spec | Auth-optional state for demo mode                        |
+| Constraint                   | Source  | Impact                                                   |
+| ---------------------------- | ------- | -------------------------------------------------------- |
+| **Flutter Web (not mobile)** | PRD     | Desktop-first, specific rendering considerations         |
+| **Supabase**                 | PRD     | Auth, Database, Storage — BaaS dependency                |
+| **Desktop-Only Editing**     | UX Spec | Mobile is view-only, reduces cross-platform complexity   |
+| **Offline-First**            | PRD/UX  | Requires local storage, sync engine, conflict resolution |
+| **Keyboard-First Scoring**   | UX Spec | Specific input handling architecture                     |
+| **Pre-Signup Demo**          | UX Spec | Auth-optional state for demo mode                        |
 
 ### Cross-Cutting Concerns Identified
 
@@ -94,7 +94,7 @@ Performance, reliability, and offline capability are the driving NFRs:
 
 ### Primary Technology Domain
 
-**Flutter Web SaaS Application** — based on PRD requirements analysis
+**Flutter Web (not mobile) SaaS Application** — based on PRD requirements analysis
 
 ### Technical Preferences (User-Specified)
 
