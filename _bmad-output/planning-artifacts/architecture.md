@@ -1842,12 +1842,14 @@ lib/core/algorithms/
 
 **Purpose:** Export professional, print-ready bracket PDFs for ring captains.
 
-**Technology Decision:** `pdf` package (pure Dart) + `printing` package (print preview/download)
+**Technology Decision:** `syncfusion_flutter_pdf` (generation) + `printing` (output)
 
 **Rationale:**
-- `pdf` is pure Dart, works on Flutter Web without platform plugins
-- Generates vector PDFs (clean at any zoom)
-- `printing` provides cross-platform print dialog and PDF download for web
+- Feature-rich, high-performance, non-UI PDF library written natively in Dart.
+- Extensive support for text, images, tables (grids), and custom drawing.
+- `printing` package required for cross-platform print dialog and web PDF download.
+- Works seamlessly on Flutter Web without platform plugins.
+- Capable of creating complex documents like brackets and reports from scratch.
 
 **Location:** `lib/features/export/`
 
@@ -1913,21 +1915,29 @@ class PdfGenerationServiceImplementation implements PdfGenerationService {
     required PdfLayoutOptions options,
   }) async {
     try {
-      final pdf = pw.Document();
+      // Create a new PDF document
+      final document = PdfDocument();
       
-      pdf.addPage(
-        pw.Page(
-          pageFormat: _mapPageFormat(options),
-          orientation: _mapOrientation(options),
-          build: (context) => BracketPdfWidget(
-            bracket: bracket,
-            matches: matches,
-            options: options,
-          ),
-        ),
+      // Add a page to the document
+      final page = document.pages.add();
+      
+      // Draw bracket content using helper class (custom implementation)
+      final bracketDrawer = BracketPdfDrawer(
+        bracket: bracket,
+        matches: matches,
+        options: options,
       );
       
-      return Right(await pdf.save());
+      // Draw on the page graphics
+      bracketDrawer.drawOn(page.graphics, bounds: page.getClientSize());
+      
+      // Save the document
+      final List<int> bytes = await document.save();
+      
+      // Dispose the document
+      document.dispose();
+      
+      return Right(Uint8List.fromList(bytes));
     } catch (e) {
       return Left(PdfGenerationFailure(
         userFriendlyMessage: 'Unable to generate PDF. Please try again.',
@@ -1951,11 +1961,11 @@ lib/features/export/
 │   └── entities/
 │       └── pdf_layout_options.dart
 └── presentation/
-    ├── pdf_widgets/                    # pw.Widget subclasses
-    │   ├── bracket_pdf_widget.dart
-    │   ├── match_cell_pdf_widget.dart
-    │   ├── tournament_header_pdf_widget.dart
-    │   └── results_table_pdf_widget.dart
+    ├── pdf_drawers/                    # Helpers for PdfGraphics drawing
+    │   ├── bracket_pdf_drawer.dart
+    │   ├── match_cell_pdf_drawer.dart
+    │   ├── tournament_header_pdf_drawer.dart
+    │   └── results_table_pdf_drawer.dart
     ├── pages/
     │   └── export_preview_page.dart
     └── bloc/
@@ -3615,12 +3625,12 @@ jobs:
 
 **Technology Decisions:**
 
-| Format   | Package                      | Rationale                       |
-| -------- | ---------------------------- | ------------------------------- |
-| **PDF**  | `pdf` + `printing`           | Already documented in Section 2 |
-| **PNG**  | `screenshot` + native Canvas | Capture widget tree as image    |
-| **CSV**  | Native Dart                  | Simple structured text output   |
-| **JSON** | `dart:convert`               | Native serialization            |
+| Format   | Package                               | Rationale                       |
+| -------- | ------------------------------------- | ------------------------------- |
+| **PDF**  | `syncfusion_flutter_pdf` + `printing` | Already documented in Section 2 |
+| **PNG**  | `screenshot` + native Canvas          | Capture widget tree as image    |
+| **CSV**  | Native Dart                           | Simple structured text output   |
+| **JSON** | `dart:convert`                        | Native serialization            |
 
 **Export Service Contracts:**
 

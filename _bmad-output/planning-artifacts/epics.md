@@ -202,7 +202,7 @@ This document provides the complete epic and story breakdown for TKD Brackets, d
 6. **Demo Migration**: UUID remapping + conflict resolution when user signs up
 7. **Supabase Realtime**: Minimal usage — scoring/matches only (not tournaments/divisions)
 8. **Error Tracking**: Sentry (`sentry_flutter`) free tier integration
-9. **PDF Generation**: `pdf` + `printing` packages for export
+9. **PDF Generation**: `syncfusion_flutter_pdf` package for export + `printing` for output
 10. **Database Schema**: 15 tables defined with complete RLS policies
 11. **Seeding Algorithm**: Constraint-satisfaction approach with backtracking for dojang separation
 12. **Bracket Visualization**: Widget-based rendering with `InteractiveViewer` for zoom/pan
@@ -542,7 +542,7 @@ This document provides the complete epic and story breakdown for TKD Brackets, d
 | FR50 | Spectator refresh      |
 
 **Scope:**
-- PDF generation service (pdf + printing packages)
+- PDF generation service: `syncfusion_flutter_pdf` (generation) + `printing` (output)
 - PNG export service
 - CSV/JSON export service
 - Public link generation (unique token)
@@ -2281,7 +2281,7 @@ lib/features/export/
 ### Story 7.2: PDF Generation Service
 
 **As a** developer,
-**I want** a PDF generation service using the `pdf` package,
+**I want** a PDF generation service using the `syncfusion_flutter_pdf` and `printing` packages,
 **So that** brackets and results can be exported to PDF format.
 
 **Acceptance Criteria:**
