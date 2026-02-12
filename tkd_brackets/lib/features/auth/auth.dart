@@ -2,22 +2,28 @@
 library;
 
 // Data - Datasources (for DI visibility)
+export 'data/datasources/organization_local_datasource.dart';
+export 'data/datasources/organization_remote_datasource.dart';
 export 'data/datasources/supabase_auth_datasource.dart';
 export 'data/datasources/user_local_datasource.dart';
 export 'data/datasources/user_remote_datasource.dart';
 
 // Data - Models
+export 'data/models/organization_model.dart';
 export 'data/models/user_model.dart';
 
 // Data - Repositories
 export 'data/repositories/auth_repository_implementation.dart';
+export 'data/repositories/organization_repository_implementation.dart';
 export 'data/repositories/user_repository_implementation.dart';
 
 // Domain - Entities
+export 'domain/entities/organization_entity.dart';
 export 'domain/entities/user_entity.dart';
 
 // Domain - Repositories
 export 'domain/repositories/auth_repository.dart';
+export 'domain/repositories/organization_repository.dart';
 export 'domain/repositories/user_repository.dart';
 
 // Domain - Use Cases

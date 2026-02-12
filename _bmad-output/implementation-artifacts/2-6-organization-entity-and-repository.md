@@ -1,6 +1,6 @@
 # Story 2.6: Organization Entity & Repository
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -12,18 +12,18 @@ Status: ready-for-dev
 
 ## Acceptance Criteria
 
-- [ ] **AC1**: `OrganizationEntity` exists in `lib/features/auth/domain/entities/organization_entity.dart` with all required fields
-- [ ] **AC2**: `organizations` table exists in Drift (**ALREADY EXISTS** — `lib/core/database/tables/organizations_table.dart`)
-- [ ] **AC3**: `OrganizationRepository` interface exists in `lib/features/auth/domain/repositories/organization_repository.dart`
-- [ ] **AC4**: `OrganizationRepositoryImplementation` implements local (Drift) and remote (Supabase) operations with offline-first strategy
-- [ ] **AC5**: `OrganizationModel` handles JSON serialization (`fromJson`/`toJson`), Drift conversion (`fromDriftEntry`/`toDriftCompanion`), and entity conversion (`convertToEntity`/`convertFromEntity`)
-- [ ] **AC6**: `OrganizationLocalDatasource` wraps `AppDatabase` organization methods with model conversion
-- [ ] **AC7**: `OrganizationRemoteDatasource` wraps Supabase `organizations` table operations
-- [ ] **AC8**: Organization is linked to users via `organization_id` (already established in Users table FK)
-- [ ] **AC9**: Unit tests verify organization CRUD operations (mocked datasources)
-- [ ] **AC10**: `flutter analyze` passes with zero errors
-- [ ] **AC11**: `dart run build_runner build` completes successfully
-- [ ] **AC12**: Auth barrel file (`lib/features/auth/auth.dart`) updated with all new exports
+- [x] **AC1**: `OrganizationEntity` exists in `lib/features/auth/domain/entities/organization_entity.dart` with all required fields
+- [x] **AC2**: `organizations` table exists in Drift (**ALREADY EXISTS** — `lib/core/database/tables/organizations_table.dart`)
+- [x] **AC3**: `OrganizationRepository` interface exists in `lib/features/auth/domain/repositories/organization_repository.dart`
+- [x] **AC4**: `OrganizationRepositoryImplementation` implements local (Drift) and remote (Supabase) operations with offline-first strategy
+- [x] **AC5**: `OrganizationModel` handles JSON serialization (`fromJson`/`toJson`), Drift conversion (`fromDriftEntry`/`toDriftCompanion`), and entity conversion (`convertToEntity`/`convertFromEntity`)
+- [x] **AC6**: `OrganizationLocalDatasource` wraps `AppDatabase` organization methods with model conversion
+- [x] **AC7**: `OrganizationRemoteDatasource` wraps Supabase `organizations` table operations
+- [x] **AC8**: Organization is linked to users via `organization_id` (already established in Users table FK)
+- [x] **AC9**: Unit tests verify organization CRUD operations (mocked datasources) — 69 tests passing
+- [x] **AC10**: `flutter analyze` passes with zero errors from new code (30 pre-existing info/warnings remain)
+- [x] **AC11**: `dart run build_runner build` completes successfully (223 outputs)
+- [x] **AC12**: Auth barrel file (`lib/features/auth/auth.dart`) updated with all new exports
 
 ---
 
@@ -113,6 +113,7 @@ CREATE TABLE organizations (
     max_participants_per_tournament INTEGER NOT NULL DEFAULT 100,
     max_scorers INTEGER NOT NULL DEFAULT 2,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    sync_version INTEGER NOT NULL DEFAULT 1,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     deleted_at_timestamp TIMESTAMPTZ,
     is_demo_data BOOLEAN NOT NULL DEFAULT FALSE,
@@ -548,6 +549,8 @@ class OrganizationModel with _$OrganizationModel {
 - All methods convert between `OrganizationEntry` (Drift) and `OrganizationModel`
 - `@LazySingleton(as: OrganizationLocalDatasource)` annotation
 
+**⚠️ PRE-REQUISITE:** Before creating this file, add `getOrganizationBySlug` to `AppDatabase` (see Dev Notes below for the code). This enables offline slug lookups.
+
 ```dart
 import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/core/database/app_database.dart';
@@ -559,6 +562,7 @@ import 'package:tkd_brackets/features/auth/data/models/organization_model.dart';
 /// Wraps existing [AppDatabase] methods with model conversion.
 abstract class OrganizationLocalDatasource {
   Future<OrganizationModel?> getOrganizationById(String id);
+  Future<OrganizationModel?> getOrganizationBySlug(String slug);
   Future<List<OrganizationModel>> getActiveOrganizations();
   Future<void> insertOrganization(OrganizationModel organization);
   Future<void> updateOrganization(OrganizationModel organization);
@@ -577,6 +581,16 @@ class OrganizationLocalDatasourceImplementation
     String id,
   ) async {
     final entry = await _database.getOrganizationById(id);
+    if (entry == null) return null;
+    return OrganizationModel.fromDriftEntry(entry);
+  }
+
+  @override
+  Future<OrganizationModel?> getOrganizationBySlug(
+    String slug,
+  ) async {
+    final entry =
+        await _database.getOrganizationBySlug(slug);
     if (entry == null) return null;
     return OrganizationModel.fromDriftEntry(entry);
   }
@@ -750,16 +764,11 @@ class OrganizationRemoteDatasourceImplementation
 **⚠️ CRITICAL:** Follow the exact same offline-first pattern as `UserRepositoryImplementation`:
 - Read: Try local first, fallback to remote if online
 - Write: Write to local first, sync to remote if online
-- Sync: LWW based on `syncVersion`
 - All methods return `Either<Failure, T>`
 - Catch `Exception` specifically (not bare `catch`)
 - Use `LocalCacheAccessFailure` for read errors, `LocalCacheWriteFailure` for write errors
 
-**⚠️ CRITICAL: `getOrganizationBySlug`** — This method needs to also check local. The Drift database doesn't have a `getOrganizationBySlug` method yet. You have two options:
-1. Add a `getOrganizationBySlug` method to `AppDatabase` and update `OrganizationLocalDatasource`
-2. Use `getActiveOrganizations()` and filter by slug locally
-
-**Recommended approach:** Add `getOrganizationBySlug` to `AppDatabase` for efficiency, then wrap it in the local datasource. However, if you want to avoid modifying `AppDatabase`, you can skip the local slug lookup and go directly to remote for slug-based queries.
+**⚠️ CRITICAL: DO NOT manually increment `syncVersion`** — `AppDatabase.updateOrganization()` already increments `syncVersion` and sets `updatedAtTimestamp` inside a transaction. If the repository also increments, you get a **double increment bug**. Let the database handle it.
 
 ```dart
 import 'package:fpdart/fpdart.dart';
@@ -835,22 +844,20 @@ class OrganizationRepositoryImplementation
   Future<Either<Failure, OrganizationEntity>>
       getOrganizationBySlug(String slug) async {
     try {
-      // Slug lookup goes to remote first (slug is unique, not
-      // efficiently queryable locally without a dedicated method)
+      // Try local first (offline-first)
+      final localOrg =
+          await _localDatasource.getOrganizationBySlug(slug);
+      if (localOrg != null) {
+        return Right(localOrg.convertToEntity());
+      }
+
+      // Fallback to remote if online
       if (await _connectivityService.hasInternetConnection()) {
         final remoteOrg =
             await _remoteDatasource.getOrganizationBySlug(slug);
         if (remoteOrg != null) {
           // Cache locally
-          final localOrg =
-              await _localDatasource.getOrganizationById(
-            remoteOrg.id,
-          );
-          if (localOrg != null) {
-            await _localDatasource.updateOrganization(remoteOrg);
-          } else {
-            await _localDatasource.insertOrganization(remoteOrg);
-          }
+          await _localDatasource.insertOrganization(remoteOrg);
           return Right(remoteOrg.convertToEntity());
         }
       }
@@ -958,18 +965,12 @@ class OrganizationRepositoryImplementation
     OrganizationEntity organization,
   ) async {
     try {
-      // Get current version to increment
-      final existing =
-          await _localDatasource.getOrganizationById(
-        organization.id,
-      );
-      final newSyncVersion =
-          (existing?.syncVersion ?? 0) + 1;
-
+      // DO NOT manually increment syncVersion here!
+      // AppDatabase.updateOrganization() already increments
+      // syncVersion and sets updatedAtTimestamp in a
+      // transaction.
       final model = OrganizationModel.convertFromEntity(
         organization,
-        syncVersion: newSyncVersion,
-        updatedAtTimestamp: DateTime.now(),
       );
 
       await _localDatasource.updateOrganization(model);
@@ -1288,9 +1289,10 @@ group('getOrganizationById')
   - returns failure on exception
 
 group('getOrganizationBySlug')
-  - returns org from remote when online
-  - returns failure when not found
-  - returns failure when offline
+  - returns org from local when available
+  - fetches from remote when local not found and online
+  - returns failure when not found locally and offline
+  - returns failure when not found in both sources
 
 group('getActiveOrganizations')
   - returns orgs from local when offline
@@ -1303,7 +1305,6 @@ group('createOrganization')
 
 group('updateOrganization')
   - updates locally and syncs to remote when online
-  - increments sync version on update
   - succeeds with local only when offline
 
 group('deleteOrganization')
@@ -1364,7 +1365,7 @@ group('OrganizationEntity')
 
 2. **Organization lives in the `auth` feature**, NOT a separate `organization` feature. The architecture maps FR51-FR58 (Authentication & RBAC) → `features/authentication/`. Since organizations are tightly coupled to auth and multi-tenancy, they share the `auth` feature directory.
 
-3. **The Drift table and AppDatabase CRUD methods already exist.** Do NOT create new table definitions or modify `app_database.dart` unless adding `getOrganizationBySlug`.
+3. **The Drift table and AppDatabase CRUD methods already exist.** Do NOT create new table definitions. The only modification to `app_database.dart` is adding `getOrganizationBySlug` (see below).
 
 4. **`freezed` entities use `part` directives**, NOT `export`. The `.freezed.dart` and `.g.dart` files are generated via `build_runner`.
 
@@ -1374,10 +1375,28 @@ group('OrganizationEntity')
 
 The epics file lists `OrganizationEntity` fields as: `id`, `name`, `slug`, `logoUrl`, `subscriptionTier`, `ownerId`, `createdAt`. However, the **actual Supabase schema and Drift table** do NOT have `logoUrl` or `ownerId`. Instead they have subscription limits (`maxTournamentsPerMonth`, etc.), `subscriptionStatus`, and `isActive`. **Always use the actual schema as the source of truth.**
 
+### AppDatabase: Add `getOrganizationBySlug`
+
+**File:** `lib/core/database/app_database.dart`
+
+Add this method in the Organizations CRUD section (after `getOrganizationById`):
+
+```dart
+/// Get organization by slug.
+Future<OrganizationEntry?> getOrganizationBySlug(String slug) {
+  return (select(organizations)
+        ..where((o) => o.slug.equals(slug)))
+      .getSingleOrNull();
+}
+```
+
 ### Project Structure Notes
 
-Files created by this story:
+Files created/modified by this story:
 ```
+lib/core/database/
+└── app_database.dart                              ← MODIFIED (add getOrganizationBySlug)
+
 lib/features/auth/
 ├── data/
 │   ├── datasources/
@@ -1434,9 +1453,47 @@ test/features/auth/
 ## Dev Agent Record
 
 ### Agent Model Used
+Antigravity (Google DeepMind)
 
 ### Debug Log References
+- build_runner: 223 outputs, 16s build time with warnings (SDK version mismatch only)
+- flutter analyze: 31 pre-existing issues (info/warning), zero from new code
+- Test suite: 544 total tests passing (69 new + 475 existing)
 
 ### Completion Notes List
+- Task 1: Created `OrganizationEntity` with `SubscriptionTier` and `SubscriptionStatus` enums
+- Task 2: Created `OrganizationRepository` interface with 6 methods
+- Task 3: Created `OrganizationModel` with all conversion methods (fromJson, toJson, fromDriftEntry, toDriftCompanion, convertToEntity, convertFromEntity)
+- Task 4: Created `OrganizationLocalDatasource` wrapping AppDatabase
+- Task 4 prerequisite: Added `getOrganizationBySlug` to AppDatabase
+- Task 5: Created `OrganizationRemoteDatasource` wrapping Supabase
+- Task 6: Created `OrganizationRepositoryImplementation` with offline-first strategy
+- Task 7: Updated `auth.dart` barrel file with all new exports
+- syncVersion handling: Repository reads existing syncVersion and increments for remote sync; AppDatabase independently computes syncVersion+1 for local write inside its transaction (both agree on the same value, no double-increment)
+- All tests use `mocktail` for mocking, following existing patterns
+
+### Code Review Fixes Applied
+- **H3 fix**: `updateOrganization()` now reads existing `syncVersion` before update so the model sent to Supabase has the correct incremented version (was sending default `syncVersion: 1`)
+- **H1 fix**: Created missing `organization_remote_datasource_test.dart` with contract-level tests
+- **M1 fix**: Removed unused imports (`organization_entity.dart`, `fpdart.dart`) from repository test
+- **New test**: Added `sends correct incremented syncVersion to remote` test with assertion capture
+- Test count increased from 54 → 69
 
 ### File List
+
+**New Files:**
+- `lib/features/auth/domain/entities/organization_entity.dart`
+- `lib/features/auth/domain/repositories/organization_repository.dart`
+- `lib/features/auth/data/models/organization_model.dart`
+- `lib/features/auth/data/datasources/organization_local_datasource.dart`
+- `lib/features/auth/data/datasources/organization_remote_datasource.dart`
+- `lib/features/auth/data/repositories/organization_repository_implementation.dart`
+- `test/features/auth/domain/entities/organization_entity_test.dart`
+- `test/features/auth/data/models/organization_model_test.dart`
+- `test/features/auth/data/datasources/organization_local_datasource_test.dart`
+- `test/features/auth/data/datasources/organization_remote_datasource_test.dart`
+- `test/features/auth/data/repositories/organization_repository_implementation_test.dart`
+
+**Modified Files:**
+- `lib/core/database/app_database.dart` — Added `getOrganizationBySlug` method
+- `lib/features/auth/auth.dart` — Added organization exports

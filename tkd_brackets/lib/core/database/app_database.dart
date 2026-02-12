@@ -81,6 +81,15 @@ class AppDatabase extends _$AppDatabase {
         .getSingleOrNull();
   }
 
+  /// Get organization by slug.
+  Future<OrganizationEntry?> getOrganizationBySlug(
+    String slug,
+  ) {
+    return (select(organizations)
+          ..where((o) => o.slug.equals(slug)))
+        .getSingleOrNull();
+  }
+
   /// Insert a new organization.
   Future<int> insertOrganization(OrganizationsCompanion org) {
     return into(organizations).insert(org);
