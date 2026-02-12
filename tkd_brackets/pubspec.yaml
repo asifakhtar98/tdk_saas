@@ -8,60 +8,60 @@ environment:
   sdk: ^3.10.8
 
 dependencies:
-  bloc: ^9.0.0
-  connectivity_plus: ^6.1.3
-  csv: ^7.1.0
-  drift: ^2.23.1
-  drift_flutter: ^0.2.4
-  envied: ^1.3.2
-  equatable: ^2.0.7
-  file_picker: ^10.3.10
+  bloc: ^9.0.0 # manage state, separate logic
+  connectivity_plus: ^6.1.3 # detect network, monitor connection
+  csv: ^7.1.0 # parse csv, generate csv
+  drift: ^2.23.1 # persist data, query sqlite
+  drift_flutter: ^0.2.4 # integrate drift, support flutter
+  envied: ^1.3.2 # obfuscate secrets, manage env
+  equatable: ^2.0.7 # compare objects, implement equality
+  file_picker: ^10.3.10 # pick files, select media
   flutter:
-    sdk: flutter
-  flutter_bloc: ^9.0.0
-  flutter_form_builder: ^10.2.0
-  flutter_stripe: ^11.5.0
-  form_builder_validators: ^11.1.0
-  fpdart: ^1.1.1
-  freezed_annotation: ^2.4.4
-  get_it: ^8.0.3
-  go_router: ^15.1.1
-  google_fonts: ^8.0.1
-  injectable: ^2.5.0
-  internet_connection_checker_plus: ^2.6.0
-  intl: ^0.20.2
-  json_annotation: ^4.9.0
-  logger: ^2.6.2
-  package_info_plus: ^9.0.0
-  path_provider: ^2.1.5
-  printing: ^5.14.2
-  qr_flutter: ^4.1.0
-  rxdart: ^0.28.0
-  sentry_flutter: ^8.12.0
-  share_plus: ^12.0.1
-  shared_preferences: ^2.2.3
-  supabase_flutter: ^2.8.4
-  syncfusion_flutter_charts: ^32.2.4
-  syncfusion_flutter_pdf: ^32.2.4
-  universal_html: ^2.3.0
-  url_launcher: ^6.3.2
-  uuid: ^4.5.2
-  web: ^1.1.0
-  zentoast: ^0.2.0
+    sdk: flutter # build ui, run app
+  flutter_bloc: ^9.0.0 # inject providers, build consumers
+  flutter_form_builder: ^10.2.0 # build forms, collect input
+  flutter_stripe: ^11.5.0 # process payments, handle cards
+  form_builder_validators: ^11.1.0 # validate fields, enforce rules
+  fpdart: ^1.1.1 # handle errors, chain monads
+  freezed_annotation: ^2.4.4 # annotate unions, define immutability
+  get_it: ^8.0.3 # locate services, inject dependencies
+  go_router: ^15.1.1 # handle navigation, manage deep-links
+  google_fonts: ^8.0.1 # load fonts, typograph text
+  injectable: ^2.5.0 # configure di, annotate services
+  internet_connection_checker_plus: ^2.6.0 # check reachability, verify access
+  intl: ^0.20.2 # format dates, localize messages
+  json_annotation: ^4.9.0 # map json, annotate models
+  logger: ^2.6.2 # log events, output debug
+  package_info_plus: ^9.0.0 # get version, read build-number
+  path_provider: ^2.1.5 # find directories, get paths
+  printing: ^5.14.2 # print documents, generate pdfs
+  qr_flutter: ^4.1.0 # render qr, display codes
+  rxdart: ^0.28.0 # transform streams, combine observables
+  sentry_flutter: ^8.12.0 # track errors, monitor performance
+  share_plus: ^12.0.1 # share content, dispatch intent
+  shared_preferences: ^2.2.3 # store keys, persist settings
+  supabase_flutter: ^2.8.4 # authenticate users, sync database
+  syncfusion_flutter_charts: ^32.2.4 # visualize data, render graphs
+  syncfusion_flutter_pdf: ^32.2.4 # create pdfs, edit documents
+  universal_html: ^2.3.0 # access dom, cross-compile web
+  url_launcher: ^6.3.2 # open urls, launch schemes
+  uuid: ^4.5.2 # generate ids, create identifiers
+  web: ^1.1.0 # interop js, access browser-api
+  zentoast: ^0.2.0 # show toasts, display alerts
 
 dev_dependencies:
-  bloc_test: ^10.0.0
-  build_runner: ^2.5.4
-  drift_dev: ^2.23.1
-  envied_generator: ^1.1.1
+  bloc_test: ^10.0.0 # test blocs, mock states
+  build_runner: ^2.5.4 # run generators, build files
+  drift_dev: ^2.23.1 # generate database, analyze schema
+  envied_generator: ^1.1.1 # generate keys, build env
   flutter_test:
-    sdk: flutter
-  freezed: ^2.5.7
-  go_router_builder: ^2.9.0
-  injectable_generator: ^2.6.3
-  json_serializable: ^6.8.0
-  mocktail: ^1.0.4
-  very_good_analysis: ^7.0.0
+    sdk: flutter # test widgets, verify logic
+  freezed: ^2.5.7 # generate unions, copy objects
+  go_router_builder: ^2.9.0 # generate routes, type-safe navigation
+  injectable_generator: ^2.6.3 # generate registration, compile dependencies
+  json_serializable: ^6.8.0 # generate serialization, parse json
+  mocktail: ^1.0.4 # mock classes, verify interactions
+  very_good_analysis: ^7.0.0 # lint code, enforce rules
 
 flutter:
   uses-material-design: true
