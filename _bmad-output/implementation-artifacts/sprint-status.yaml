@@ -74,7 +74,7 @@ development_status:
   2-4-email-magic-link-sign-in: done
   2-5-auth-state-management-authbloc: done
   2-6-organization-entity-and-repository: done
-  2-7-create-organization-use-case: ready-for-dev
+  2-7-create-organization-use-case: done
   2-8-invitation-entity-and-send-invite: backlog
   2-9-rbac-permission-service: backlog
   2-10-demo-to-production-migration: backlog

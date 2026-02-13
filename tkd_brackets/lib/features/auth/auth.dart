@@ -27,6 +27,8 @@ export 'domain/repositories/organization_repository.dart';
 export 'domain/repositories/user_repository.dart';
 
 // Domain - Use Cases
+export 'domain/usecases/create_organization_params.dart';
+export 'domain/usecases/create_organization_use_case.dart';
 export 'domain/usecases/get_current_user_use_case.dart';
 export 'domain/usecases/sign_in_with_email_params.dart';
 export 'domain/usecases/sign_in_with_email_use_case.dart';

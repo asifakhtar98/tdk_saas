@@ -120,5 +120,14 @@ class AuthorizationPermissionDeniedFailure extends Failure {
   const AuthorizationPermissionDeniedFailure({
     super.userFriendlyMessage =
         'You do not have permission to perform this action.',
+    super.technicalDetails,
+  });
+}
+
+/// Generic failure for authentication errors.
+class AuthenticationFailure extends Failure {
+  const AuthenticationFailure({
+    required super.userFriendlyMessage,
+    super.technicalDetails,
   });
 }
