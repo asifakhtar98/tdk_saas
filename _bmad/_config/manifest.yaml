@@ -1,21 +1,22 @@
 installation:
   version: 6.0.0-Beta.8
   installDate: 2026-01-30T05:36:04.400Z
-  lastUpdated: 2026-02-12T15:12:34.430Z
+  lastUpdated: 2026-02-13T05:06:50.376Z
 modules:
   - name: core
     version: 6.0.0-Beta.8
     installDate: 2026-01-30T05:36:04.400Z
-    lastUpdated: 2026-02-12T15:12:34.430Z
+    lastUpdated: 2026-02-13T05:06:50.376Z
     source: built-in
     npmPackage: null
     repoUrl: null
   - name: bmm
     version: 6.0.0-Beta.8
     installDate: 2026-01-30T05:36:04.390Z
-    lastUpdated: 2026-02-12T15:12:34.430Z
+    lastUpdated: 2026-02-13T05:06:50.376Z
     source: built-in
     npmPackage: null
     repoUrl: null
 ides:
   - antigravity
+  - claude-code
