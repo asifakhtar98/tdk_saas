@@ -19,7 +19,7 @@
 >
 > **AC2:** `CreateOrganizationParams` freezed class is created with required `name` (String) and `userId` (String) fields
 >
-> **AC3:** Organization name validation rejects empty, whitespace-only, and names exceeding 255 characters — returns `InputValidationFailure`
+> **AC3:** Organization name validation rejects empty, whitespace-only, names exceeding 255 characters, and names with no alphanumeric characters (empty slug) — returns `InputValidationFailure`
 >
 > **AC4:** Slug is auto-generated from organization name: lowercase, spaces replaced with hyphens, special characters removed, consecutive hyphens collapsed
 >
@@ -80,6 +80,7 @@ class CreateOrganizationParams
 ```dart
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
+import 'package:meta/meta.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/usecases/use_case.dart';
 import 'package:tkd_brackets/features/auth/domain/entities/organization_entity.dart';
@@ -114,6 +115,8 @@ class CreateOrganizationUseCase
   /// Maximum allowed length for organization name.
   static const int maxNameLength = 255;
 
+  static const _uuid = Uuid();
+
   @override
   Future<Either<Failure, OrganizationEntity>> call(
     CreateOrganizationParams params,
@@ -147,10 +150,22 @@ class CreateOrganizationUseCase
 
     // 2. Generate slug from name
     final slug = generateSlug(trimmedName);
+    if (slug.isEmpty) {
+      return const Left(
+        InputValidationFailure(
+          userFriendlyMessage:
+              'Organization name must contain at least '
+              'one letter or number.',
+          fieldErrors: {
+            'name':
+                'Name must contain alphanumeric characters',
+          },
+        ),
+      );
+    }
 
     // 3. Generate UUID for organization
-    const uuid = Uuid();
-    final orgId = uuid.v4();
+    final orgId = _uuid.v4();
 
     // 4. Build entity with free-tier defaults
     final organization = OrganizationEntity(
@@ -211,6 +226,7 @@ class CreateOrganizationUseCase
   /// - Trim leading/trailing hyphens
   ///
   /// Example: "Dragon Martial Arts!" → "dragon-martial-arts"
+  @visibleForTesting
   static String generateSlug(String name) {
     return name
         .toLowerCase()
@@ -232,9 +248,9 @@ class CreateOrganizationUseCase
 
 4. **Free-tier defaults match the Supabase schema defaults**: `maxTournamentsPerMonth: 2`, `maxActiveBrackets: 3`, `maxParticipantsPerBracket: 32`, `maxParticipantsPerTournament: 100`, `maxScorers: 2`. These MUST match the SQL `DEFAULT` values in the organizations table.
 
-5. **UUID generation**: Use the `uuid` package which is already in `pubspec.yaml` dependencies. Always use `v4()` for random UUIDs.
+5. **UUID generation**: Use the `uuid` package which is already in `pubspec.yaml` dependencies. A `static const _uuid = Uuid()` is defined at the class level for reuse. Always use `v4()` for random UUIDs.
 
-6. **The nested `fold` pattern**: When the organization creation succeeds, we need to fetch the user and update them. Each step can fail, so we chain `fold` calls. This is the standard pattern in this codebase for multi-step operations.
+6. **The nested `fold` pattern**: When the organization creation succeeds, we need to fetch the user and update them. Each step can fail, so we chain `fold` calls. This is the first multi-step use case in this codebase. Dart's `FutureOr` inference handles the mixing of sync `Left.new` and async callbacks in `fold` branches.
 
 7. **User `copyWith`**: `UserEntity` is a freezed class, so `copyWith` is auto-generated. We update `organizationId` and `role` fields.
 
@@ -284,6 +300,16 @@ cd tkd_brackets && flutter analyze
 ```
 
 Must pass with zero new errors from the code in this story. Pre-existing info/warning issues are acceptable.
+
+---
+
+### Task 5b: Run full test suite — Regression check
+
+```bash
+cd tkd_brackets && flutter test
+```
+
+All existing tests (544+) must continue to pass. Zero new failures allowed. This verifies barrel file exports and DI registration don't break existing code.
 
 ---
 
@@ -481,27 +507,6 @@ void main() {
       test(
         'trims whitespace from name before processing',
         () async {
-          when(
-            () => mockOrganizationRepository
-                .createOrganization(any()),
-          ).thenAnswer(
-            (_) async {
-              // Capture the argument to verify trimming
-              final captured = verify(
-                () => mockOrganizationRepository
-                    .createOrganization(
-                  captureAny(),
-                ),
-              ).captured.first as OrganizationEntity;
-              expect(captured.name, 'Dragon Dojang');
-              return Right(captured);
-            },
-          );
-
-          // Use a different approach — set up mocks
-          // to capture and verify
-          reset(mockOrganizationRepository);
-
           late OrganizationEntity capturedOrg;
           when(
             () => mockOrganizationRepository
@@ -531,6 +536,31 @@ void main() {
           );
 
           expect(capturedOrg.name, 'Dragon Dojang');
+        },
+      );
+
+      test(
+        'returns InputValidationFailure for name with '
+        'no alphanumeric characters',
+        () async {
+          final result = await useCase(
+            const CreateOrganizationParams(
+              name: '!!!@#\$%',
+              userId: 'user-123',
+            ),
+          );
+
+          expect(result.isLeft(), isTrue);
+          result.fold(
+            (failure) => expect(
+              failure,
+              isA<InputValidationFailure>(),
+            ),
+            (_) => fail('Expected Left'),
+          );
+          verifyZeroInteractions(
+            mockOrganizationRepository,
+          );
         },
       );
     });
@@ -622,6 +652,18 @@ void main() {
           'dragon-dojang-academy',
         );
       });
+
+      test(
+        'returns empty string for all-special-characters',
+        () {
+          expect(
+            CreateOrganizationUseCase.generateSlug(
+              '!!!@#\$%',
+            ),
+            '',
+          );
+        },
+      );
     });
 
     group('successful organization creation', () {
@@ -763,6 +805,22 @@ void main() {
     });
 
     group('error handling', () {
+      final testOrg = OrganizationEntity(
+        id: 'org-1',
+        name: 'Dragon Dojang',
+        slug: 'dragon-dojang',
+        subscriptionTier: SubscriptionTier.free,
+        subscriptionStatus:
+            SubscriptionStatus.active,
+        maxTournamentsPerMonth: 2,
+        maxActiveBrackets: 3,
+        maxParticipantsPerBracket: 32,
+        maxParticipantsPerTournament: 100,
+        maxScorers: 2,
+        isActive: true,
+        createdAt: DateTime(2024),
+      );
+
       test(
         'returns failure when organization repository '
         'fails',
@@ -815,23 +873,7 @@ void main() {
             () => mockOrganizationRepository
                 .createOrganization(any()),
           ).thenAnswer(
-            (_) async => Right(
-              OrganizationEntity(
-                id: 'org-1',
-                name: 'Dragon Dojang',
-                slug: 'dragon-dojang',
-                subscriptionTier: SubscriptionTier.free,
-                subscriptionStatus:
-                    SubscriptionStatus.active,
-                maxTournamentsPerMonth: 2,
-                maxActiveBrackets: 3,
-                maxParticipantsPerBracket: 32,
-                maxParticipantsPerTournament: 100,
-                maxScorers: 2,
-                isActive: true,
-                createdAt: DateTime(2024),
-              ),
-            ),
+            (_) async => Right(testOrg),
           );
           when(
             () => mockUserRepository
@@ -874,23 +916,7 @@ void main() {
             () => mockOrganizationRepository
                 .createOrganization(any()),
           ).thenAnswer(
-            (_) async => Right(
-              OrganizationEntity(
-                id: 'org-1',
-                name: 'Dragon Dojang',
-                slug: 'dragon-dojang',
-                subscriptionTier: SubscriptionTier.free,
-                subscriptionStatus:
-                    SubscriptionStatus.active,
-                maxTournamentsPerMonth: 2,
-                maxActiveBrackets: 3,
-                maxParticipantsPerBracket: 32,
-                maxParticipantsPerTournament: 100,
-                maxScorers: 2,
-                isActive: true,
-                createdAt: DateTime(2024),
-              ),
-            ),
+            (_) async => Right(testOrg),
           );
           when(
             () => mockUserRepository
@@ -982,6 +1008,10 @@ These values MUST match the SQL `DEFAULT` clauses in the `organizations` table:
 - **Duplicate slug handling**: The AC says "duplicate name" errors are handled, but this is handled at the **database level** (Supabase `UNIQUE` constraint on `slug`, Drift `unique()` constraint). The repository will throw an exception which is caught and returned as a `Left(Failure)`. No additional logic is needed in the use case.
 - **Presentation layer**: No BLoC events/states for organization creation (that would be a separate story).
 - **RLS policies**: Already configured in Supabase for the `organizations` table.
+
+### Known Limitation: Partial Failure on Multi-Step Create
+
+If organization creation succeeds (step 1) but user update fails (steps 2-3), the organization persists without an owner linked. This is acceptable for MVP — the user can retry, and the duplicate slug constraint prevents duplicate organizations. A future cleanup mechanism can handle orphaned records if needed.
 
 ### Epics vs. Actual Implementation Discrepancy
 
