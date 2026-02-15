@@ -1,6 +1,6 @@
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
-import 'package:meta/meta.dart';
 import 'package:tkd_brackets/core/error/error_reporting_service.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/usecases/use_case.dart';
@@ -84,7 +84,7 @@ class CreateOrganizationUseCase
     }
 
     if (trimmedName.length > maxNameLength) {
-      return Left(
+      return const Left(
         InputValidationFailure(
           userFriendlyMessage:
               'Organization name is too long '
@@ -151,20 +151,23 @@ class CreateOrganizationUseCase
           (failure) {
             // CRITICAL: Organization created but user update failed!
             // We have an orphaned organization and a user who thinks it failed.
-            _errorReportingService.reportError(
-              'CRITICAL DATA INCONSISTENCY: Organization created but user update failed.',
-              error: failure,
-              stackTrace: StackTrace.current,
-            );
-            _errorReportingService.addBreadcrumb(
-              message: 'Orphaned Organization Created',
-              category: 'data_integrity',
-              data: {
-                'organizationId': createdOrg.id,
-                'userId': params.userId,
-                'failure': failure.toString(),
-              },
-            );
+            _errorReportingService
+              ..reportError(
+                'CRITICAL DATA INCONSISTENCY: '
+                'Organization created but user '
+                'update failed.',
+                error: failure,
+                stackTrace: StackTrace.current,
+              )
+              ..addBreadcrumb(
+                message: 'Orphaned Organization Created',
+                category: 'data_integrity',
+                data: {
+                  'organizationId': createdOrg.id,
+                  'userId': params.userId,
+                  'failure': failure.toString(),
+                },
+              );
             return Left(failure);
           },
           (_) => Right(createdOrg),
@@ -188,8 +191,8 @@ class CreateOrganizationUseCase
     return name
         .toLowerCase()
         .replaceAll(RegExp(r'[\s_]+'), '-')
-        .replaceAll(RegExp(r'[^a-z0-9-]'), '')
-        .replaceAll(RegExp(r'-{2,}'), '-')
+        .replaceAll(RegExp('[^a-z0-9-]'), '')
+        .replaceAll(RegExp('-{2,}'), '-')
         .replaceAll(RegExp(r'^-+|-+$'), '');
   }
 }

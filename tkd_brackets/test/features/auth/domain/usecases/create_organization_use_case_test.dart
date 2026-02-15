@@ -459,6 +459,7 @@ void main() {
           (_) => fail('Expected Left'),
         );
         verifyNever(() => mockUserRepository.updateUser(any()));
+        verifyZeroInteractions(mockErrorReportingService);
       });
 
       test('returns failure and reports critical error when updateUser fails after org creation', () async {

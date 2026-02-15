@@ -3,7 +3,7 @@
 ## Epic: Epic 2 — Authentication & Organization
 ## Story ID: 2.7
 ## Title: Create Organization Use Case
-## Status: review
+## Status: done
 
 ---
 
@@ -1097,6 +1097,16 @@ All acceptance criteria satisfied:
 - **Data Integrity:** Injected `ErrorReportingService` to log critical errors ("Orphaned Organization") if user update fails after organization creation.
 - **Error Handling:** Added `AuthenticationFailure` and `AuthorizationPermissionDeniedFailure` with technical details support to `failures.dart`.
 - **Testing:** Updated unit tests to mock new dependencies and verify security and error logging scenarios.
+
+### Code Review #2 Fixes Applied (2026-02-15)
+- **M2 (cascade):** Used Dart cascade operator (`..`) for consecutive `_errorReportingService` calls.
+- **M3 (const):** Added `const` to `Left(InputValidationFailure(...))` for name-too-long validation.
+- **L1 (import):** Replaced `package:meta/meta.dart` with `package:flutter/foundation.dart show visibleForTesting` to match codebase pattern and fix `depend_on_referenced_packages` lint.
+- **L2 (raw strings):** Removed unnecessary `r` prefix from regex patterns without backslash escapes.
+- **L5 (test gap):** Added `verifyZeroInteractions(mockErrorReportingService)` to getUserById failure test to verify error reporter is NOT invoked on non-orphan failures.
+- **Line length:** Broke long critical error message string to comply with 80-char limit.
+- **Import ordering:** Sorted `flutter` import before `fpdart` to fix `directives_ordering` lint.
+- **Result:** `flutter analyze` now shows **0 issues** (down from 10 info-level). All 22 tests pass.
 
 ### File List
 
