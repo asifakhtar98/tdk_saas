@@ -8,7 +8,7 @@
 
 ## Status
 
-**Status:** Draft
+**Status:** Ready for Dev
 **Epic:** Epic 2 — Authentication & Organization
 **Previous Story:** 2.7 — Create Organization Use Case (done)
 **Next Story:** 2.9 — RBAC Permission Service
