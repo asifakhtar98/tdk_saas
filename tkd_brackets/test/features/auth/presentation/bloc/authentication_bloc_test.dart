@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/auth_failures.dart';
-import 'package:tkd_brackets/core/error/failures.dart';
+import 'package:tkd_brackets/core/error/failures.dart' hide AuthenticationFailure;
 import 'package:tkd_brackets/core/usecases/use_case.dart';
 import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/auth_repository.dart';
