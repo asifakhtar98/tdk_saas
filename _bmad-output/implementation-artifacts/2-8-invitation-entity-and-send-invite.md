@@ -8,10 +8,37 @@
 
 ## Status
 
-**Status:** Ready for Dev
+**Status:** Done
 **Epic:** Epic 2 — Authentication & Organization
 **Previous Story:** 2.7 — Create Organization Use Case (done)
 **Next Story:** 2.9 — RBAC Permission Service
+
+## Dev Agent Record
+
+**Implementation Date:** 2026-02-15  
+**Files Modified:** 17  
+**All Tasks Completed:** ✅
+
+### File List
+
+- `lib/features/auth/domain/entities/invitation_entity.dart` — Created
+- `lib/core/database/tables/invitations_table.dart` — Created
+- `lib/features/auth/data/models/invitation_model.dart` — Created
+- `lib/features/auth/data/datasources/invitation_local_datasource.dart` — Created
+- `lib/features/auth/data/datasources/invitation_remote_datasource.dart` — Created
+- `lib/features/auth/domain/repositories/invitation_repository.dart` — Created
+- `lib/features/auth/data/repositories/invitation_repository_implementation.dart` — Created
+- `lib/features/auth/domain/usecases/send_invitation_params.dart` — Created
+- `lib/features/auth/domain/usecases/send_invitation_use_case.dart` — Created
+- `lib/features/auth/domain/usecases/accept_invitation_params.dart` — Created
+- `lib/features/auth/domain/usecases/accept_invitation_use_case.dart` — Created
+- `lib/core/database/app_database.dart` — Modified (migration + CRUD)
+- `lib/core/database/tables/tables.dart` — Modified (export)
+- `lib/features/auth/auth.dart` — Modified (exports)
+- `test/features/auth/domain/usecases/send_invitation_use_case_test.dart` — Created
+- `test/features/auth/domain/usecases/accept_invitation_use_case_test.dart` — Created
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — Modified
+
 
 ## Acceptance Criteria
 
@@ -601,7 +628,7 @@ class InvitationRepositoryImplementation implements InvitationRepository {
 
   final InvitationLocalDatasource _localDatasource;
   final InvitationRemoteDatasource _remoteDatasource;
-  final NetworkInfo _networkInfo;
+  final ConnectivityService _connectivityService;
   final SyncQueue _syncQueue;
 
   @override
@@ -615,7 +642,7 @@ class InvitationRepositoryImplementation implements InvitationRepository {
       await _localDatasource.insertInvitation(model);
 
       // 2. Attempt remote sync if online
-      if (await _networkInfo.isConnected) {
+      if (await _connectivityService.hasInternetConnection()) {
         try {
           // Sync invitation to Supabase
           await _remoteDatasource.upsertInvitation(model);

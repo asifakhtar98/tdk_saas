@@ -17,14 +17,17 @@ part 'app_database.g.dart';
 /// final orgs = await db.select(db.organizations).get();
 /// ```
 @lazySingleton
-@DriftDatabase(tables: [
-  Organizations,
-  Users,
-  SyncQueueTable,
-  Tournaments,
-  Divisions,
-  Participants,
-])
+@DriftDatabase(
+  tables: [
+    Organizations,
+    Users,
+    SyncQueueTable,
+    Tournaments,
+    Divisions,
+    Participants,
+    Invitations,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   /// Creates database with platform-appropriate connection.
   ///
@@ -36,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -54,6 +57,10 @@ class AppDatabase extends _$AppDatabase {
           await m.createTable(tournaments);
           await m.createTable(divisions);
           await m.createTable(participants);
+        }
+        // Version 4: Add invitations table for team member invitations
+        if (from < 4) {
+          await m.createTable(invitations);
         }
       },
       beforeOpen: (details) async {
@@ -77,17 +84,16 @@ class AppDatabase extends _$AppDatabase {
 
   /// Get organization by ID.
   Future<OrganizationEntry?> getOrganizationById(String id) {
-    return (select(organizations)..where((o) => o.id.equals(id)))
-        .getSingleOrNull();
+    return (select(
+      organizations,
+    )..where((o) => o.id.equals(id))).getSingleOrNull();
   }
 
   /// Get organization by slug.
-  Future<OrganizationEntry?> getOrganizationBySlug(
-    String slug,
-  ) {
-    return (select(organizations)
-          ..where((o) => o.slug.equals(slug)))
-        .getSingleOrNull();
+  Future<OrganizationEntry?> getOrganizationBySlug(String slug) {
+    return (select(
+      organizations,
+    )..where((o) => o.slug.equals(slug))).getSingleOrNull();
   }
 
   /// Insert a new organization.
@@ -99,17 +105,18 @@ class AppDatabase extends _$AppDatabase {
   ///
   /// Uses a transaction to ensure atomicity of the read-modify-write
   /// operation for sync_version increment.
-  Future<bool> updateOrganization(
-      String id, OrganizationsCompanion org) async {
+  Future<bool> updateOrganization(String id, OrganizationsCompanion org) async {
     return transaction(() async {
       final current = await getOrganizationById(id);
       if (current == null) return false;
 
       final rows = await (update(organizations)..where((o) => o.id.equals(id)))
-          .write(org.copyWith(
-            syncVersion: Value(current.syncVersion + 1),
-            updatedAtTimestamp: Value(DateTime.now()),
-          ));
+          .write(
+            org.copyWith(
+              syncVersion: Value(current.syncVersion + 1),
+              updatedAtTimestamp: Value(DateTime.now()),
+            ),
+          );
       return rows > 0;
     });
   }
@@ -117,11 +124,13 @@ class AppDatabase extends _$AppDatabase {
   /// Soft delete an organization.
   Future<bool> softDeleteOrganization(String id) {
     return (update(organizations)..where((o) => o.id.equals(id)))
-        .write(OrganizationsCompanion(
-          isDeleted: const Value(true),
-          deletedAtTimestamp: Value(DateTime.now()),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ))
+        .write(
+          OrganizationsCompanion(
+            isDeleted: const Value(true),
+            deletedAtTimestamp: Value(DateTime.now()),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        )
         .then((rows) => rows > 0);
   }
 
@@ -150,8 +159,9 @@ class AppDatabase extends _$AppDatabase {
 
   /// Get user by email.
   Future<UserEntry?> getUserByEmail(String email) {
-    return (select(users)..where((u) => u.email.equals(email)))
-        .getSingleOrNull();
+    return (select(
+      users,
+    )..where((u) => u.email.equals(email))).getSingleOrNull();
   }
 
   /// Insert a new user.
@@ -168,11 +178,12 @@ class AppDatabase extends _$AppDatabase {
       final current = await getUserById(id);
       if (current == null) return false;
 
-      final rows = await (update(users)..where((u) => u.id.equals(id)))
-          .write(user.copyWith(
-            syncVersion: Value(current.syncVersion + 1),
-            updatedAtTimestamp: Value(DateTime.now()),
-          ));
+      final rows = await (update(users)..where((u) => u.id.equals(id))).write(
+        user.copyWith(
+          syncVersion: Value(current.syncVersion + 1),
+          updatedAtTimestamp: Value(DateTime.now()),
+        ),
+      );
       return rows > 0;
     });
   }
@@ -180,11 +191,13 @@ class AppDatabase extends _$AppDatabase {
   /// Soft delete a user.
   Future<bool> softDeleteUser(String id) {
     return (update(users)..where((u) => u.id.equals(id)))
-        .write(UsersCompanion(
-          isDeleted: const Value(true),
-          deletedAtTimestamp: Value(DateTime.now()),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ))
+        .write(
+          UsersCompanion(
+            isDeleted: const Value(true),
+            deletedAtTimestamp: Value(DateTime.now()),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        )
         .then((rows) => rows > 0);
   }
 
@@ -194,7 +207,8 @@ class AppDatabase extends _$AppDatabase {
 
   /// Get all active tournaments for an organization.
   Future<List<TournamentEntry>> getTournamentsForOrganization(
-      String organizationId) {
+    String organizationId,
+  ) {
     return (select(tournaments)
           ..where((t) => t.organizationId.equals(organizationId))
           ..where((t) => t.isDeleted.equals(false))
@@ -204,8 +218,9 @@ class AppDatabase extends _$AppDatabase {
 
   /// Get tournament by ID.
   Future<TournamentEntry?> getTournamentById(String id) {
-    return (select(tournaments)..where((t) => t.id.equals(id)))
-        .getSingleOrNull();
+    return (select(
+      tournaments,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
   /// Insert a new tournament.
@@ -215,18 +230,20 @@ class AppDatabase extends _$AppDatabase {
 
   /// Update a tournament and increment sync_version.
   Future<bool> updateTournament(
-      String id, TournamentsCompanion tournament) async {
+    String id,
+    TournamentsCompanion tournament,
+  ) async {
     return transaction(() async {
       final current = await getTournamentById(id);
       if (current == null) return false;
 
-      final rows =
-          await (update(tournaments)..where((t) => t.id.equals(id))).write(
-        tournament.copyWith(
-          syncVersion: Value(current.syncVersion + 1),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ),
-      );
+      final rows = await (update(tournaments)..where((t) => t.id.equals(id)))
+          .write(
+            tournament.copyWith(
+              syncVersion: Value(current.syncVersion + 1),
+              updatedAtTimestamp: Value(DateTime.now()),
+            ),
+          );
       return rows > 0;
     });
   }
@@ -234,11 +251,13 @@ class AppDatabase extends _$AppDatabase {
   /// Soft delete a tournament.
   Future<bool> softDeleteTournament(String id) {
     return (update(tournaments)..where((t) => t.id.equals(id)))
-        .write(TournamentsCompanion(
-          isDeleted: const Value(true),
-          deletedAtTimestamp: Value(DateTime.now()),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ))
+        .write(
+          TournamentsCompanion(
+            isDeleted: const Value(true),
+            deletedAtTimestamp: Value(DateTime.now()),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        )
         .then((rows) => rows > 0);
   }
 
@@ -271,13 +290,13 @@ class AppDatabase extends _$AppDatabase {
       final current = await getDivisionById(id);
       if (current == null) return false;
 
-      final rows =
-          await (update(divisions)..where((d) => d.id.equals(id))).write(
-        division.copyWith(
-          syncVersion: Value(current.syncVersion + 1),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ),
-      );
+      final rows = await (update(divisions)..where((d) => d.id.equals(id)))
+          .write(
+            division.copyWith(
+              syncVersion: Value(current.syncVersion + 1),
+              updatedAtTimestamp: Value(DateTime.now()),
+            ),
+          );
       return rows > 0;
     });
   }
@@ -285,11 +304,13 @@ class AppDatabase extends _$AppDatabase {
   /// Soft delete a division.
   Future<bool> softDeleteDivision(String id) {
     return (update(divisions)..where((d) => d.id.equals(id)))
-        .write(DivisionsCompanion(
-          isDeleted: const Value(true),
-          deletedAtTimestamp: Value(DateTime.now()),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ))
+        .write(
+          DivisionsCompanion(
+            isDeleted: const Value(true),
+            deletedAtTimestamp: Value(DateTime.now()),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        )
         .then((rows) => rows > 0);
   }
 
@@ -311,8 +332,9 @@ class AppDatabase extends _$AppDatabase {
 
   /// Get participant by ID.
   Future<ParticipantEntry?> getParticipantById(String id) {
-    return (select(participants)..where((p) => p.id.equals(id)))
-        .getSingleOrNull();
+    return (select(
+      participants,
+    )..where((p) => p.id.equals(id))).getSingleOrNull();
   }
 
   /// Insert a new participant.
@@ -322,18 +344,20 @@ class AppDatabase extends _$AppDatabase {
 
   /// Update a participant and increment sync_version.
   Future<bool> updateParticipant(
-      String id, ParticipantsCompanion participant) async {
+    String id,
+    ParticipantsCompanion participant,
+  ) async {
     return transaction(() async {
       final current = await getParticipantById(id);
       if (current == null) return false;
 
-      final rows =
-          await (update(participants)..where((p) => p.id.equals(id))).write(
-        participant.copyWith(
-          syncVersion: Value(current.syncVersion + 1),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ),
-      );
+      final rows = await (update(participants)..where((p) => p.id.equals(id)))
+          .write(
+            participant.copyWith(
+              syncVersion: Value(current.syncVersion + 1),
+              updatedAtTimestamp: Value(DateTime.now()),
+            ),
+          );
       return rows > 0;
     });
   }
@@ -341,11 +365,13 @@ class AppDatabase extends _$AppDatabase {
   /// Soft delete a participant.
   Future<bool> softDeleteParticipant(String id) {
     return (update(participants)..where((p) => p.id.equals(id)))
-        .write(ParticipantsCompanion(
-          isDeleted: const Value(true),
-          deletedAtTimestamp: Value(DateTime.now()),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ))
+        .write(
+          ParticipantsCompanion(
+            isDeleted: const Value(true),
+            deletedAtTimestamp: Value(DateTime.now()),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        )
         .then((rows) => rows > 0);
   }
 
@@ -361,8 +387,77 @@ class AppDatabase extends _$AppDatabase {
 
   /// Get all active participants (for testing).
   Future<List<ParticipantEntry>> getActiveParticipants() {
-    return (select(participants)..where((p) => p.isDeleted.equals(false)))
+    return (select(
+      participants,
+    )..where((p) => p.isDeleted.equals(false))).get();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Invitations CRUD
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Get all pending invitations for an organization.
+  Future<List<InvitationEntry>> getPendingInvitationsForOrganization(
+    String organizationId,
+  ) {
+    return (select(invitations)
+          ..where((i) => i.organizationId.equals(organizationId))
+          ..where((i) => i.status.equals('pending'))
+          ..where((i) => i.isDeleted.equals(false))
+          ..orderBy([(i) => OrderingTerm.desc(i.createdAtTimestamp)]))
         .get();
+  }
+
+  /// Get invitation by ID.
+  Future<InvitationEntry?> getInvitationById(String id) {
+    return (select(
+      invitations,
+    )..where((i) => i.id.equals(id))).getSingleOrNull();
+  }
+
+  /// Get invitation by token.
+  Future<InvitationEntry?> getInvitationByToken(String token) {
+    return (select(
+      invitations,
+    )..where((i) => i.token.equals(token))).getSingleOrNull();
+  }
+
+  /// Get invitation by email and organization.
+  Future<InvitationEntry?> getInvitationByEmailAndOrganization(
+    String email,
+    String organizationId,
+  ) {
+    return (select(invitations)
+          ..where((i) => i.email.equals(email))
+          ..where((i) => i.organizationId.equals(organizationId))
+          ..where((i) => i.status.equals('pending'))
+          ..where((i) => i.isDeleted.equals(false)))
+        .getSingleOrNull();
+  }
+
+  /// Insert a new invitation.
+  Future<int> insertInvitation(InvitationsCompanion invitation) {
+    return into(invitations).insert(invitation);
+  }
+
+  /// Update an invitation and increment sync_version.
+  Future<bool> updateInvitation(
+    String id,
+    InvitationsCompanion invitation,
+  ) async {
+    return transaction(() async {
+      final current = await getInvitationById(id);
+      if (current == null) return false;
+
+      final rows = await (update(invitations)..where((i) => i.id.equals(id)))
+          .write(
+            invitation.copyWith(
+              syncVersion: Value(current.syncVersion + 1),
+              updatedAtTimestamp: Value(DateTime.now()),
+            ),
+          );
+      return rows > 0;
+    });
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -371,10 +466,11 @@ class AppDatabase extends _$AppDatabase {
 
   /// Check if demo data exists.
   Future<bool> hasDemoData() async {
-    final result = await (select(organizations)
-          ..where((o) => o.isDemoData.equals(true))
-          ..limit(1))
-        .get();
+    final result =
+        await (select(organizations)
+              ..where((o) => o.isDemoData.equals(true))
+              ..limit(1))
+            .get();
     return result.isNotEmpty;
   }
 
@@ -384,6 +480,7 @@ class AppDatabase extends _$AppDatabase {
     await (delete(participants)..where((p) => p.isDemoData.equals(true))).go();
     await (delete(divisions)..where((d) => d.isDemoData.equals(true))).go();
     await (delete(tournaments)..where((t) => t.isDemoData.equals(true))).go();
+    await (delete(invitations)..where((i) => i.isDemoData.equals(true))).go();
     await (delete(users)..where((u) => u.isDemoData.equals(true))).go();
     await (delete(organizations)..where((o) => o.isDemoData.equals(true))).go();
   }
