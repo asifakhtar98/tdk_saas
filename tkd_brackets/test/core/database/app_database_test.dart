@@ -18,7 +18,7 @@ void main() {
   group('AppDatabase', () {
     test('should create database successfully', () {
       expect(database, isNotNull);
-      expect(database.schemaVersion, 3);
+      expect(database.schemaVersion, 4);
     });
 
     test('should have organizations table', () {

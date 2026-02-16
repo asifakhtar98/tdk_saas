@@ -24,6 +24,8 @@ export 'data/repositories/user_repository_implementation.dart';
 // Domain - Entities
 export 'domain/entities/invitation_entity.dart';
 export 'domain/entities/organization_entity.dart';
+export 'domain/entities/permission.dart';
+export 'domain/entities/rbac_permission_service.dart';
 export 'domain/entities/user_entity.dart';
 
 // Domain - Repositories
@@ -38,6 +40,8 @@ export 'domain/usecases/accept_invitation_use_case.dart';
 export 'domain/usecases/create_organization_params.dart';
 export 'domain/usecases/create_organization_use_case.dart';
 export 'domain/usecases/get_current_user_use_case.dart';
+export 'domain/usecases/remove_organization_member_params.dart';
+export 'domain/usecases/remove_organization_member_use_case.dart';
 export 'domain/usecases/send_invitation_params.dart';
 export 'domain/usecases/send_invitation_use_case.dart';
 export 'domain/usecases/sign_in_with_email_params.dart';
@@ -45,6 +49,8 @@ export 'domain/usecases/sign_in_with_email_use_case.dart';
 export 'domain/usecases/sign_out_use_case.dart';
 export 'domain/usecases/sign_up_with_email_params.dart';
 export 'domain/usecases/sign_up_with_email_use_case.dart';
+export 'domain/usecases/update_user_role_params.dart';
+export 'domain/usecases/update_user_role_use_case.dart';
 export 'domain/usecases/verify_magic_link_params.dart';
 export 'domain/usecases/verify_magic_link_use_case.dart';
 

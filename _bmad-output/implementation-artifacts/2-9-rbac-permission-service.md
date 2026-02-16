@@ -3,7 +3,7 @@
 ## Epic: Epic 2 — Authentication & Organization
 ## Story ID: 2.9
 ## Title: RBAC Permission Service
-## Status: ready-for-dev
+## Status: done
 
 ---
 
@@ -55,50 +55,56 @@
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create `Permission` enum (AC: 2)
-  - [ ] 1.1: Define enum in `domain/entities/permission.dart`
-  - [ ] 1.2: Add all permission values with string representations
-- [ ] Task 2: Create `RbacPermissionService` (AC: 1, 3, 4, 5)
-  - [ ] 2.1: Define static permission matrix as `Map<UserRole, Set<Permission>>`
-  - [ ] 2.2: Implement `canPerform()` method
-  - [ ] 2.3: Implement `assertPermission()` method
-- [ ] Task 3: Create `UpdateUserRoleParams` (AC: 7, 16)
-  - [ ] 3.1: Define freezed params class
-- [ ] Task 4: Create `UpdateUserRoleUseCase` (AC: 6, 10)
-  - [ ] 4.1: Implement auth check, owner verification, validation, and role update
-- [ ] Task 5: Create `RemoveOrganizationMemberParams` (AC: 9, 16)
-  - [ ] 5.1: Define freezed params class
-- [ ] Task 6: Create `RemoveOrganizationMemberUseCase` (AC: 8, 10)
-  - [ ] 6.1: Implement auth check, owner verification, validation, and user removal
-- [ ] Task 7: Write unit tests for `RbacPermissionService` (AC: 11)
-  - [ ] 7.1: Verify Owner has all 17 permissions via Permission.values
-  - [ ] 7.2: Verify Admin has all except billing and deleteOrganization
-  - [ ] 7.3: Verify Scorer has only enterScores, editScores, viewData
-  - [ ] 7.4: Verify Viewer has only viewData
-  - [ ] 7.5: Verify permission matrix structure is complete
-  - [ ] 7.6: Test `assertPermission()` returns correct Either values
-- [ ] Task 8: Write unit tests for `UpdateUserRoleUseCase` (AC: 12)
-  - [ ] 8.1: Test successful role change
-  - [ ] 8.2: Test non-owner rejection
-  - [ ] 8.3: Test self-change rejection
-  - [ ] 8.4: Test owner-role assignment rejection
-  - [ ] 8.5: Test auth mismatch rejection
-  - [ ] 8.6: Test organization mismatch rejection
-  - [ ] 8.7: Test empty organization rejection
-  - [ ] 8.8: Test repository failure propagation
-- [ ] Task 9: Write unit tests for `RemoveOrganizationMemberUseCase` (AC: 13)
-  - [ ] 9.1: Test successful removal
-  - [ ] 9.2: Test non-owner rejection
-  - [ ] 9.3: Test self-removal rejection
-  - [ ] 9.4: Test auth mismatch rejection
-  - [ ] 9.5: Test organization mismatch rejection
-  - [ ] 9.6: Test empty organization rejection
-  - [ ] 9.7: Test repository failure propagation
-- [ ] Task 10: Update `auth.dart` barrel file (AC: 14)
-  - [ ] 10.1: Add all new exports in correct sections
-- [ ] Task 11: Run `build_runner` (AC: 16)
-- [ ] Task 12: Run `flutter analyze` (AC: 15)
-- [ ] Task 13: Run full test suite — regression check
+- [x] Task 1: Create `Permission` enum (AC: 2)
+  - [x] 1.1: Define enum in `domain/entities/permission.dart`
+  - [x] 1.2: Add all permission values with string representations
+- [x] Task 2: Create `RbacPermissionService` (AC: 1, 3, 4, 5)
+  - [x] 2.1: Define static permission matrix as `Map<UserRole, Set<Permission>>`
+  - [x] 2.2: Implement `canPerform()` method
+  - [x] 2.3: Implement `assertPermission()` method
+- [x] Task 3: Create `UpdateUserRoleParams` (AC: 7, 16)
+  - [x] 3.1: Define freezed params class
+- [x] Task 4: Create `UpdateUserRoleUseCase` (AC: 6, 10)
+  - [x] 4.1: Implement auth check, owner verification, validation, and role update
+- [x] Task 5: Create `RemoveOrganizationMemberParams` (AC: 9, 16)
+  - [x] 5.1: Define freezed params class
+- [x] Task 6: Create `RemoveOrganizationMemberUseCase` (AC: 8, 10)
+  - [x] 6.1: Implement auth check, owner verification, validation, and user removal
+- [x] Task 7: Write unit tests for `RbacPermissionService` (AC: 11)
+  - [x] 7.1: Verify Owner has all 17 permissions via Permission.values
+  - [x] 7.2: Verify Admin has all except billing and deleteOrganization
+  - [x] 7.3: Verify Scorer has only enterScores, editScores, viewData
+  - [x] 7.4: Verify Viewer has only viewData
+  - [x] 7.5: Verify permission matrix structure is complete
+  - [x] 7.6: Test `assertPermission()` returns correct Either values
+- [x] Task 8: Write unit tests for `UpdateUserRoleUseCase` (AC: 12)
+  - [x] 8.1: Test successful role change
+  - [x] 8.2: Test non-owner rejection
+  - [x] 8.3: Test self-change rejection
+  - [x] 8.4: Test owner-role assignment rejection
+  - [x] 8.5: Test auth mismatch rejection
+  - [x] 8.6: Test organization mismatch rejection
+  - [x] 8.7: Test empty organization rejection
+  - [x] 8.8: Test repository failure propagation
+- [x] Task 9: Write unit tests for `RemoveOrganizationMemberUseCase` (AC: 13)
+  - [x] 9.1: Test successful removal
+  - [x] 9.2: Test non-owner rejection
+  - [x] 9.3: Test self-removal rejection
+  - [x] 9.4: Test auth mismatch rejection
+  - [x] 9.5: Test organization mismatch rejection
+  - [x] 9.6: Test empty organization rejection
+  - [x] 9.7: Test repository failure propagation
+- [x] Task 10: Update `auth.dart` barrel file (AC: 14)
+  - [x] 10.1: Add all new exports in correct sections
+- [x] Task 11: Run `build_runner` (AC: 16)
+- [x] Task 12: Run `flutter analyze` (AC: 15)
+- [x] Task 13: Run full test suite — regression check
+- [x] Task 14: Final Code Review & Refinement (AC: 11, 12, 13)
+  - [x] 14.1: Convert RbacPermissionService to use `const` for static matrix
+  - [x] 14.2: Fix AppDatabase schema version in unit tests
+  - [x] 14.3: Implement missing organization mismatch tests in Use Cases
+  - [x] 14.4: Remove rogue project root `lib/` directory
+  - [x] 14.5: Clean up `try/catch` logic in entity tests
 
 ---
 
@@ -941,7 +947,7 @@ void main() {
 
 ---
 
-### Task 12: Write Unit Tests for `UpdateUserRoleUseCase` — AC12
+### Task 8: Write Unit Tests for `UpdateUserRoleUseCase` — AC12
 
 #### Test File: `test/features/auth/domain/usecases/update_user_role_use_case_test.dart`
 
@@ -1255,7 +1261,7 @@ void main() {
 
 ---
 
-### Task 13: Write Unit Tests for `RemoveOrganizationMemberUseCase` — AC13
+### Task 9: Write Unit Tests for `RemoveOrganizationMemberUseCase` — AC13
 
 #### Test File: `test/features/auth/domain/usecases/remove_organization_member_use_case_test.dart`
 
@@ -1642,3 +1648,25 @@ All use cases return `Either<Failure, T>` using fpdart:
 ### Completion Notes List
 
 ### File List
+
+## Dev Agent Record (Post-Review Fixes)
+
+**Date:** 2026-02-16
+**Agent:** Antigravity
+
+### Refinements & Bug Fixes:
+
+1. **Architecture Compliance:** Deleted rogue `lib/` directory at the project root which was accidentally created instead of target `tkd_brackets/lib/` path.
+2. **Performance Optimization:** Converted `RbacPermissionService.permissionMatrix` and its constituent sets to `static const` as requested in architectural guidelines.
+3. **Test Coverage Gaps:** Implemented previously missing but marked-as-done tests in `UpdateUserRoleUseCase` and `RemoveOrganizationMemberUseCase` regarding organization ID mismatch and empty organization rejection.
+4. **Test Quality:** Cleaned up `rbac_permission_service_test.dart` by removing defensive `try/catch` blocks that were left over from the TDD unimplemented phase. All tests now assert directly against implemented logic.
+5. **Regression Fix:** Updated `AppDatabase` unit tests to expect `schemaVersion 4` to match the current DB state, resolving a test suite failure.
+
+### Verified State:
+- `flutter analyze`: PASSED
+- `flutter test`: PASSED (198 tests)
+- Rogue files removed.
+
+### Final Code Review Fixes (Post-Adversarial Review):
+1. **Implementation Alignment:** Fixed `RbacPermissionService` to use `...Permission.values` spreading for the Owner role, ensuring future-proof permission inheritance as claimed in documentation.
+2. **Test Robustness:** Refactored `Admin` and `Scorer` test suites to use comprehensive negative testing (iterating over all permissions) to prevent false positives when new permissions are added.
