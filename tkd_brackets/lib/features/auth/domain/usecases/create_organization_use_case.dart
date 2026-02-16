@@ -10,6 +10,8 @@ import 'package:tkd_brackets/features/auth/domain/repositories/auth_repository.d
 import 'package:tkd_brackets/features/auth/domain/repositories/organization_repository.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/user_repository.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/create_organization_params.dart';
+import 'package:tkd_brackets/features/auth/domain/usecases/migrate_demo_data_params.dart';
+import 'package:tkd_brackets/features/auth/domain/usecases/migrate_demo_data_use_case.dart';
 import 'package:uuid/uuid.dart';
 
 /// Use case to create a new organization for a newly registered
@@ -31,12 +33,14 @@ class CreateOrganizationUseCase
     this._userRepository,
     this._authRepository,
     this._errorReportingService,
+    this._migrateDemoDataUseCase,
   );
 
   final OrganizationRepository _organizationRepository;
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
   final ErrorReportingService _errorReportingService;
+  final MigrateDemoDataUseCase _migrateDemoDataUseCase;
 
   /// Maximum allowed length for organization name.
   static const int maxNameLength = 255;
@@ -170,7 +174,35 @@ class CreateOrganizationUseCase
               );
             return Left(failure);
           },
-          (_) => Right(createdOrg),
+          (_) async {
+            // 7. Migrate demo data if exists (gracefully skips if none)
+            final migrationResult = await _migrateDemoDataUseCase(
+              MigrateDemoDataParams(newOrganizationId: createdOrg.id),
+            );
+
+            // Migration failure is not critical - log but don't fail
+            migrationResult.fold(
+              (failure) {
+                _errorReportingService.addBreadcrumb(
+                  message: 'Demo data migration failed (non-critical)',
+                  category: 'migration',
+                  data: {
+                    'organizationId': createdOrg.id,
+                    'failure': failure.toString(),
+                  },
+                );
+              },
+              (_) {
+                _errorReportingService.addBreadcrumb(
+                  message: 'Demo data migration completed',
+                  category: 'migration',
+                  data: {'organizationId': createdOrg.id},
+                );
+              },
+            );
+
+            return Right(createdOrg);
+          },
         );
       });
     });

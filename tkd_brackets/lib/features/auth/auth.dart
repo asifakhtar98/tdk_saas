@@ -34,12 +34,17 @@ export 'domain/repositories/invitation_repository.dart';
 export 'domain/repositories/organization_repository.dart';
 export 'domain/repositories/user_repository.dart';
 
+// Data - Services
+export 'data/services/demo_migration_service.dart';
+
 // Domain - Use Cases
 export 'domain/usecases/accept_invitation_params.dart';
 export 'domain/usecases/accept_invitation_use_case.dart';
 export 'domain/usecases/create_organization_params.dart';
 export 'domain/usecases/create_organization_use_case.dart';
 export 'domain/usecases/get_current_user_use_case.dart';
+export 'domain/usecases/migrate_demo_data_params.dart';
+export 'domain/usecases/migrate_demo_data_use_case.dart';
 export 'domain/usecases/remove_organization_member_params.dart';
 export 'domain/usecases/remove_organization_member_use_case.dart';
 export 'domain/usecases/send_invitation_params.dart';

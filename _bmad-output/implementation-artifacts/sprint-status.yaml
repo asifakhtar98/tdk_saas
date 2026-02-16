@@ -77,7 +77,7 @@ development_status:
   2-7-create-organization-use-case: done
   2-8-invitation-entity-and-send-invite: done
   2-9-rbac-permission-service: done
-  2-10-demo-to-production-migration: backlog
+  2-10-demo-to-production-migration: done
   epic-2-retrospective: backlog
 
   # ═══════════════════════════════════════════════════════════════════════════

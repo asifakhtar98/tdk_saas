@@ -27,6 +27,7 @@ dependencies:
   get_it: ^8.0.3 # locate services, inject dependencies
   go_router: ^15.1.1 # handle navigation, manage deep-links
   google_fonts: ^8.0.1 # load fonts, typograph text
+  graphview: ^1.5.1 #Bracket - Tree, Directed, Layered, Balloon, Circular, Radial, Tidier Tree, and Mindmap layout algorithms
   injectable: ^2.5.0 # configure di, annotate services
   internet_connection_checker_plus: ^2.6.0 # check reachability, verify access
   intl: ^0.20.2 # format dates, localize messages

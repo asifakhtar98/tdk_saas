@@ -10,6 +10,8 @@ import 'package:tkd_brackets/features/auth/domain/repositories/organization_repo
 import 'package:tkd_brackets/features/auth/domain/repositories/user_repository.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/create_organization_params.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/create_organization_use_case.dart';
+import 'package:tkd_brackets/features/auth/domain/usecases/migrate_demo_data_params.dart';
+import 'package:tkd_brackets/features/auth/domain/usecases/migrate_demo_data_use_case.dart';
 
 class MockOrganizationRepository extends Mock
     implements OrganizationRepository {}
@@ -20,9 +22,14 @@ class MockAuthRepository extends Mock implements AuthRepository {}
 
 class MockErrorReportingService extends Mock implements ErrorReportingService {}
 
+class MockMigrateDemoDataUseCase extends Mock
+    implements MigrateDemoDataUseCase {}
+
 class FakeOrganizationEntity extends Fake implements OrganizationEntity {}
 
 class FakeUserEntity extends Fake implements UserEntity {}
+
+class FakeMigrateDemoDataParams extends Fake implements MigrateDemoDataParams {}
 
 void main() {
   late CreateOrganizationUseCase useCase;
@@ -30,10 +37,12 @@ void main() {
   late MockUserRepository mockUserRepository;
   late MockAuthRepository mockAuthRepository;
   late MockErrorReportingService mockErrorReportingService;
+  late MockMigrateDemoDataUseCase mockMigrateDemoDataUseCase;
 
   setUpAll(() {
     registerFallbackValue(FakeOrganizationEntity());
     registerFallbackValue(FakeUserEntity());
+    registerFallbackValue(FakeMigrateDemoDataParams());
   });
 
   // Test user fixture
@@ -52,17 +61,24 @@ void main() {
     mockUserRepository = MockUserRepository();
     mockAuthRepository = MockAuthRepository();
     mockErrorReportingService = MockErrorReportingService();
+    mockMigrateDemoDataUseCase = MockMigrateDemoDataUseCase();
 
     // Default: Authenticated user matches params.userId
     when(
       () => mockAuthRepository.getCurrentAuthenticatedUser(),
     ).thenAnswer((_) async => Right(testUser));
 
+    // Default: Demo migration succeeds
+    when(
+      () => mockMigrateDemoDataUseCase.call(any()),
+    ).thenAnswer((_) async => const Right(unit));
+
     useCase = CreateOrganizationUseCase(
       mockOrganizationRepository,
       mockUserRepository,
       mockAuthRepository,
       mockErrorReportingService,
+      mockMigrateDemoDataUseCase,
     );
   });
 
@@ -75,41 +91,38 @@ void main() {
         ).thenAnswer((_) async => Right(otherUser));
 
         final result = await useCase(
-          const CreateOrganizationParams(
-            name: 'New Org',
-            userId: 'user-123',
-          ),
+          const CreateOrganizationParams(name: 'New Org', userId: 'user-123'),
         );
 
         expect(result.isLeft(), isTrue);
-        
+
         // Check for specific failure type
         result.fold(
           (failure) => expect(failure, isA<AuthenticationFailure>()),
           (_) => fail('Expected Left'),
         );
 
-        verify(() => mockAuthRepository.getCurrentAuthenticatedUser()).called(1);
+        verify(
+          () => mockAuthRepository.getCurrentAuthenticatedUser(),
+        ).called(1);
         verifyZeroInteractions(mockOrganizationRepository);
         verifyZeroInteractions(mockUserRepository);
       });
 
       test('returns Failure if getCurrentAuthenticatedUser fails', () async {
-        when(
-          () => mockAuthRepository.getCurrentAuthenticatedUser(),
-        ).thenAnswer(
-          (_) async => const Left(AuthenticationFailure(userFriendlyMessage: 'Error')),
+        when(() => mockAuthRepository.getCurrentAuthenticatedUser()).thenAnswer(
+          (_) async =>
+              const Left(AuthenticationFailure(userFriendlyMessage: 'Error')),
         );
 
         final result = await useCase(
-          const CreateOrganizationParams(
-            name: 'New Org',
-            userId: 'user-123',
-          ),
+          const CreateOrganizationParams(name: 'New Org', userId: 'user-123'),
         );
 
         expect(result.isLeft(), isTrue);
-        verify(() => mockAuthRepository.getCurrentAuthenticatedUser()).called(1);
+        verify(
+          () => mockAuthRepository.getCurrentAuthenticatedUser(),
+        ).called(1);
         verifyZeroInteractions(mockOrganizationRepository);
       });
     });
@@ -142,19 +155,22 @@ void main() {
         verifyZeroInteractions(mockOrganizationRepository);
       });
 
-      test('returns InputValidationFailure for name exceeding 255 characters', () async {
-        final longName = 'A' * 256;
-        final result = await useCase(
-          CreateOrganizationParams(name: longName, userId: 'user-123'),
-        );
+      test(
+        'returns InputValidationFailure for name exceeding 255 characters',
+        () async {
+          final longName = 'A' * 256;
+          final result = await useCase(
+            CreateOrganizationParams(name: longName, userId: 'user-123'),
+          );
 
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(failure, isA<InputValidationFailure>()),
-          (_) => fail('Expected Left'),
-        );
-        verifyZeroInteractions(mockOrganizationRepository);
-      });
+          expect(result.isLeft(), isTrue);
+          result.fold(
+            (failure) => expect(failure, isA<InputValidationFailure>()),
+            (_) => fail('Expected Left'),
+          );
+          verifyZeroInteractions(mockOrganizationRepository);
+        },
+      );
 
       test('accepts name with exactly 255 characters', () async {
         final exactName = 'A' * 255;
@@ -221,18 +237,24 @@ void main() {
         expect(capturedOrg.name, 'Dragon Dojang');
       });
 
-      test('returns InputValidationFailure for name with no alphanumeric characters', () async {
-        final result = await useCase(
-          const CreateOrganizationParams(name: '!!!@#\$%', userId: 'user-123'),
-        );
+      test(
+        'returns InputValidationFailure for name with no alphanumeric characters',
+        () async {
+          final result = await useCase(
+            const CreateOrganizationParams(
+              name: '!!!@#\$%',
+              userId: 'user-123',
+            ),
+          );
 
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(failure, isA<InputValidationFailure>()),
-          (_) => fail('Expected Left'),
-        );
-        verifyZeroInteractions(mockOrganizationRepository);
-      });
+          expect(result.isLeft(), isTrue);
+          result.fold(
+            (failure) => expect(failure, isA<InputValidationFailure>()),
+            (_) => fail('Expected Left'),
+          );
+          verifyZeroInteractions(mockOrganizationRepository);
+        },
+      );
     });
 
     group('slug generation', () {
@@ -327,7 +349,7 @@ void main() {
 
         // Verify organization was created correctly
         expect(result.isRight(), isTrue);
-        
+
         result.fold((_) => fail('Expected Right'), (org) {
           expect(org.name, 'Dragon Martial Arts');
           expect(org.slug, 'dragon-martial-arts');
@@ -426,7 +448,7 @@ void main() {
         );
 
         expect(result.isLeft(), isTrue);
-        
+
         result.fold(
           (failure) => expect(failure, isA<LocalCacheWriteFailure>()),
           (_) => fail('Expected Left'),
@@ -436,81 +458,87 @@ void main() {
         verifyNever(() => mockUserRepository.updateUser(any()));
       });
 
-      test('returns failure when getUserById fails after org creation', () async {
-        when(
-          () => mockOrganizationRepository.createOrganization(any()),
-        ).thenAnswer((_) async => Right(testOrg));
-        when(() => mockUserRepository.getUserById('user-123')).thenAnswer(
-          (_) async => const Left(
-            LocalCacheAccessFailure(userFriendlyMessage: 'User not found.'),
-          ),
-        );
-
-        final result = await useCase(
-          const CreateOrganizationParams(
-            name: 'Dragon Dojang',
-            userId: 'user-123',
-          ),
-        );
-
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(failure, isA<LocalCacheAccessFailure>()),
-          (_) => fail('Expected Left'),
-        );
-        verifyNever(() => mockUserRepository.updateUser(any()));
-        verifyZeroInteractions(mockErrorReportingService);
-      });
-
-      test('returns failure and reports critical error when updateUser fails after org creation', () async {
-        when(
-          () => mockOrganizationRepository.createOrganization(any()),
-        ).thenAnswer((_) async => Right(testOrg));
-        when(
-          () => mockUserRepository.getUserById('user-123'),
-        ).thenAnswer((_) async => Right(testUser));
-        
-        const expectedFailure = LocalCacheWriteFailure(
-          userFriendlyMessage: 'Failed to update user.',
-        );
-        when(() => mockUserRepository.updateUser(any())).thenAnswer(
-          (_) async => const Left(expectedFailure),
-        );
-
-        final result = await useCase(
-          const CreateOrganizationParams(
-            name: 'Dragon Dojang',
-            userId: 'user-123',
-          ),
-        );
-
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(failure, isA<LocalCacheWriteFailure>()),
-          (_) => fail('Expected Left'),
-        );
-
-        // Verify ErrorReportingService was called
-        verify(
-          () => mockErrorReportingService.reportError(
-            any(
-              that: contains(
-                'CRITICAL DATA INCONSISTENCY: Organization created but user update failed',
-              ),
+      test(
+        'returns failure when getUserById fails after org creation',
+        () async {
+          when(
+            () => mockOrganizationRepository.createOrganization(any()),
+          ).thenAnswer((_) async => Right(testOrg));
+          when(() => mockUserRepository.getUserById('user-123')).thenAnswer(
+            (_) async => const Left(
+              LocalCacheAccessFailure(userFriendlyMessage: 'User not found.'),
             ),
-            error: expectedFailure,
-            stackTrace: any(named: 'stackTrace'),
-          ),
-        ).called(1);
-        
-        verify(
-           () => mockErrorReportingService.addBreadcrumb(
-             message: any(named: 'message'),
-             category: any(named: 'category'),
-             data: any(named: 'data'),
-           ),
-        ).called(1);
-      });
+          );
+
+          final result = await useCase(
+            const CreateOrganizationParams(
+              name: 'Dragon Dojang',
+              userId: 'user-123',
+            ),
+          );
+
+          expect(result.isLeft(), isTrue);
+          result.fold(
+            (failure) => expect(failure, isA<LocalCacheAccessFailure>()),
+            (_) => fail('Expected Left'),
+          );
+          verifyNever(() => mockUserRepository.updateUser(any()));
+          verifyZeroInteractions(mockErrorReportingService);
+        },
+      );
+
+      test(
+        'returns failure and reports critical error when updateUser fails after org creation',
+        () async {
+          when(
+            () => mockOrganizationRepository.createOrganization(any()),
+          ).thenAnswer((_) async => Right(testOrg));
+          when(
+            () => mockUserRepository.getUserById('user-123'),
+          ).thenAnswer((_) async => Right(testUser));
+
+          const expectedFailure = LocalCacheWriteFailure(
+            userFriendlyMessage: 'Failed to update user.',
+          );
+          when(
+            () => mockUserRepository.updateUser(any()),
+          ).thenAnswer((_) async => const Left(expectedFailure));
+
+          final result = await useCase(
+            const CreateOrganizationParams(
+              name: 'Dragon Dojang',
+              userId: 'user-123',
+            ),
+          );
+
+          expect(result.isLeft(), isTrue);
+          result.fold(
+            (failure) => expect(failure, isA<LocalCacheWriteFailure>()),
+            (_) => fail('Expected Left'),
+          );
+
+          // Verify ErrorReportingService was called
+          verify(
+            () => mockErrorReportingService.reportError(
+              any(
+                that: contains(
+                  'CRITICAL DATA INCONSISTENCY: Organization created but user update failed',
+                ),
+              ),
+              error: expectedFailure,
+              stackTrace: any(named: 'stackTrace'),
+            ),
+          ).called(1);
+
+          verify(
+            () => mockErrorReportingService.addBreadcrumb(
+              message: any(named: 'message'),
+              category: any(named: 'category'),
+              data: any(named: 'data'),
+            ),
+          ).called(1);
+        },
+      );
     });
   });
 }

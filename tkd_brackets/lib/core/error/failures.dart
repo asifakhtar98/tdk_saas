@@ -2,18 +2,15 @@ import 'package:equatable/equatable.dart';
 
 /// Base failure class for all domain-level errors.
 /// All use cases return `Either<Failure, T>`.
-/// 
+///
 /// Failures are user-facing errors that bubble up from the domain layer.
 /// For data-layer errors, use Exception types instead.
 abstract class Failure extends Equatable {
-  const Failure({
-    required this.userFriendlyMessage,
-    this.technicalDetails,
-  });
+  const Failure({required this.userFriendlyMessage, this.technicalDetails});
 
   /// Message safe to display to end users.
   final String userFriendlyMessage;
-  
+
   /// Technical details for logging/debugging (not shown to users).
   final String? technicalDetails;
 
@@ -47,10 +44,10 @@ class ServerResponseFailure extends Failure {
 
   @override
   List<Object?> get props => [
-        userFriendlyMessage,
-        technicalDetails,
-        statusCode,
-      ];
+    userFriendlyMessage,
+    technicalDetails,
+    statusCode,
+  ];
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -130,4 +127,35 @@ class AuthenticationFailure extends Failure {
     required super.userFriendlyMessage,
     super.technicalDetails,
   });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Demo Migration Failures
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// Failure reasons for demo migration.
+enum DemoMigrationFailureReason {
+  /// No demo data exists to migrate.
+  noData,
+
+  /// Migration is already in progress.
+  alreadyInProgress,
+
+  /// Data integrity check failed.
+  dataIntegrity,
+}
+
+/// Failure when demo data migration fails.
+class DemoMigrationFailure extends Failure {
+  const DemoMigrationFailure({
+    required this.reason,
+    required super.userFriendlyMessage,
+    super.technicalDetails,
+  });
+
+  /// The specific reason for the migration failure.
+  final DemoMigrationFailureReason reason;
+
+  @override
+  List<Object?> get props => [userFriendlyMessage, technicalDetails, reason];
 }
