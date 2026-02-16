@@ -59,7 +59,7 @@ development_status:
   1-10-sync-service-foundation: done
   1-11-demo-mode-data-seeding: done
   1-12-foundation-ui-shell: done
-  epic-1-retrospective: backlog
+  epic-1-retrospective: done
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Epic 2: Authentication & Organization
@@ -67,7 +67,7 @@ development_status:
   # FRs: FR51-FR58
   # Dependencies: Epic 1 (Foundation)
   # ═══════════════════════════════════════════════════════════════════════════
-  epic-2: in-progress
+  epic-2: done
   2-1-auth-feature-structure-and-domain-layer: done
   2-2-user-entity-and-repository: done
   2-3-email-magic-link-sign-up: done
@@ -78,7 +78,7 @@ development_status:
   2-8-invitation-entity-and-send-invite: done
   2-9-rbac-permission-service: done
   2-10-demo-to-production-migration: done
-  epic-2-retrospective: backlog
+  epic-2-retrospective: done
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Epic 3: Tournament & Division Management
@@ -86,8 +86,8 @@ development_status:
   # FRs: FR1-FR12
   # Dependencies: Epic 2 (Auth & Organization)
   # ═══════════════════════════════════════════════════════════════════════════
-  epic-3: backlog
-  3-1-tournament-feature-structure: backlog
+  epic-3: in-progress
+  3-1-tournament-feature-structure: done
   3-2-tournament-entity-and-repository: backlog
   3-3-create-tournament-use-case: backlog
   3-4-tournament-settings-configuration: backlog
