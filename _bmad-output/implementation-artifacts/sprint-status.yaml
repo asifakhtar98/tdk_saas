@@ -88,7 +88,7 @@ development_status:
   # ═══════════════════════════════════════════════════════════════════════════
   epic-3: in-progress
   3-1-tournament-feature-structure: done
-  3-2-tournament-entity-and-repository: backlog
+  3-2-tournament-entity-and-repository: done
   3-3-create-tournament-use-case: backlog
   3-4-tournament-settings-configuration: backlog
   3-5-duplicate-tournament-as-template: backlog
