@@ -91,8 +91,6 @@ development_status:
   3-2-tournament-entity-and-repository: done
   3-3-create-tournament-use-case: done
   3-4-tournament-settings-configuration: done
-  3-5-duplicate-tournament-as-template: backlog
-  3-6-archive-and-delete-tournament: backlog
   3-7-division-entity-and-repository: backlog
   3-8-smart-division-builder-algorithm: backlog
   3-9-federation-template-registry: backlog
@@ -100,6 +98,8 @@ development_status:
   3-11-division-merge-and-split: backlog
   3-12-ring-assignment-service: backlog
   3-13-scheduling-conflict-detection: backlog
+  3-6-archive-and-delete-tournament: backlog
+  3-5-duplicate-tournament-as-template: backlog
   3-14-tournament-management-ui: backlog
   epic-3-retrospective: backlog
 
@@ -117,8 +117,8 @@ development_status:
   4-5-duplicate-detection-algorithm: backlog
   4-6-bulk-import-with-validation: backlog
   4-7-participant-status-management: backlog
-  4-8-assign-participants-to-divisions: backlog
   4-9-auto-assignment-algorithm: backlog
+  4-8-assign-participants-to-divisions: backlog
   4-10-division-participant-view: backlog
   4-11-participant-edit-and-transfer: backlog
   4-12-participant-management-ui: backlog
@@ -155,12 +155,12 @@ development_status:
   epic-6: backlog
   6-1-scoring-feature-structure: backlog
   6-2-score-entity-and-repository: backlog
-  6-3-enter-match-score-use-case: backlog
-  6-4-keyboard-first-score-entry: backlog
   6-5-forms-event-scoring: backlog
   6-6-multi-judge-score-aggregation: backlog
   6-7-match-winner-determination: backlog
   6-8-bracket-progression-service: backlog
+  6-3-enter-match-score-use-case: backlog
+  6-4-keyboard-first-score-entry: backlog
   6-9-undo-score-with-audit-trail: backlog
   6-10-supabase-realtime-score-sync: backlog
   6-11-multi-ring-view-venue-display: backlog
