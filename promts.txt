@@ -1,0 +1,1 @@
+Validate , enhance, refine, verbosify story using [@checklist.md](file:///Users/asak/Documents/dev/proj/personal/taekwondo_fix/_bmad/bmm/workflows/4-implementation/create-story/checklist.md)

@@ -100,6 +100,14 @@ class InputValidationFailure extends Failure {
   List<Object?> get props => [userFriendlyMessage, fieldErrors];
 }
 
+/// Failure when a requested resource is not found.
+class NotFoundFailure extends Failure {
+  const NotFoundFailure({
+    super.userFriendlyMessage = 'Resource not found',
+    super.technicalDetails,
+  });
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Authentication Failures
 // ═══════════════════════════════════════════════════════════════════════════

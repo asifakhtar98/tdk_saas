@@ -90,7 +90,7 @@ development_status:
   3-1-tournament-feature-structure: done
   3-2-tournament-entity-and-repository: done
   3-3-create-tournament-use-case: done
-  3-4-tournament-settings-configuration: backlog
+  3-4-tournament-settings-configuration: done
   3-5-duplicate-tournament-as-template: backlog
   3-6-archive-and-delete-tournament: backlog
   3-7-division-entity-and-repository: backlog

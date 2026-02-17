@@ -14,6 +14,8 @@ export 'domain/repositories/tournament_repository.dart';
 // Domain - Use Cases
 export 'domain/usecases/create_tournament_params.dart';
 export 'domain/usecases/create_tournament_usecase.dart';
+export 'domain/usecases/update_tournament_settings_params.dart';
+export 'domain/usecases/update_tournament_settings_usecase.dart';
 
 // Presentation exports
 export 'presentation/pages/tournament_list_page.dart';
