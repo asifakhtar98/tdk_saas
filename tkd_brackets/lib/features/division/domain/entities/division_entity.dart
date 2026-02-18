@@ -24,6 +24,7 @@ class DivisionEntity with _$DivisionEntity {
     @Default(false) bool isDeleted,
     DateTime? deletedAtTimestamp,
     @Default(false) bool isDemoData,
+    @Default(false) bool isCustom,
     required DateTime createdAtTimestamp,
     required DateTime updatedAtTimestamp,
     @Default(1) int syncVersion,

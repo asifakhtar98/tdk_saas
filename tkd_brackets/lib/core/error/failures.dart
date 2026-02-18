@@ -87,6 +87,24 @@ class DataSynchronizationFailure extends Failure {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /// Failure when input validation fails.
+class ValidationFailure extends Failure {
+  const ValidationFailure({
+    required super.userFriendlyMessage,
+    super.technicalDetails,
+    this.fieldErrors,
+  });
+
+  final Map<String, String>? fieldErrors;
+
+  @override
+  List<Object?> get props => [
+    userFriendlyMessage,
+    technicalDetails,
+    fieldErrors,
+  ];
+}
+
+/// Failure when input validation fails.
 class InputValidationFailure extends Failure {
   const InputValidationFailure({
     required super.userFriendlyMessage,

@@ -67,6 +67,12 @@ class Divisions extends Table with BaseSyncMixin, BaseAuditMixin {
   /// Validation enforced at application layer.
   TextColumn get status => text().withDefault(const Constant('setup'))();
 
+  /// Whether this division was created manually by the organizer.
+  /// true = custom division (can be edited/deleted)
+  /// false = template-derived division (read-only)
+  BoolColumn get isCustom =>
+      boolean().named('is_custom').withDefault(const Constant(false))();
+
   @override
   Set<Column> get primaryKey => {id};
 }
