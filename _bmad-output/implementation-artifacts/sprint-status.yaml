@@ -94,8 +94,8 @@ development_status:
   3-7-division-entity-and-repository: done
   3-8-smart-division-builder-algorithm: done
   3-9-federation-template-registry: done
-  3-10-custom-division-creation: in-progress
-  3-11-division-merge-and-split: backlog
+  3-10-custom-division-creation: done
+  3-11-division-merge-and-split: done
   3-12-ring-assignment-service: backlog
   3-13-scheduling-conflict-detection: backlog
   3-6-archive-and-delete-tournament: backlog
