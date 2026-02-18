@@ -60,6 +60,15 @@ class TournamentEntity with _$TournamentEntity {
 
     /// When the tournament was created.
     required DateTime createdAt,
+
+    /// Whether this tournament has been soft-deleted.
+    @Default(false) bool isDeleted,
+
+    /// Timestamp when the tournament was deleted (null if not deleted).
+    DateTime? deletedAtTimestamp,
+
+    /// Sync version for conflict resolution in offline-first sync.
+    @Default(0) int syncVersion,
   }) = _TournamentEntity;
 }
 
@@ -86,10 +95,9 @@ enum FederationType {
 /// Enum for tournament statuses.
 enum TournamentStatus {
   draft('draft'),
-  registrationOpen('registration_open'),
-  registrationClosed('registration_closed'),
-  inProgress('in_progress'),
+  active('active'),
   completed('completed'),
+  archived('archived'),
   cancelled('cancelled');
 
   const TournamentStatus(this.value);

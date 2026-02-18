@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tkd_brackets/core/database/app_database.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/network/connectivity_service.dart';
 import 'package:tkd_brackets/features/tournament/data/datasources/tournament_local_datasource.dart';
@@ -17,11 +18,14 @@ class MockTournamentRemoteDatasource extends Mock
 
 class MockConnectivityService extends Mock implements ConnectivityService {}
 
+class MockAppDatabase extends Mock implements AppDatabase {}
+
 void main() {
   late TournamentRepositoryImplementation repository;
   late MockTournamentLocalDatasource mockLocalDatasource;
   late MockTournamentRemoteDatasource mockRemoteDatasource;
   late MockConnectivityService mockConnectivityService;
+  late MockAppDatabase mockAppDatabase;
 
   final testDate = DateTime.now();
   final testEntity = TournamentEntity(
@@ -65,10 +69,12 @@ void main() {
     mockLocalDatasource = MockTournamentLocalDatasource();
     mockRemoteDatasource = MockTournamentRemoteDatasource();
     mockConnectivityService = MockConnectivityService();
+    mockAppDatabase = MockAppDatabase();
     repository = TournamentRepositoryImplementation(
       mockLocalDatasource,
       mockRemoteDatasource,
       mockConnectivityService,
+      mockAppDatabase,
     );
   });
 

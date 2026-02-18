@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
+import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 
 /// Repository interface for tournament operations.
@@ -31,4 +32,17 @@ abstract class TournamentRepository {
 
   /// Delete a tournament (soft delete).
   Future<Either<Failure, Unit>> deleteTournament(String id);
+
+  /// Hard delete a tournament (permanent removal from local DB).
+  Future<Either<Failure, Unit>> hardDeleteTournament(String tournamentId);
+
+  /// Get divisions for a tournament (for cascade delete operations).
+  Future<Either<Failure, List<DivisionEntity>>> getDivisionsByTournamentId(
+    String tournamentId,
+  );
+
+  /// Update a division (for cascade soft-delete).
+  Future<Either<Failure, DivisionEntity>> updateDivision(
+    DivisionEntity division,
+  );
 }

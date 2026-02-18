@@ -1,7 +1,10 @@
+import 'package:drift/drift.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
+import 'package:tkd_brackets/core/database/app_database.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/network/connectivity_service.dart';
+import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/tournament/data/datasources/tournament_local_datasource.dart';
 import 'package:tkd_brackets/features/tournament/data/datasources/tournament_remote_datasource.dart';
 import 'package:tkd_brackets/features/tournament/data/models/tournament_model.dart';
@@ -19,11 +22,13 @@ class TournamentRepositoryImplementation implements TournamentRepository {
     this._localDatasource,
     this._remoteDatasource,
     this._connectivityService,
+    this._database,
   );
 
   final TournamentLocalDatasource _localDatasource;
   final TournamentRemoteDatasource _remoteDatasource;
   final ConnectivityService _connectivityService;
+  final AppDatabase _database;
 
   @override
   Future<Either<Failure, List<TournamentEntity>>> getTournamentsForOrganization(
@@ -161,5 +166,84 @@ class TournamentRepositoryImplementation implements TournamentRepository {
     } on Exception catch (e) {
       return Left(LocalCacheWriteFailure(technicalDetails: e.toString()));
     }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> hardDeleteTournament(
+    String tournamentId,
+  ) async {
+    try {
+      await _database.softDeleteTournament(tournamentId);
+      return const Right(unit);
+    } on Exception catch (e) {
+      return Left(LocalCacheWriteFailure(technicalDetails: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<DivisionEntity>>> getDivisionsByTournamentId(
+    String tournamentId,
+  ) async {
+    try {
+      final divisions = await _database.getDivisionsForTournament(tournamentId);
+      return Right(divisions.map(_divisionEntryToEntity).toList());
+    } on Exception catch (e) {
+      return Left(LocalCacheAccessFailure(technicalDetails: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, DivisionEntity>> updateDivision(
+    DivisionEntity division,
+  ) async {
+    try {
+      final success = await _database.updateDivision(
+        division.id,
+        DivisionsCompanion(
+          isDeleted: Value(division.isDeleted),
+          deletedAtTimestamp: Value(division.deletedAtTimestamp),
+          syncVersion: Value(division.syncVersion + 1),
+          updatedAtTimestamp: Value(DateTime.now()),
+        ),
+      );
+      if (success) {
+        return Right(division);
+      }
+      return const Left(
+        LocalCacheWriteFailure(
+          userFriendlyMessage: 'Failed to update division',
+        ),
+      );
+    } on Exception catch (e) {
+      return Left(LocalCacheWriteFailure(technicalDetails: e.toString()));
+    }
+  }
+
+  DivisionEntity _divisionEntryToEntity(DivisionEntry entry) {
+    return DivisionEntity(
+      id: entry.id,
+      tournamentId: entry.tournamentId,
+      name: entry.name,
+      category: DivisionCategory.fromString(entry.category),
+      gender: DivisionGender.fromString(entry.gender),
+      ageMin: entry.ageMin,
+      ageMax: entry.ageMax,
+      weightMinKg: entry.weightMinKg,
+      weightMaxKg: entry.weightMaxKg,
+      beltRankMin: entry.beltRankMin,
+      beltRankMax: entry.beltRankMax,
+      bracketFormat: BracketFormat.fromString(entry.bracketFormat),
+      assignedRingNumber: entry.assignedRingNumber,
+      isCombined: entry.isCombined,
+      displayOrder: entry.displayOrder,
+      status: DivisionStatus.fromString(entry.status),
+      isDeleted: entry.isDeleted,
+      deletedAtTimestamp: entry.deletedAtTimestamp,
+      isDemoData: entry.isDemoData,
+      isCustom: entry.isCustom,
+      createdAtTimestamp: entry.createdAtTimestamp,
+      updatedAtTimestamp: entry.updatedAtTimestamp,
+      syncVersion: entry.syncVersion,
+    );
   }
 }

@@ -104,7 +104,7 @@ void main() {
           name: 'Test Tournament',
           scheduledDate: now,
           federationType: 'custom',
-          status: 'registration_open',
+          status: 'active',
           isTemplate: false,
           numberOfRings: 2,
           settingsJson: <String, dynamic>{},
@@ -121,7 +121,7 @@ void main() {
         // Assert
         expect(entity.id, 'test-id');
         expect(entity.federationType, FederationType.custom);
-        expect(entity.status, TournamentStatus.registrationOpen);
+        expect(entity.status, TournamentStatus.active);
         expect(entity.isTemplate, false);
       });
 

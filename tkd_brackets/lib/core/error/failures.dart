@@ -156,6 +156,29 @@ class AuthenticationFailure extends Failure {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Tournament Failures
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// Failure when attempting to archive/delete an active tournament
+/// with matches in progress.
+class TournamentActiveFailure extends Failure {
+  const TournamentActiveFailure({
+    required super.userFriendlyMessage,
+    super.technicalDetails,
+    this.activeMatchCount = 0,
+  });
+
+  final int activeMatchCount;
+
+  @override
+  List<Object?> get props => [
+    userFriendlyMessage,
+    technicalDetails,
+    activeMatchCount,
+  ];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Demo Migration Failures
 // ═══════════════════════════════════════════════════════════════════════════
 

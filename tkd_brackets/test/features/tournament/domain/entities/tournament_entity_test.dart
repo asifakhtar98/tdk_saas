@@ -42,7 +42,7 @@ void main() {
         name: 'Test Tournament',
         scheduledDate: now,
         federationType: FederationType.ata,
-        status: TournamentStatus.inProgress,
+        status: TournamentStatus.active,
         description: 'A test tournament',
         venueName: 'Main Hall',
         venueAddress: '123 Main St',
@@ -158,30 +158,22 @@ void main() {
   group('TournamentStatus', () {
     test('should have correct values', () {
       expect(TournamentStatus.draft.value, 'draft');
-      expect(TournamentStatus.registrationOpen.value, 'registration_open');
-      expect(TournamentStatus.registrationClosed.value, 'registration_closed');
-      expect(TournamentStatus.inProgress.value, 'in_progress');
+      expect(TournamentStatus.active.value, 'active');
       expect(TournamentStatus.completed.value, 'completed');
+      expect(TournamentStatus.archived.value, 'archived');
       expect(TournamentStatus.cancelled.value, 'cancelled');
     });
 
     test('should parse from string correctly', () {
       expect(TournamentStatus.fromString('draft'), TournamentStatus.draft);
-      expect(
-        TournamentStatus.fromString('registration_open'),
-        TournamentStatus.registrationOpen,
-      );
-      expect(
-        TournamentStatus.fromString('registration_closed'),
-        TournamentStatus.registrationClosed,
-      );
-      expect(
-        TournamentStatus.fromString('in_progress'),
-        TournamentStatus.inProgress,
-      );
+      expect(TournamentStatus.fromString('active'), TournamentStatus.active);
       expect(
         TournamentStatus.fromString('completed'),
         TournamentStatus.completed,
+      );
+      expect(
+        TournamentStatus.fromString('archived'),
+        TournamentStatus.archived,
       );
       expect(
         TournamentStatus.fromString('cancelled'),
