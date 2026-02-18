@@ -43,6 +43,11 @@ abstract class DivisionRepository {
     required List<ParticipantEntry> participants,
   });
 
+  Future<Either<Failure, List<DivisionEntity>>> getDivisionsForRing(
+    String tournamentId,
+    int ringNumber,
+  );
+
   Future<Either<Failure, List<DivisionEntity>>> splitDivision({
     required DivisionEntity poolADivision,
     required DivisionEntity poolBDivision,

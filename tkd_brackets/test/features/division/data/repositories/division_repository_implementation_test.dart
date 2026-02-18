@@ -3,6 +3,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/network/connectivity_service.dart';
+import 'package:tkd_brackets/core/sync/sync_queue.dart';
 import 'package:tkd_brackets/features/division/data/datasources/division_local_datasource.dart';
 import 'package:tkd_brackets/features/division/data/datasources/division_remote_datasource.dart';
 import 'package:tkd_brackets/features/division/data/models/division_model.dart';
@@ -17,11 +18,14 @@ class MockDivisionRemoteDatasource extends Mock
 
 class MockConnectivityService extends Mock implements ConnectivityService {}
 
+class MockSyncQueue extends Mock implements SyncQueue {}
+
 void main() {
   late DivisionRepositoryImplementation repository;
   late MockDivisionLocalDatasource mockLocalDatasource;
   late MockDivisionRemoteDatasource mockRemoteDatasource;
   late MockConnectivityService mockConnectivityService;
+  late MockSyncQueue mockSyncQueue;
 
   final testDate = DateTime(2024, 1, 1);
 
@@ -61,10 +65,12 @@ void main() {
     mockLocalDatasource = MockDivisionLocalDatasource();
     mockRemoteDatasource = MockDivisionRemoteDatasource();
     mockConnectivityService = MockConnectivityService();
+    mockSyncQueue = MockSyncQueue();
     repository = DivisionRepositoryImplementation(
       mockLocalDatasource,
       mockRemoteDatasource,
       mockConnectivityService,
+      mockSyncQueue,
     );
   });
 
@@ -224,6 +230,71 @@ void main() {
         verify(() => mockRemoteDatasource.updateDivision(any())).called(1);
       },
     );
+
+    test('should queue for sync when offline during update', () async {
+      when(
+        () => mockLocalDatasource.getDivisionById(any()),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.updateDivision(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
+      when(
+        () => mockSyncQueue.enqueue(
+          tableName: any(named: 'tableName'),
+          recordId: any(named: 'recordId'),
+          operation: any(named: 'operation'),
+        ),
+      ).thenAnswer((_) async {});
+
+      final result = await repository.updateDivision(testEntity);
+
+      expect(result.isRight(), true);
+      verify(() => mockLocalDatasource.updateDivision(any())).called(1);
+      verify(
+        () => mockSyncQueue.enqueue(
+          tableName: 'divisions',
+          recordId: 'division-id',
+          operation: 'update',
+        ),
+      ).called(1);
+    });
+
+    test('should queue for sync when remote fails during update', () async {
+      when(
+        () => mockLocalDatasource.getDivisionById(any()),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.updateDivision(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.updateDivision(any()),
+      ).thenThrow(Exception('Network error'));
+      when(
+        () => mockSyncQueue.enqueue(
+          tableName: any(named: 'tableName'),
+          recordId: any(named: 'recordId'),
+          operation: any(named: 'operation'),
+        ),
+      ).thenAnswer((_) async {});
+
+      final result = await repository.updateDivision(testEntity);
+
+      expect(result.isRight(), true);
+      verify(() => mockLocalDatasource.updateDivision(any())).called(1);
+      verify(
+        () => mockSyncQueue.enqueue(
+          tableName: 'divisions',
+          recordId: 'division-id',
+          operation: 'update',
+        ),
+      ).called(1);
+    });
   });
 
   group('deleteDivision', () {

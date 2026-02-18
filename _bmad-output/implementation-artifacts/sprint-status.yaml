@@ -96,7 +96,7 @@ development_status:
   3-9-federation-template-registry: done
   3-10-custom-division-creation: done
   3-11-division-merge-and-split: done
-  3-12-ring-assignment-service: backlog
+  3-12-ring-assignment-service: done
   3-13-scheduling-conflict-detection: backlog
   3-6-archive-and-delete-tournament: backlog
   3-5-duplicate-tournament-as-template: backlog

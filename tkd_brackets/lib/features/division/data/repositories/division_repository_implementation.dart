@@ -4,11 +4,14 @@ import 'package:tkd_brackets/core/database/app_database.dart'
     show ParticipantEntry;
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/network/connectivity_service.dart';
+import 'package:tkd_brackets/core/sync/sync_queue.dart';
 import 'package:tkd_brackets/features/division/data/datasources/division_local_datasource.dart';
 import 'package:tkd_brackets/features/division/data/datasources/division_remote_datasource.dart';
 import 'package:tkd_brackets/features/division/data/models/division_model.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
+
+const String _divisionsTableName = 'divisions';
 
 @LazySingleton(as: DivisionRepository)
 class DivisionRepositoryImplementation implements DivisionRepository {
@@ -16,11 +19,13 @@ class DivisionRepositoryImplementation implements DivisionRepository {
     this._localDatasource,
     this._remoteDatasource,
     this._connectivityService,
+    this._syncQueue,
   );
 
   final DivisionLocalDatasource _localDatasource;
   final DivisionRemoteDatasource _remoteDatasource;
   final ConnectivityService _connectivityService;
+  final SyncQueue _syncQueue;
 
   @override
   Future<Either<Failure, List<DivisionEntity>>> getDivisionsForTournament(
@@ -125,8 +130,18 @@ class DivisionRepositoryImplementation implements DivisionRepository {
         try {
           await _remoteDatasource.updateDivision(model);
         } on Exception catch (_) {
-          // Queued for sync
+          await _syncQueue.enqueue(
+            tableName: _divisionsTableName,
+            recordId: division.id,
+            operation: 'update',
+          );
         }
+      } else {
+        await _syncQueue.enqueue(
+          tableName: _divisionsTableName,
+          recordId: division.id,
+          operation: 'update',
+        );
       }
 
       return Right(division);
@@ -144,8 +159,18 @@ class DivisionRepositoryImplementation implements DivisionRepository {
         try {
           await _remoteDatasource.deleteDivision(id);
         } on Exception catch (_) {
-          // Queued for sync
+          await _syncQueue.enqueue(
+            tableName: _divisionsTableName,
+            recordId: id,
+            operation: 'delete',
+          );
         }
+      } else {
+        await _syncQueue.enqueue(
+          tableName: _divisionsTableName,
+          recordId: id,
+          operation: 'delete',
+        );
       }
 
       return const Right(unit);
@@ -195,6 +220,24 @@ class DivisionRepositoryImplementation implements DivisionRepository {
         divisionIds,
       );
       return Right(participants);
+    } on Exception catch (e) {
+      return Left(LocalCacheAccessFailure(technicalDetails: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<DivisionEntity>>> getDivisionsForRing(
+    String tournamentId,
+    int ringNumber,
+  ) async {
+    try {
+      final divisionsResult = await getDivisionsForTournament(tournamentId);
+      return divisionsResult.map((divisions) {
+        return divisions
+            .where((d) => d.assignedRingNumber == ringNumber && !d.isDeleted)
+            .toList()
+          ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
+      });
     } on Exception catch (e) {
       return Left(LocalCacheAccessFailure(technicalDetails: e.toString()));
     }
