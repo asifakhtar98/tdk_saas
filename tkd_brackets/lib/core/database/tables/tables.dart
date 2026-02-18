@@ -2,6 +2,7 @@
 library;
 
 export 'base_tables.dart';
+export 'division_templates_table.dart';
 export 'divisions_table.dart';
 export 'invitations_table.dart';
 export 'organizations_table.dart';

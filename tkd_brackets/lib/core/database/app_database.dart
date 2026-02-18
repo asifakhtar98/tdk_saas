@@ -26,6 +26,7 @@ part 'app_database.g.dart';
     Divisions,
     Participants,
     Invitations,
+    DivisionTemplates,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -39,7 +40,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration {
@@ -61,6 +62,10 @@ class AppDatabase extends _$AppDatabase {
         // Version 4: Add invitations table for team member invitations
         if (from < 4) {
           await m.createTable(invitations);
+        }
+        // Version 5: Add division_templates table for federation templates
+        if (from < 5) {
+          await m.createTable(divisionTemplates);
         }
       },
       beforeOpen: (details) async {
@@ -458,6 +463,75 @@ class AppDatabase extends _$AppDatabase {
           );
       return rows > 0;
     });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Division Templates CRUD
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Get all custom templates for an organization.
+  Future<List<DivisionTemplateEntry>> getCustomTemplatesForOrganization(
+    String organizationId,
+  ) {
+    return (select(divisionTemplates)
+          ..where((t) => t.organizationId.equals(organizationId))
+          ..where((t) => t.isActive.equals(true))
+          ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
+        .get();
+  }
+
+  /// Get all active templates for a federation.
+  Future<List<DivisionTemplateEntry>> getTemplatesByFederation(
+    String federationType,
+  ) {
+    return (select(divisionTemplates)
+          ..where((t) => t.federationType.equals(federationType))
+          ..where((t) => t.isActive.equals(true))
+          ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
+        .get();
+  }
+
+  /// Get template by ID.
+  Future<DivisionTemplateEntry?> getDivisionTemplateById(String id) {
+    return (select(
+      divisionTemplates,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
+
+  /// Insert a new template.
+  Future<int> insertDivisionTemplate(DivisionTemplatesCompanion template) {
+    return into(divisionTemplates).insert(template);
+  }
+
+  /// Update a template.
+  Future<bool> updateDivisionTemplate(
+    String id,
+    DivisionTemplatesCompanion template,
+  ) async {
+    return transaction(() async {
+      final current = await getDivisionTemplateById(id);
+      if (current == null) return false;
+
+      final rows =
+          await (update(
+            divisionTemplates,
+          )..where((t) => t.id.equals(id))).write(
+            template.copyWith(updatedAtTimestamp: Value(DateTime.now())),
+          );
+      return rows > 0;
+    });
+  }
+
+  /// Delete (deactivate) a template.
+  Future<bool> deleteDivisionTemplate(String id) {
+    return (update(divisionTemplates)..where((t) => t.id.equals(id)))
+        .write(
+          DivisionTemplatesCompanion(
+            isActive: const Value(false),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        )
+        .then((rows) => rows > 0);
   }
 
   // ─────────────────────────────────────────────────────────────────────────

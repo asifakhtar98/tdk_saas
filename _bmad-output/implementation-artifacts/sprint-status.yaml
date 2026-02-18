@@ -92,8 +92,8 @@ development_status:
   3-3-create-tournament-use-case: done
   3-4-tournament-settings-configuration: done
   3-7-division-entity-and-repository: done
-  3-8-smart-division-builder-algorithm: backlog
-  3-9-federation-template-registry: backlog
+  3-8-smart-division-builder-algorithm: done
+  3-9-federation-template-registry: done
   3-10-custom-division-creation: backlog
   3-11-division-merge-and-split: backlog
   3-12-ring-assignment-service: backlog
