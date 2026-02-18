@@ -18,6 +18,8 @@ export 'domain/usecases/create_tournament_params.dart';
 export 'domain/usecases/create_tournament_usecase.dart';
 export 'domain/usecases/delete_tournament_params.dart';
 export 'domain/usecases/delete_tournament_usecase.dart';
+export 'domain/usecases/duplicate_tournament_params.dart';
+export 'domain/usecases/duplicate_tournament_usecase.dart';
 export 'domain/usecases/update_tournament_settings_params.dart';
 export 'domain/usecases/update_tournament_settings_usecase.dart';
 
