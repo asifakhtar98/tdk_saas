@@ -1,6 +1,6 @@
 # Story 3.13: Scheduling Conflict Detection
 
-**Status:** review
+**Status:** done
 
 **Created:** 2026-02-18
 
@@ -51,22 +51,22 @@ Epic 3 encompasses the complete tournament and division management system. This 
 
 **Epic 3 Stories Status (as of this story creation):**
 
-| Story | Status | Notes |
-|-------|--------|-------|
-| 3-1 Tournament Feature Structure | ✅ DONE | Feature scaffold complete |
-| 3-2 Tournament Entity & Repository | ✅ DONE | Core entity established |
-| 3-3 Create Tournament Use Case | ✅ DONE | CRUD operations working |
-| 3-4 Tournament Settings Configuration | ✅ DONE | Federation type, venue, rings |
-| 3-7 Division Entity & Repository | ✅ DONE | Division core complete |
-| 3-8 Smart Division Builder Algorithm | ✅ DONE | Core differentiator |
-| 3-9 Federation Template Registry | ✅ DONE | WT/ITF/ATA templates |
-| 3-10 Custom Division Creation | ✅ DONE | Custom divisions supported |
-| 3-11 Division Merge & Split | ✅ DONE | Recently completed |
-| 3-12 Ring Assignment Service | ✅ DONE | Ring assignment complete |
-| **3-13 Scheduling Conflict Detection** | 🔄 CURRENT | This story |
-| 3-6 Archive & Delete Tournament | ⏳ BACKLOG | |
-| 3-5 Duplicate Tournament as Template | ⏳ BACKLOG | |
-| 3-14 Tournament Management UI | ⏳ BACKLOG | Final UI layer |
+| Story                                  | Status    | Notes                         |
+| -------------------------------------- | --------- | ----------------------------- |
+| 3-1 Tournament Feature Structure       | ✅ DONE    | Feature scaffold complete     |
+| 3-2 Tournament Entity & Repository     | ✅ DONE    | Core entity established       |
+| 3-3 Create Tournament Use Case         | ✅ DONE    | CRUD operations working       |
+| 3-4 Tournament Settings Configuration  | ✅ DONE    | Federation type, venue, rings |
+| 3-7 Division Entity & Repository       | ✅ DONE    | Division core complete        |
+| 3-8 Smart Division Builder Algorithm   | ✅ DONE    | Core differentiator           |
+| 3-9 Federation Template Registry       | ✅ DONE    | WT/ITF/ATA templates          |
+| 3-10 Custom Division Creation          | ✅ DONE    | Custom divisions supported    |
+| 3-11 Division Merge & Split            | ✅ DONE    | Recently completed            |
+| 3-12 Ring Assignment Service           | ✅ DONE    | Ring assignment complete      |
+| **3-13 Scheduling Conflict Detection** | 🔄 CURRENT | This story                    |
+| 3-6 Archive & Delete Tournament        | ⏳ BACKLOG |                               |
+| 3-5 Duplicate Tournament as Template   | ⏳ BACKLOG |                               |
+| 3-14 Tournament Management UI          | ⏳ BACKLOG | Final UI layer                |
 
 ### Cross-Epic Dependencies
 
@@ -143,25 +143,25 @@ Epic 3 encompasses the complete tournament and division management system. This 
 
 ### CRITICAL ACCEPTANCE CRITERIA (Must Pass - Blocker Level)
 
-| ID | Criterion | Verification Method |
-|----|-----------|-------------------|
+| ID      | Criterion                                                                                                                 | Verification Method                                                                                                  |
+| ------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | **AC1** | **Same Ring Conflict Detection:** System detects when same participant is in multiple divisions assigned to the same ring | Manual: Assign Participant A to Division 1 (Ring 1) and Division 2 (Ring 1), run detection, verify conflict returned |
-| **AC2** | **Conflict Warning Structure:** ConflictWarning contains participant name, both division names, and ring number | Unit test: Verify ConflictWarning fields populated correctly |
-| **AC3** | **Multiple Conflicts:** Service can detect multiple conflicts in single tournament | Manual: Create 3 participants with conflicts, verify all returned |
-| **AC4** | **No False Positives:** No conflict reported when participant is in different rings | Manual: Participant in Division A (Ring 1) and Division B (Ring 2) - no conflict expected |
-| **AC5** | **No False Positives:** No conflict reported when divisions are in same ring but different displayOrder times | Note: This story detects ring conflicts only - time-based scheduling is out of scope |
-| **AC6** | **Either Return Type:** Service returns Either<Failure, List<ConflictWarning>> per architecture | Unit test: Verify Either pattern used correctly |
-| **AC7** | **Unit Tests:** Minimum 8 test cases covering all scenarios | `dart test` - all tests passing |
+| **AC2** | **Conflict Warning Structure:** ConflictWarning contains participant name, both division names, and ring number           | Unit test: Verify ConflictWarning fields populated correctly                                                         |
+| **AC3** | **Multiple Conflicts:** Service can detect multiple conflicts in single tournament                                        | Manual: Create 3 participants with conflicts, verify all returned                                                    |
+| **AC4** | **No False Positives:** No conflict reported when participant is in different rings                                       | Manual: Participant in Division A (Ring 1) and Division B (Ring 2) - no conflict expected                            |
+| **AC5** | **No False Positives:** No conflict reported when divisions are in same ring but different displayOrder times             | Note: This story detects ring conflicts only - time-based scheduling is out of scope                                 |
+| **AC6** | **Either Return Type:** Service returns Either<Failure, List<ConflictWarning>> per architecture                           | Unit test: Verify Either pattern used correctly                                                                      |
+| **AC7** | **Unit Tests:** Minimum 8 test cases covering all scenarios                                                               | `dart test` - all tests passing                                                                                      |
 
 ### SECONDARY ACCEPTANCE CRITERIA (Should Pass - Quality Level)
 
-| ID | Criterion | Verification Method |
-|----|-----------|-------------------|
-| **AC8** | **Empty Result:** Returns empty list when no conflicts exist | Unit test: Verify empty list returned for no-conflict scenario |
-| **AC9** | **Soft Delete Handling:** Ignores divisions marked as deleted | Manual: Participant in deleted division - should not cause conflict |
-| **AC10** | **Performance:** Conflict detection completes in <100ms for typical tournament | Performance test: Time detection on 50 divisions, 100 participants |
-| **AC11** | **Offline-First:** Service works completely offline (no network calls) | Manual: Disable network, run detection, verify it works |
-| **AC12** | **Integration Ready:** Service can be called from BLoC/UI layer | Code review: Verify method signature is UI-friendly |
+| ID       | Criterion                                                                      | Verification Method                                                 |
+| -------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| **AC8**  | **Empty Result:** Returns empty list when no conflicts exist                   | Unit test: Verify empty list returned for no-conflict scenario      |
+| **AC9**  | **Soft Delete Handling:** Ignores divisions marked as deleted                  | Manual: Participant in deleted division - should not cause conflict |
+| **AC10** | **Performance:** Conflict detection completes in <100ms for typical tournament | Performance test: Time detection on 50 divisions, 100 participants  |
+| **AC11** | **Offline-First:** Service works completely offline (no network calls)         | Manual: Disable network, run detection, verify it works             |
+| **AC12** | **Integration Ready:** Service can be called from BLoC/UI layer                | Code review: Verify method signature is UI-friendly                 |
 
 ---
 
@@ -1206,13 +1206,13 @@ ParticipantEntity _createParticipant({
 
 ### What Could Go Wrong:
 
-| Scenario | Prevention | Error Handling |
-|----------|------------|---------------|
-| No divisions with rings assigned | Return empty list | Not an error - return Right([]) |
-| Participant has no divisions | Skip participant | Return empty for that participant |
-| Division query fails | Try-catch in repo | Return Left(Failure) |
-| Participant query fails | Try-catch in repo | Return Left(Failure) |
-| Junction table missing | Create table | Add migration |
+| Scenario                         | Prevention        | Error Handling                    |
+| -------------------------------- | ----------------- | --------------------------------- |
+| No divisions with rings assigned | Return empty list | Not an error - return Right([])   |
+| Participant has no divisions     | Skip participant  | Return empty for that participant |
+| Division query fails             | Try-catch in repo | Return Left(Failure)              |
+| Participant query fails          | Try-catch in repo | Return Left(Failure)              |
+| Junction table missing           | Create table      | Add migration                     |
 
 ### Boundary Conditions:
 
@@ -1322,4 +1322,10 @@ Claude 3.5 Sonnet (via OpenCode)
   - Fixed test data to use same participant ID for conflict scenarios
   - Regenerated DI config (service already registered via @injectable)
   - Updated File List to accurately reflect implementation
+- 2026-02-19: Second code review fixes applied:
+  - CRITICAL: Fixed failure swallowing in detectConflicts() and detectConflictsForParticipant() — failures now properly propagated as Left(Failure)
+  - CRITICAL: Fixed detectConflictsForParticipant() to iterate ALL participant entries, not just the first
+  - MEDIUM: Added 2 failure propagation tests (division query fail, participant query fail) — 14 tests total
+  - LOW: Fixed "different rings" test to use same participant ID for proper AC4 validation
+
 

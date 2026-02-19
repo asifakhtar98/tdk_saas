@@ -148,7 +148,7 @@ void main() {
             lastName: 'Doe',
           ),
           createParticipant(
-            id: 'part-002',
+            id: 'part-001',
             divisionId: 'div-002',
             firstName: 'John',
             lastName: 'Doe',
@@ -340,6 +340,52 @@ void main() {
         );
       },
     );
+  });
+
+  group('ConflictDetectionService - failure propagation', () {
+    test('should return failure when division query fails', () async {
+      const tournamentId = 'tournament-001';
+
+      when(
+        () => mockDivisionRepository.getDivisionsForTournament(tournamentId),
+      ).thenAnswer(
+        (_) async => Left(const LocalCacheAccessFailure(
+          technicalDetails: 'Database error',
+        )),
+      );
+
+      final result = await service.detectConflicts(tournamentId);
+
+      expect(result.isLeft(), true);
+    });
+
+    test('should return failure when participant query fails', () async {
+      const tournamentId = 'tournament-001';
+
+      final divisions = [
+        createDivision(
+          id: 'div-001',
+          tournamentId: tournamentId,
+          name: 'Division A',
+          assignedRingNumber: 1,
+        ),
+      ];
+
+      when(
+        () => mockDivisionRepository.getDivisionsForTournament(tournamentId),
+      ).thenAnswer((_) async => Right(divisions));
+      when(
+        () => mockDivisionRepository.getParticipantsForDivisions(any()),
+      ).thenAnswer(
+        (_) async => Left(const LocalCacheAccessFailure(
+          technicalDetails: 'Database error',
+        )),
+      );
+
+      final result = await service.detectConflicts(tournamentId);
+
+      expect(result.isLeft(), true);
+    });
   });
 
   group('ConflictDetectionService - hasConflicts', () {
