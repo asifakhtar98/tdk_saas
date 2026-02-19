@@ -18,6 +18,7 @@ void main() {
         settingsJson: {},
         isTemplate: false,
         createdAt: now,
+        updatedAtTimestamp: now,
       );
 
       // Assert
@@ -53,6 +54,7 @@ void main() {
         settingsJson: {'key': 'value'},
         isTemplate: true,
         createdAt: now,
+        updatedAtTimestamp: now,
       );
 
       // Assert
@@ -80,6 +82,7 @@ void main() {
         settingsJson: {},
         isTemplate: false,
         createdAt: now,
+        updatedAtTimestamp: now,
       );
       final entity2 = TournamentEntity(
         id: 'test-id',
@@ -93,6 +96,7 @@ void main() {
         settingsJson: {},
         isTemplate: false,
         createdAt: now,
+        updatedAtTimestamp: now,
       );
 
       // Assert
@@ -114,6 +118,7 @@ void main() {
         settingsJson: {},
         isTemplate: false,
         createdAt: now,
+        updatedAtTimestamp: now,
       );
       final entity2 = TournamentEntity(
         id: 'test-id-2',
@@ -127,6 +132,7 @@ void main() {
         settingsJson: {},
         isTemplate: false,
         createdAt: now,
+        updatedAtTimestamp: now,
       );
 
       // Assert

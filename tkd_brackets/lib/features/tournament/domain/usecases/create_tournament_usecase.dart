@@ -88,6 +88,7 @@ class CreateTournamentUseCase
       isTemplate: false,
       settingsJson: const {},
       createdAt: DateTime.now(),
+      updatedAtTimestamp: DateTime.now(),
     );
 
     return _repository.createTournament(tournament, user.organizationId);

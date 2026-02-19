@@ -160,6 +160,7 @@ class TournamentModel with _$TournamentModel {
       numberOfRings: numberOfRings,
       settingsJson: settingsJson,
       createdAt: createdAtTimestamp,
+      updatedAtTimestamp: updatedAtTimestamp,
     );
   }
 

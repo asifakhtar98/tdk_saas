@@ -50,6 +50,7 @@ void main() {
     settingsJson: const {},
     isTemplate: false,
     createdAt: DateTime(2024),
+    updatedAtTimestamp: DateTime(2024),
   );
 
   final testOwner = UserEntity(

@@ -53,6 +53,7 @@ void main() {
     settingsJson: {},
     isTemplate: false,
     createdAt: DateTime(2024),
+    updatedAtTimestamp: DateTime(2024),
     isDeleted: false,
     syncVersion: 0,
   );

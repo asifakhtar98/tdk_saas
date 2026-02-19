@@ -82,6 +82,7 @@ void main() {
           settingsJson: <String, dynamic>{'test': 'data'},
           isTemplate: true,
           createdAt: now,
+          updatedAtTimestamp: now,
         );
 
         // Act
@@ -139,6 +140,7 @@ void main() {
           settingsJson: <String, dynamic>{},
           isTemplate: false,
           createdAt: now,
+          updatedAtTimestamp: now,
         );
 
         // Act
@@ -168,6 +170,7 @@ void main() {
             settingsJson: <String, dynamic>{},
             isTemplate: false,
             createdAt: now,
+            updatedAtTimestamp: now,
           ),
           syncVersion: 5,
         );
@@ -189,6 +192,7 @@ void main() {
             settingsJson: <String, dynamic>{},
             isTemplate: false,
             createdAt: now,
+            updatedAtTimestamp: now,
           ),
           isDeleted: true,
         );
@@ -210,6 +214,7 @@ void main() {
             settingsJson: <String, dynamic>{},
             isTemplate: false,
             createdAt: now,
+            updatedAtTimestamp: now,
           ),
           isDemoData: true,
         );

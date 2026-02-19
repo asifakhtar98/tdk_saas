@@ -4,7 +4,9 @@ import 'package:tkd_brackets/features/dashboard/dashboard.dart';
 import 'package:tkd_brackets/features/demo/presentation/pages/demo_page.dart';
 import 'package:tkd_brackets/features/home/presentation/pages/home_page.dart';
 import 'package:tkd_brackets/features/settings/settings.dart';
-import 'package:tkd_brackets/features/tournament/tournament.dart';
+import 'package:tkd_brackets/features/tournament/presentation/pages/tournament_list_page.dart';
+import 'package:tkd_brackets/features/tournament/presentation/pages/tournament_detail_page.dart';
+import 'package:tkd_brackets/features/tournament/presentation/pages/division_builder_wizard.dart';
 
 part 'routes.g.dart';
 
@@ -72,10 +74,20 @@ class TournamentDetailsRoute extends GoRouteData {
   final String tournamentId;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => Scaffold(
-        appBar: AppBar(title: Text('Tournament $tournamentId')),
-        body: Center(
-          child: Text('Tournament Details: $tournamentId'),
-        ),
-      );
+  Widget build(BuildContext context, GoRouterState state) =>
+      TournamentDetailPage(tournamentId: tournamentId);
+}
+
+/// Tournament divisions route - for division builder wizard.
+@TypedGoRoute<TournamentDivisionsRoute>(
+  path: '/tournaments/:tournamentId/divisions',
+)
+class TournamentDivisionsRoute extends GoRouteData {
+  const TournamentDivisionsRoute({required this.tournamentId});
+
+  final String tournamentId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      DivisionBuilderWizard(tournamentId: tournamentId);
 }

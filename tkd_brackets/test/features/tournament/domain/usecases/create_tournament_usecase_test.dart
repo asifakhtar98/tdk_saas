@@ -145,6 +145,7 @@ void main() {
               isTemplate: false,
               settingsJson: const {},
               createdAt: DateTime.now(),
+              updatedAtTimestamp: DateTime.now(),
             ),
           ),
         );
@@ -229,6 +230,7 @@ void main() {
               isTemplate: false,
               settingsJson: const {},
               createdAt: DateTime.now(),
+              updatedAtTimestamp: DateTime.now(),
             ),
           ),
         );
@@ -265,6 +267,7 @@ void main() {
               isTemplate: false,
               settingsJson: const {},
               createdAt: DateTime.now(),
+              updatedAtTimestamp: DateTime.now(),
             ),
           ),
         );

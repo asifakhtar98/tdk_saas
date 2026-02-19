@@ -79,6 +79,7 @@ void main() {
       settingsJson: const {},
       isTemplate: false,
       createdAt: DateTime(2026, 1, 1),
+      updatedAtTimestamp: DateTime(2026, 1, 1),
     );
   }
 

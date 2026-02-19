@@ -40,6 +40,7 @@ void main() {
     settingsJson: {},
     isTemplate: false,
     createdAt: testDate,
+    updatedAtTimestamp: testDate,
   );
 
   final testModel = TournamentModel(
