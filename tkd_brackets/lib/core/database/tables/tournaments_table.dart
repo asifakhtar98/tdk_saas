@@ -32,8 +32,9 @@ class Tournaments extends Table with BaseSyncMixin, BaseAuditMixin {
   /// Venue address for the tournament location.
   TextColumn get venueAddress => text().named('venue_address').nullable()();
 
-  /// Scheduled date for the tournament.
-  DateTimeColumn get scheduledDate => dateTime().named('scheduled_date')();
+  /// Scheduled date for the tournament (nullable for templates).
+  DateTimeColumn get scheduledDate =>
+      dateTime().named('scheduled_date').nullable()();
 
   /// Optional start time for the tournament.
   DateTimeColumn get scheduledStartTime =>

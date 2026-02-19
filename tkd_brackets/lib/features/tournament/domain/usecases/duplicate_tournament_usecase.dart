@@ -77,6 +77,17 @@ class DuplicateTournamentUseCase
       );
     }
 
+    // Check if source tournament is soft-deleted
+    if (sourceTournament.isDeleted) {
+      return Left(
+        NotFoundFailure(
+          userFriendlyMessage: 'Tournament not found',
+          technicalDetails:
+              'Tournament ${params.sourceTournamentId} has been deleted',
+        ),
+      );
+    }
+
     // STEP 2: Verify authorization (Owner or Admin)
     final authResult = await _authRepository.getCurrentAuthenticatedUser();
     final user = authResult.fold((failure) => null, (u) => u);
@@ -129,8 +140,9 @@ class DuplicateTournamentUseCase
       syncVersion: 0, // CRITICAL: New entity
       isDeleted: false,
       createdAt: now,
-      scheduledDate:
-          sourceTournament.scheduledDate, // Keep the date or set to now
+      updatedAtTimestamp: now, // CRITICAL: Both timestamps!
+      completedAtTimestamp: null, // Templates are not completed
+      scheduledDate: null, // Templates don't have dates
       description: sourceTournament.description,
       venueName: sourceTournament.venueName,
       venueAddress: sourceTournament.venueAddress,
@@ -202,6 +214,13 @@ class DuplicateTournamentUseCase
     }
 
     // STEP 7: Return the newly created tournament
+    // TODO(AC16): Emit domain event for BLoC state management
+    // TODO: Once eventBus is available, emit TournamentDuplicatedEvent:
+    // eventBus.fire(TournamentDuplicatedEvent(
+    //   newTournamentId: createdTournament.id,
+    //   sourceTournamentId: params.sourceTournamentId,
+    //   duplicatedDivisionCount: createdDivisions.length,
+    // ));
     return Right(createdTournament);
   }
 }

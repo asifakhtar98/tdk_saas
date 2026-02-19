@@ -47,7 +47,7 @@ void main() {
           id: tournamentId,
           organizationId: testOrgId,
           name: 'Spring Championship',
-          scheduledDate: scheduledDate,
+          scheduledDate: Value(scheduledDate),
         ),
       );
 
@@ -67,7 +67,7 @@ void main() {
           id: tournamentId,
           organizationId: testOrgId,
           name: 'Default Test',
-          scheduledDate: DateTime.now(),
+          scheduledDate: Value(DateTime.now()),
         ),
       );
 
@@ -90,7 +90,7 @@ void main() {
           id: tournamentId,
           organizationId: testOrgId,
           name: 'Nullable Test',
-          scheduledDate: DateTime.now(),
+          scheduledDate: Value(DateTime.now()),
         ),
       );
 
@@ -114,7 +114,7 @@ void main() {
           organizationId: testOrgId,
           createdByUserId: Value(testUserId),
           name: 'Created By User Test',
-          scheduledDate: DateTime.now(),
+          scheduledDate: Value(DateTime.now()),
         ),
       );
 
@@ -129,7 +129,7 @@ void main() {
           id: 'org-tournament-1',
           organizationId: testOrgId,
           name: 'Tournament 1',
-          scheduledDate: DateTime(2026, 3, 1),
+          scheduledDate: Value(DateTime(2026, 3, 1)),
         ),
       );
       await database.insertTournament(
@@ -137,12 +137,13 @@ void main() {
           id: 'org-tournament-2',
           organizationId: testOrgId,
           name: 'Tournament 2',
-          scheduledDate: DateTime(2026, 6, 1),
+          scheduledDate: Value(DateTime(2026, 6, 1)),
         ),
       );
 
-      final tournaments =
-          await database.getTournamentsForOrganization(testOrgId);
+      final tournaments = await database.getTournamentsForOrganization(
+        testOrgId,
+      );
 
       expect(tournaments, hasLength(2));
       // Ordered by scheduledDate DESC
@@ -157,7 +158,7 @@ void main() {
           id: tournamentId,
           organizationId: testOrgId,
           name: 'To Delete',
-          scheduledDate: DateTime.now(),
+          scheduledDate: Value(DateTime.now()),
         ),
       );
 
@@ -175,7 +176,7 @@ void main() {
           id: 'active-tournament',
           organizationId: testOrgId,
           name: 'Active',
-          scheduledDate: DateTime.now(),
+          scheduledDate: Value(DateTime.now()),
         ),
       );
       await database.insertTournament(
@@ -183,13 +184,14 @@ void main() {
           id: 'deleted-tournament',
           organizationId: testOrgId,
           name: 'Deleted',
-          scheduledDate: DateTime.now(),
+          scheduledDate: Value(DateTime.now()),
           isDeleted: const Value(true),
         ),
       );
 
-      final tournaments =
-          await database.getTournamentsForOrganization(testOrgId);
+      final tournaments = await database.getTournamentsForOrganization(
+        testOrgId,
+      );
 
       expect(tournaments, hasLength(1));
       expect(tournaments.first.name, 'Active');
@@ -203,15 +205,13 @@ void main() {
           id: tournamentId,
           organizationId: testOrgId,
           name: 'Original Name',
-          scheduledDate: DateTime.now(),
+          scheduledDate: Value(DateTime.now()),
         ),
       );
 
       await database.updateTournament(
         tournamentId,
-        const TournamentsCompanion(
-          name: Value('Updated Name'),
-        ),
+        const TournamentsCompanion(name: Value('Updated Name')),
       );
 
       final updated = await database.getTournamentById(tournamentId);
@@ -227,7 +227,7 @@ void main() {
           id: tournamentId,
           organizationId: testOrgId,
           name: 'Sync Mixin Test',
-          scheduledDate: DateTime.now(),
+          scheduledDate: Value(DateTime.now()),
           isDemoData: const Value(true),
         ),
       );
@@ -249,7 +249,7 @@ void main() {
           id: tournamentId,
           organizationId: testOrgId,
           name: 'Audit Mixin Test',
-          scheduledDate: DateTime.now(),
+          scheduledDate: Value(DateTime.now()),
         ),
       );
 

@@ -1,6 +1,6 @@
 # Story 3.5: Duplicate Tournament as Template
 
-Status: review
+Status: done
 
 <!-- 
   ===============================================================================

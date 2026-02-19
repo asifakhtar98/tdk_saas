@@ -28,7 +28,7 @@ void main() {
         id: testTournamentId,
         organizationId: testOrgId,
         name: 'Test Tournament',
-        scheduledDate: DateTime.now(),
+        scheduledDate: Value(DateTime.now()),
       ),
     );
   });
@@ -168,8 +168,9 @@ void main() {
         ),
       );
 
-      final divisions =
-          await database.getDivisionsForTournament(testTournamentId);
+      final divisions = await database.getDivisionsForTournament(
+        testTournamentId,
+      );
 
       expect(divisions, hasLength(2));
       // Ordered by displayOrder ASC
@@ -215,8 +216,9 @@ void main() {
         ),
       );
 
-      final divisions =
-          await database.getDivisionsForTournament(testTournamentId);
+      final divisions = await database.getDivisionsForTournament(
+        testTournamentId,
+      );
 
       expect(divisions, hasLength(1));
       expect(divisions.first.name, 'Active');
@@ -236,9 +238,7 @@ void main() {
 
       await database.updateDivision(
         divisionId,
-        const DivisionsCompanion(
-          name: Value('Updated Name'),
-        ),
+        const DivisionsCompanion(name: Value('Updated Name')),
       );
 
       final updated = await database.getDivisionById(divisionId);

@@ -30,7 +30,7 @@ void main() {
         id: testTournamentId,
         organizationId: testOrgId,
         name: 'Test Tournament',
-        scheduledDate: DateTime.now(),
+        scheduledDate: Value(DateTime.now()),
       ),
     );
 
@@ -116,24 +116,26 @@ void main() {
       expect(result.notes, isNull);
     });
 
-    test('should store schoolOrDojangName (critical for dojang separation)',
-        () async {
-      const participantId = 'participant-dojang';
+    test(
+      'should store schoolOrDojangName (critical for dojang separation)',
+      () async {
+        const participantId = 'participant-dojang';
 
-      await database.insertParticipant(
-        ParticipantsCompanion.insert(
-          id: participantId,
-          divisionId: testDivisionId,
-          firstName: 'Dojang',
-          lastName: 'Test',
-          schoolOrDojangName: const Value('Dragon Martial Arts'),
-        ),
-      );
+        await database.insertParticipant(
+          ParticipantsCompanion.insert(
+            id: participantId,
+            divisionId: testDivisionId,
+            firstName: 'Dojang',
+            lastName: 'Test',
+            schoolOrDojangName: const Value('Dragon Martial Arts'),
+          ),
+        );
 
-      final result = await database.getParticipantById(participantId);
+        final result = await database.getParticipantById(participantId);
 
-      expect(result!.schoolOrDojangName, 'Dragon Martial Arts');
-    });
+        expect(result!.schoolOrDojangName, 'Dragon Martial Arts');
+      },
+    );
 
     test('should store all athletic data', () async {
       const participantId = 'participant-athletic';
@@ -182,8 +184,9 @@ void main() {
         ),
       );
 
-      final participants =
-          await database.getParticipantsForDivision(testDivisionId);
+      final participants = await database.getParticipantsForDivision(
+        testDivisionId,
+      );
 
       expect(participants, hasLength(2));
       // Ordered by seedNumber ASC, then lastName ASC
@@ -229,8 +232,9 @@ void main() {
         ),
       );
 
-      final participants =
-          await database.getParticipantsForDivision(testDivisionId);
+      final participants = await database.getParticipantsForDivision(
+        testDivisionId,
+      );
 
       expect(participants, hasLength(1));
       expect(participants.first.firstName, 'Active');
@@ -250,9 +254,7 @@ void main() {
 
       await database.updateParticipant(
         participantId,
-        const ParticipantsCompanion(
-          firstName: Value('Updated'),
-        ),
+        const ParticipantsCompanion(firstName: Value('Updated')),
       );
 
       final updated = await database.getParticipantById(participantId);

@@ -23,7 +23,7 @@ class TournamentEntity with _$TournamentEntity {
     required String name,
 
     /// Scheduled date for the tournament.
-    required DateTime scheduledDate,
+    DateTime? scheduledDate,
 
     /// Federation type (WT, ITF, ATA, or custom).
     required FederationType federationType,
@@ -60,6 +60,12 @@ class TournamentEntity with _$TournamentEntity {
 
     /// When the tournament was created.
     required DateTime createdAt,
+
+    /// When the tournament was last updated.
+    required DateTime updatedAtTimestamp,
+
+    /// When the tournament was completed (null if not completed).
+    DateTime? completedAtTimestamp,
 
     /// Whether this tournament has been soft-deleted.
     @Default(false) bool isDeleted,

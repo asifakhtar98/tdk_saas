@@ -61,8 +61,15 @@ void main() {
     syncVersion: 5,
     isDeleted: false,
     createdAt: DateTime(2024),
+    updatedAtTimestamp: DateTime(2024),
+    completedAtTimestamp: DateTime(2026, 3, 16),
     scheduledDate: DateTime(2026, 3, 15),
     createdByUserId: 'user-123',
+  );
+
+  final testSoftDeletedTournament = testTournament.copyWith(
+    isDeleted: true,
+    deletedAtTimestamp: DateTime(2026, 1, 1),
   );
 
   final testActiveTournament = testTournament.copyWith(
@@ -135,26 +142,6 @@ void main() {
       );
 
       test(
-        'returns NotFoundFailure when source tournament does not exist (Left failure)',
-        () async {
-          when(() => mockRepository.getTournamentById(any())).thenAnswer(
-            (_) async =>
-                const Left(NotFoundFailure(userFriendlyMessage: 'Not found')),
-          );
-
-          final result = await useCase(
-            DuplicateTournamentParams(sourceTournamentId: 'nonexistent'),
-          );
-
-          expect(result.isLeft(), isTrue);
-          result.fold(
-            (failure) => expect(failure, isA<NotFoundFailure>()),
-            (_) => fail('Expected Left'),
-          );
-        },
-      );
-
-      test(
         'returns NotFoundFailure when source tournament returns null',
         () async {
           // Repository returns Left for null tournament (simulating database not found)
@@ -166,6 +153,25 @@ void main() {
 
           final result = await useCase(
             DuplicateTournamentParams(sourceTournamentId: 'null-tournament'),
+          );
+
+          expect(result.isLeft(), isTrue);
+          result.fold(
+            (failure) => expect(failure, isA<NotFoundFailure>()),
+            (_) => fail('Expected Left'),
+          );
+        },
+      );
+
+      test(
+        'returns NotFoundFailure when source tournament is soft-deleted',
+        () async {
+          when(
+            () => mockRepository.getTournamentById(any()),
+          ).thenAnswer((_) async => Right(testSoftDeletedTournament));
+
+          final result = await useCase(
+            DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
           );
 
           expect(result.isLeft(), isTrue);
@@ -403,6 +409,45 @@ void main() {
 
         expect(result.isRight(), isTrue);
         verifyNever(() => mockDivisionRepository.createDivision(any()));
+      });
+
+      test('handles custom divisions (isCustom: true) correctly', () async {
+        final customDivision = testDivision.copyWith(isCustom: true);
+        when(
+          () => mockRepository.getTournamentById(any()),
+        ).thenAnswer((_) async => Right(testTournament));
+        when(
+          () => mockAuthRepository.getCurrentAuthenticatedUser(),
+        ).thenAnswer((_) async => Right(testOwner));
+        when(
+          () => mockRepository.getDivisionsByTournamentId(any()),
+        ).thenAnswer((_) async => Right([customDivision]));
+        when(() => mockRepository.createTournament(any(), any())).thenAnswer((
+          invocation,
+        ) async {
+          final tournament =
+              invocation.positionalArguments[0] as TournamentEntity;
+          return Right(tournament);
+        });
+        when(() => mockDivisionRepository.createDivision(any())).thenAnswer((
+          invocation,
+        ) async {
+          final division = invocation.positionalArguments[0] as DivisionEntity;
+          return Right(division);
+        });
+
+        final result = await useCase(
+          DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+        );
+
+        expect(result.isRight(), isTrue);
+
+        final captured =
+            verify(
+                  () => mockDivisionRepository.createDivision(captureAny()),
+                ).captured.single
+                as DivisionEntity;
+        expect(captured.isCustom, isTrue);
       });
 
       test('does not copy participants (only divisions)', () async {
