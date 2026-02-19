@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tkd_brackets/core/config/supabase_config.dart';
+import 'package:uuid/uuid.dart';
 
 /// Module for registering third-party libraries and external dependencies.
 ///
@@ -23,4 +24,7 @@ abstract class RegisterModule {
   /// checks.
   @lazySingleton
   InternetConnection get internetConnection => InternetConnection();
+
+  @lazySingleton
+  Uuid get uuid => const Uuid();
 }

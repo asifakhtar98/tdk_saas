@@ -4,7 +4,7 @@ import 'package:tkd_brackets/features/division/domain/entities/division_entity.d
 import 'package:tkd_brackets/features/division/domain/entities/division_template.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_template_repository.dart';
 
-@singleton
+@LazySingleton()
 class FederationTemplateRegistry {
   FederationTemplateRegistry(this._repository);
 

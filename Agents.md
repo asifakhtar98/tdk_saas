@@ -1,0 +1,1 @@
+Prd, architecture, specs etc: /Users/asak/Documents/dev/proj/personal/taekwondo_fix/_bmad-output/planning-artifacts
