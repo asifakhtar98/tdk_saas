@@ -1,6 +1,6 @@
 # Story 3.14: Tournament Management UI
 
-**Status:** in-progress
+**Status:** done
 
 **Created:** 2026-02-19
 
