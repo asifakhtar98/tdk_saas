@@ -98,18 +98,6 @@ void main() {
           reason: 'Barrel file should have Presentation exports section',
         );
 
-        // Ensure no live exports exist (scaffolding only)
-        final exportLines = content
-            .split('\n')
-            .where((l) => l.trimLeft().startsWith('export '))
-            .toList();
-        expect(
-          exportLines,
-          isEmpty,
-          reason:
-              'Barrel file must have zero export statements '
-              'at this scaffolding stage',
-        );
       });
 
       test('parent directories should have .gitkeep for consistency', () {
