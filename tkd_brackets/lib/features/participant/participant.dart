@@ -10,6 +10,7 @@ export 'data/repositories/participant_repository_implementation.dart';
 // Domain exports
 export 'domain/entities/participant_entity.dart';
 export 'domain/repositories/participant_repository.dart';
+export 'domain/services/services.dart';
 export 'domain/usecases/usecases.dart';
 
 // Presentation exports (will be added in subsequent stories)
