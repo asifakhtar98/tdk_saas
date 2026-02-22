@@ -114,7 +114,7 @@ development_status:
   4-2-participant-entity-and-repository: done
   4-3-manual-participant-entry: review
   4-4-csv-import-parser: done
-  4-5-duplicate-detection-algorithm: backlog
+  4-5-duplicate-detection-algorithm: done
   4-6-bulk-import-with-validation: backlog
   4-7-participant-status-management: backlog
   4-9-auto-assignment-algorithm: backlog
