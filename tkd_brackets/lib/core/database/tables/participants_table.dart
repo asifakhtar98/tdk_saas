@@ -59,6 +59,10 @@ class Participants extends Table with BaseSyncMixin, BaseAuditMixin {
   DateTimeColumn get checkInAtTimestamp =>
       dateTime().named('check_in_at_timestamp').nullable()();
 
+  /// Disqualification reason (nullable, set only when status is
+  /// 'disqualified').
+  TextColumn get dqReason => text().named('dq_reason').nullable()();
+
   /// Optional photo URL.
   TextColumn get photoUrl => text().named('photo_url').nullable()();
 

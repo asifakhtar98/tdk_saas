@@ -52,6 +52,9 @@ class ParticipantEntity with _$ParticipantEntity {
     /// When the participant checked in.
     DateTime? checkInAtTimestamp,
 
+    /// Reason for disqualification (only set when status is disqualified).
+    String? dqReason,
+
     /// Optional photo URL.
     String? photoUrl,
 
@@ -99,7 +102,8 @@ enum ParticipantStatus {
   pending('pending'),
   checkedIn('checked_in'),
   noShow('no_show'),
-  withdrawn('withdrawn');
+  withdrawn('withdrawn'),
+  disqualified('disqualified');
 
   const ParticipantStatus(this.value);
 

@@ -116,7 +116,7 @@ development_status:
   4-4-csv-import-parser: done
   4-5-duplicate-detection-algorithm: done
   4-6-bulk-import-with-validation: done
-  4-7-participant-status-management: backlog
+  4-7-participant-status-management: done
   4-9-auto-assignment-algorithm: backlog
   4-8-assign-participants-to-divisions: backlog
   4-10-division-participant-view: backlog
