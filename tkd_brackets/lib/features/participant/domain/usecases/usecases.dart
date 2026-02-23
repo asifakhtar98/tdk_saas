@@ -1,3 +1,6 @@
+export 'auto_assignment_match.dart';
+export 'auto_assignment_result.dart';
+export 'auto_assign_participants_usecase.dart';
 export 'bulk_import_preview.dart';
 export 'bulk_import_preview_row.dart';
 export 'bulk_import_result.dart';
