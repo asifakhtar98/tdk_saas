@@ -118,7 +118,7 @@ development_status:
   4-6-bulk-import-with-validation: done
   4-7-participant-status-management: done
   4-9-auto-assignment-algorithm: done
-  4-8-assign-participants-to-divisions: backlog
+  4-8-assign-participants-to-divisions: done
   4-10-division-participant-view: backlog
   4-11-participant-edit-and-transfer: backlog
   4-12-participant-management-ui: backlog

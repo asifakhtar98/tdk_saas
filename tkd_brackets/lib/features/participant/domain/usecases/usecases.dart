@@ -1,3 +1,4 @@
+export 'assign_to_division_usecase.dart';
 export 'auto_assignment_match.dart';
 export 'auto_assignment_result.dart';
 export 'auto_assign_participants_usecase.dart';
