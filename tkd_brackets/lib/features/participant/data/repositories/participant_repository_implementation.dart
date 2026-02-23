@@ -160,4 +160,36 @@ class ParticipantRepositoryImplementation implements ParticipantRepository {
       return Left(LocalCacheWriteFailure(technicalDetails: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, List<ParticipantEntity>>> createParticipantsBatch(
+    List<ParticipantEntity> participants,
+  ) async {
+    try {
+      final models = participants
+          .map(ParticipantModel.convertFromEntity)
+          .toList();
+
+      await _localDatasource.insertParticipantsBatch(models);
+
+      if (await _connectivityService.hasInternetConnection()) {
+        try {
+          for (final model in models) {
+            await _remoteDatasource.insertParticipant(model);
+          }
+        } on Exception catch (_) {
+          // Queued for sync - local data is safe
+        }
+      }
+
+      return Right(participants);
+    } on Exception catch (e) {
+      return Left(
+        LocalCacheWriteFailure(
+          userFriendlyMessage: 'Failed to save participants',
+          technicalDetails: e.toString(),
+        ),
+      );
+    }
+  }
 }

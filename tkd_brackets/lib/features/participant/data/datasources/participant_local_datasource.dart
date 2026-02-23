@@ -20,6 +20,12 @@ abstract class ParticipantLocalDatasource {
 
   /// Soft delete a participant.
   Future<void> deleteParticipant(String id);
+
+  /// Batch insert participants using Drift batch operation.
+  /// More efficient than individual inserts for bulk operations.
+  Future<List<ParticipantModel>> insertParticipantsBatch(
+    List<ParticipantModel> participants,
+  );
 }
 
 @LazySingleton(as: ParticipantLocalDatasource)
@@ -60,5 +66,16 @@ class ParticipantLocalDatasourceImplementation
   @override
   Future<void> deleteParticipant(String id) async {
     await _database.softDeleteParticipant(id);
+  }
+
+  @override
+  Future<List<ParticipantModel>> insertParticipantsBatch(
+    List<ParticipantModel> participants,
+  ) async {
+    final companions = participants.map((p) => p.toDriftCompanion()).toList();
+    await _database.batch((batch) {
+      batch.insertAll(_database.participants, companions);
+    });
+    return participants;
   }
 }

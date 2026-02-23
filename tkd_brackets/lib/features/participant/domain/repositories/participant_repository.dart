@@ -30,4 +30,11 @@ abstract class ParticipantRepository {
 
   /// Delete a participant (soft delete).
   Future<Either<Failure, Unit>> deleteParticipant(String id);
+
+  /// Batch create multiple participants in a single transaction.
+  /// More efficient than individual inserts for bulk operations.
+  /// Returns created participants on success.
+  Future<Either<Failure, List<ParticipantEntity>>> createParticipantsBatch(
+    List<ParticipantEntity> participants,
+  );
 }
