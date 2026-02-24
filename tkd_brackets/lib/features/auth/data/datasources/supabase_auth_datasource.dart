@@ -69,11 +69,7 @@ class SupabaseAuthDatasourceImplementation implements SupabaseAuthDatasource {
     required String token,
     required OtpType type,
   }) async {
-    return _supabase.auth.verifyOTP(
-      email: email,
-      token: token,
-      type: type,
-    );
+    return _supabase.auth.verifyOTP(email: email, token: token, type: type);
   }
 
   @override

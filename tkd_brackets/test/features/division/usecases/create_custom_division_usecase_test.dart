@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/create_custom_division_usecase.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/create_custom_division_params.dart';
-import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
-import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
+import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
+import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/create_custom_division_params.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/create_custom_division_usecase.dart';
 
 class MockDivisionRepository extends Mock implements DivisionRepository {}
 
@@ -32,15 +32,15 @@ void main() {
     test(
       'should create division with isCustom=true when all fields provided',
       () async {
-        final params = CreateCustomDivisionParams(
+        const params = CreateCustomDivisionParams(
           tournamentId: 'tournament-123',
           name: 'Custom Sparring Division',
           category: DivisionCategory.sparring,
           gender: DivisionGender.male,
           ageMin: 12,
           ageMax: 14,
-          weightMinKg: 40.0,
-          weightMaxKg: 50.0,
+          weightMinKg: 40,
+          weightMaxKg: 50,
           bracketFormat: BracketFormat.singleElimination,
         );
 
@@ -52,8 +52,8 @@ void main() {
           gender: DivisionGender.male,
           ageMin: 12,
           ageMax: 14,
-          weightMinKg: 40.0,
-          weightMaxKg: 50.0,
+          weightMinKg: 40,
+          weightMaxKg: 50,
           bracketFormat: BracketFormat.singleElimination,
           isCustom: true,
           status: DivisionStatus.setup,
@@ -83,7 +83,7 @@ void main() {
     test(
       'should create division with minimal fields (only name and category)',
       () async {
-        final params = CreateCustomDivisionParams(
+        const params = CreateCustomDivisionParams(
           tournamentId: 'tournament-123',
           name: 'Minimal Division',
           category: DivisionCategory.demoTeam,
@@ -118,7 +118,7 @@ void main() {
     );
 
     test('should create division with only criteria (no category)', () async {
-      final params = CreateCustomDivisionParams(
+      const params = CreateCustomDivisionParams(
         tournamentId: 'tournament-123',
         name: 'Criteria Only Division',
         beltRankMin: 'white',
@@ -157,7 +157,7 @@ void main() {
 
   group('CreateCustomDivisionUseCase - Validation Failures', () {
     test('should return ValidationFailure when name is empty', () async {
-      final params = CreateCustomDivisionParams(
+      const params = CreateCustomDivisionParams(
         tournamentId: 'tournament-123',
         name: '',
       );
@@ -188,7 +188,7 @@ void main() {
     test(
       'should return ValidationFailure when no criteria and no category',
       () async {
-        final params = CreateCustomDivisionParams(
+        const params = CreateCustomDivisionParams(
           tournamentId: 'tournament-123',
           name: 'Empty Division',
         );
@@ -203,7 +203,7 @@ void main() {
     );
 
     test('should return ValidationFailure when ageMin > ageMax', () async {
-      final params = CreateCustomDivisionParams(
+      const params = CreateCustomDivisionParams(
         tournamentId: 'tournament-123',
         name: 'Invalid Age',
         ageMin: 20,
@@ -218,11 +218,11 @@ void main() {
     test(
       'should return ValidationFailure when weightMin > weightMax',
       () async {
-        final params = CreateCustomDivisionParams(
+        const params = CreateCustomDivisionParams(
           tournamentId: 'tournament-123',
           name: 'Invalid Weight',
-          weightMinKg: 100.0,
-          weightMaxKg: 50.0,
+          weightMinKg: 100,
+          weightMaxKg: 50,
         );
 
         final result = await useCase(params);
@@ -234,7 +234,7 @@ void main() {
     test(
       'should return ValidationFailure when judgeCount out of range',
       () async {
-        final params = CreateCustomDivisionParams(
+        const params = CreateCustomDivisionParams(
           tournamentId: 'tournament-123',
           name: 'Invalid Judges',
           category: DivisionCategory.sparring,
@@ -272,7 +272,7 @@ void main() {
           () => mockRepository.getDivisionsForTournament('tournament-123'),
         ).thenAnswer((_) async => Right([existingDivision]));
 
-        final params = CreateCustomDivisionParams(
+        const params = CreateCustomDivisionParams(
           tournamentId: 'tournament-123',
           name: 'Existing Division',
           category: DivisionCategory.sparring,
@@ -290,15 +290,15 @@ void main() {
 
   group('CreateCustomDivisionUseCase - Repository Failures', () {
     test('should return failure when local DB fails', () async {
-      final params = CreateCustomDivisionParams(
+      const params = CreateCustomDivisionParams(
         tournamentId: 'tournament-123',
         name: 'Test Division',
         category: DivisionCategory.sparring,
       );
 
       when(() => mockRepository.createDivision(any())).thenAnswer(
-        (_) async => Left(
-          const LocalCacheWriteFailure(
+        (_) async => const Left(
+          LocalCacheWriteFailure(
             userFriendlyMessage: 'Unable to save division locally',
           ),
         ),

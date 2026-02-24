@@ -63,21 +63,18 @@ class SentryService {
 
     _enabled = true;
 
-    await SentryFlutter.init(
-      (options) {
-        options
-          ..dsn = dsn
-          ..environment = environment
-          ..tracesSampleRate = tracesSampleRate
-          // Disable in debug builds even if DSN provided
-          ..debug = kDebugMode
-          // Attach screenshots on crash (default is true)
-          ..attachScreenshot = true
-          // Track app lifecycle events as breadcrumbs
-          ..enableAutoSessionTracking = true;
-      },
-      appRunner: appRunner,
-    );
+    await SentryFlutter.init((options) {
+      options
+        ..dsn = dsn
+        ..environment = environment
+        ..tracesSampleRate = tracesSampleRate
+        // Disable in debug builds even if DSN provided
+        ..debug = kDebugMode
+        // Attach screenshots on crash (default is true)
+        ..attachScreenshot = true
+        // Track app lifecycle events as breadcrumbs
+        ..enableAutoSessionTracking = true;
+    }, appRunner: appRunner);
   }
 
   /// Captures an exception to Sentry.
@@ -122,11 +119,7 @@ class SentryService {
     if (!_enabled) return;
 
     Sentry.addBreadcrumb(
-      Breadcrumb(
-        message: message,
-        category: category,
-        data: data,
-      ),
+      Breadcrumb(message: message, category: category, data: data),
     );
   }
 

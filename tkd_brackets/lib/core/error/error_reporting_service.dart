@@ -28,9 +28,7 @@ class ErrorReportingService {
     );
 
     if (failure.technicalDetails != null) {
-      _loggerService.error(
-        'Technical details: ${failure.technicalDetails}',
-      );
+      _loggerService.error('Technical details: ${failure.technicalDetails}');
     }
 
     // Send to Sentry (no-op if disabled)
@@ -69,11 +67,7 @@ class ErrorReportingService {
   ///
   /// Use this method for general error reporting when you don't have a
   /// structured Failure or Exception.
-  void reportError(
-    String message, {
-    Object? error,
-    StackTrace? stackTrace,
-  }) {
+  void reportError(String message, {Object? error, StackTrace? stackTrace}) {
     _loggerService.error(message, error, stackTrace);
 
     // Send to Sentry (no-op if disabled)

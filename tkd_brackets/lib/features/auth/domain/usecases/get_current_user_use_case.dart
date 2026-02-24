@@ -10,16 +10,13 @@ import 'package:tkd_brackets/features/auth/domain/repositories/auth_repository.d
 /// Checks Supabase session, then local cache, then remote.
 /// Returns [UserEntity] if authenticated, [Failure] if not.
 @injectable
-class GetCurrentUserUseCase
-    extends UseCase<UserEntity, NoParams> {
+class GetCurrentUserUseCase extends UseCase<UserEntity, NoParams> {
   GetCurrentUserUseCase(this._authRepository);
 
   final AuthRepository _authRepository;
 
   @override
-  Future<Either<Failure, UserEntity>> call(
-    NoParams params,
-  ) async {
+  Future<Either<Failure, UserEntity>> call(NoParams params) async {
     return _authRepository.getCurrentAuthenticatedUser();
   }
 }

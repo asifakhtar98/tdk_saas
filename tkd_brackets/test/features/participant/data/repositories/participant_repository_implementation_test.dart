@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/database/app_database.dart';
 import 'package:tkd_brackets/core/error/failures.dart';

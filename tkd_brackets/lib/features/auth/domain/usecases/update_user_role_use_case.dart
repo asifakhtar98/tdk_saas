@@ -9,29 +9,22 @@ import 'package:tkd_brackets/features/auth/domain/usecases/update_user_role_para
 
 @injectable
 class UpdateUserRoleUseCase extends UseCase<UserEntity, UpdateUserRoleParams> {
-  UpdateUserRoleUseCase(
-    this._userRepository,
-    this._authRepository,
-  );
+  UpdateUserRoleUseCase(this._userRepository, this._authRepository);
 
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
 
   @override
-  Future<Either<Failure, UserEntity>> call(
-    UpdateUserRoleParams params,
-  ) async {
+  Future<Either<Failure, UserEntity>> call(UpdateUserRoleParams params) async {
     // 1. Security: Verify authenticated user matches params
-    final authResult =
-        await _authRepository.getCurrentAuthenticatedUser();
+    final authResult = await _authRepository.getCurrentAuthenticatedUser();
 
     return authResult.fold(Left.new, (authUser) async {
       if (authUser.id != params.requestingUserId) {
         return const Left(
           AuthenticationFailure(
             userFriendlyMessage: 'Unauthorized operation.',
-            technicalDetails:
-                'User ID mismatch in UpdateUserRoleParams',
+            technicalDetails: 'User ID mismatch in UpdateUserRoleParams',
           ),
         );
       }
@@ -46,8 +39,7 @@ class UpdateUserRoleUseCase extends UseCase<UserEntity, UpdateUserRoleParams> {
             AuthorizationPermissionDeniedFailure(
               userFriendlyMessage:
                   'Only organization owners can change user roles.',
-              technicalDetails:
-                  'Non-owner attempted to change user role',
+              technicalDetails: 'Non-owner attempted to change user role',
             ),
           );
         }
@@ -56,11 +48,8 @@ class UpdateUserRoleUseCase extends UseCase<UserEntity, UpdateUserRoleParams> {
         if (params.targetUserId == params.requestingUserId) {
           return const Left(
             InputValidationFailure(
-              userFriendlyMessage:
-                  'You cannot change your own role.',
-              fieldErrors: {
-                'targetUserId': 'Cannot target yourself',
-              },
+              userFriendlyMessage: 'You cannot change your own role.',
+              fieldErrors: {'targetUserId': 'Cannot target yourself'},
             ),
           );
         }
@@ -71,10 +60,7 @@ class UpdateUserRoleUseCase extends UseCase<UserEntity, UpdateUserRoleParams> {
             InputValidationFailure(
               userFriendlyMessage:
                   'Owner role cannot be assigned to other users.',
-              fieldErrors: {
-                'newRole':
-                    'Owner role cannot be assigned',
-              },
+              fieldErrors: {'newRole': 'Owner role cannot be assigned'},
             ),
           );
         }
@@ -90,9 +76,7 @@ class UpdateUserRoleUseCase extends UseCase<UserEntity, UpdateUserRoleParams> {
               InputValidationFailure(
                 userFriendlyMessage:
                     'This user does not belong to any organization.',
-                fieldErrors: {
-                  'targetUserId': 'User has no organization',
-                },
+                fieldErrors: {'targetUserId': 'User has no organization'},
               ),
             );
           }
@@ -109,9 +93,7 @@ class UpdateUserRoleUseCase extends UseCase<UserEntity, UpdateUserRoleParams> {
           }
 
           // 8. Update target user's role
-          final updatedUser = targetUser.copyWith(
-            role: params.newRole,
-          );
+          final updatedUser = targetUser.copyWith(role: params.newRole);
           return _userRepository.updateUser(updatedUser);
         });
       });

@@ -83,7 +83,7 @@ void main() {
         );
 
         final result = await useCase(
-          ArchiveTournamentParams(tournamentId: 'nonexistent'),
+          const ArchiveTournamentParams(tournamentId: 'nonexistent'),
         );
 
         expect(result.isLeft(), isTrue);
@@ -108,7 +108,7 @@ void main() {
           );
 
           final result = await useCase(
-            ArchiveTournamentParams(tournamentId: 'tournament-123'),
+            const ArchiveTournamentParams(tournamentId: 'tournament-123'),
           );
 
           expect(result.isLeft(), isTrue);
@@ -131,7 +131,7 @@ void main() {
           ).thenAnswer((_) async => Right(testViewer));
 
           final result = await useCase(
-            ArchiveTournamentParams(tournamentId: 'tournament-123'),
+            const ArchiveTournamentParams(tournamentId: 'tournament-123'),
           );
 
           expect(result.isLeft(), isTrue);
@@ -155,7 +155,7 @@ void main() {
           ).thenAnswer((_) async => Right(testScorer));
 
           final result = await useCase(
-            ArchiveTournamentParams(tournamentId: 'tournament-123'),
+            const ArchiveTournamentParams(tournamentId: 'tournament-123'),
           );
 
           expect(result.isLeft(), isTrue);
@@ -182,7 +182,7 @@ void main() {
           ).thenAnswer((_) async => Right(testOwner));
 
           final result = await useCase(
-            ArchiveTournamentParams(tournamentId: 'tournament-123'),
+            const ArchiveTournamentParams(tournamentId: 'tournament-123'),
           );
 
           expect(result.isLeft(), isTrue);
@@ -212,7 +212,7 @@ void main() {
         );
 
         final result = await useCase(
-          ArchiveTournamentParams(tournamentId: 'tournament-123'),
+          const ArchiveTournamentParams(tournamentId: 'tournament-123'),
         );
 
         expect(result.isRight(), isTrue);
@@ -243,7 +243,7 @@ void main() {
         );
 
         final result = await useCase(
-          ArchiveTournamentParams(tournamentId: 'tournament-123'),
+          const ArchiveTournamentParams(tournamentId: 'tournament-123'),
         );
 
         expect(result.isRight(), isTrue);
@@ -268,7 +268,7 @@ void main() {
         );
 
         final result = await useCase(
-          ArchiveTournamentParams(tournamentId: 'tournament-123'),
+          const ArchiveTournamentParams(tournamentId: 'tournament-123'),
         );
 
         final archived = result.fold(

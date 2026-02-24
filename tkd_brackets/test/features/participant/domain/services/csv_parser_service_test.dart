@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
-import 'package:tkd_brackets/features/division/domain/entities/belt_rank.dart';
 import 'package:tkd_brackets/features/participant/domain/entities/participant_entity.dart';
 import 'package:tkd_brackets/features/participant/domain/services/csv_import_result.dart';
 import 'package:tkd_brackets/features/participant/domain/services/csv_parser_service.dart';
@@ -15,27 +14,34 @@ void main() {
   });
 
   const standardCSVFixture =
-      '''FirstName,LastName,DOB,Gender,Dojang,Belt,Weight,RegNumber,Notes
+      '''
+FirstName,LastName,DOB,Gender,Dojang,Belt,Weight,RegNumber,Notes
 John,Smith,2010-05-15,M,Kim's TKD,Blue,45.5,,
 Jane,Doe,2012-08-22,F,Elite TKD,Green,38.0,REG001,Allergy note''';
 
   const alternateHeadersFixture =
-      '''first_name,last_name,birthday,sex,school,rank,weight_kg
+      '''
+first_name,last_name,birthday,sex,school,rank,weight_kg
 Jane,Doe,2012-08-22,F,Elite TKD,Green,38.0''';
 
-  const quotedValueFixture = '''FirstName,LastName,Dojang,Belt,Notes
+  const quotedValueFixture = '''
+FirstName,LastName,Dojang,Belt,Notes
 John,"Smith, Jr.",Kim's TKD,Blue,"Allergy: peanuts, shellfish"''';
 
-  const escapedQuotesFixture = '''FirstName,LastName,Dojang,Belt,Notes
+  const escapedQuotesFixture = '''
+FirstName,LastName,Dojang,Belt,Notes
 Jane,O'Brien,Elite TKD,Green,"Uses ""nickname"" in competition"''';
 
-  const usDateFormatFixture = '''FirstName,LastName,DOB,Dojang,Belt
+  const usDateFormatFixture = '''
+FirstName,LastName,DOB,Dojang,Belt
 John,Smith,05/15/2010,Kim's TKD,Blue''';
 
-  const euDateFormatFixture = '''FirstName,LastName,DOB,Dojang,Belt
+  const euDateFormatFixture = '''
+FirstName,LastName,DOB,Dojang,Belt
 Hans,Mueller,15-05-2010,Berlin TKD,Blue''';
 
-  const missingColumnsFixture = '''FirstName,LastName,Dojang
+  const missingColumnsFixture = '''
+FirstName,LastName,Dojang
 John,Smith,Kim's TKD''';
 
   const headerOnlyFixture =
@@ -43,16 +49,20 @@ John,Smith,Kim's TKD''';
 
   const emptyCSVFixture = '';
 
-  const invalidBeltFixture = '''FirstName,LastName,Dojang,Belt
+  const invalidBeltFixture = '''
+FirstName,LastName,Dojang,Belt
 John,Smith,Kim's TKD,Purple''';
 
-  const invalidGenderFixture = '''FirstName,LastName,Gender,Dojang,Belt
+  const invalidGenderFixture = '''
+FirstName,LastName,Gender,Dojang,Belt
 John,Smith,X,Kim's TKD,Blue''';
 
-  const multipleErrorsFixture = '''FirstName,LastName,DOB,Gender,Dojang,Belt
+  const multipleErrorsFixture = '''
+FirstName,LastName,DOB,Gender,Dojang,Belt
 ,Smith,2099-01-01,X,,Purple''';
 
-  const danFormatsFixture = '''FirstName,LastName,Dojang,Belt
+  const danFormatsFixture = '''
+FirstName,LastName,Dojang,Belt
 John,Smith,Kim's TKD,Black 1st Dan
 Jane,Doe,Elite TKD,2nd Dan
 Mike,Johnson,Champion TKD,Black 3rd Dan''';
@@ -164,7 +174,8 @@ Mike,Johnson,Champion TKD,Black 3rd Dan''';
 
   group('belt rank normalization', () {
     test('normalizes standard belt ranks', () async {
-      const fixture = '''FirstName,LastName,Dojang,Belt
+      const fixture = '''
+FirstName,LastName,Dojang,Belt
 John,Smith,Kim's TKD,White
 Jane,Doe,Elite TKD,Yellow
 Bob,Jones,Test TKD,Green
@@ -221,7 +232,8 @@ Sam,Kim,Test TKD,Black''';
 
   group('gender normalization', () {
     test('normalizes gender values (M, Male, F, Female)', () async {
-      const fixture = '''FirstName,LastName,Gender,Dojang,Belt
+      const fixture = '''
+FirstName,LastName,Gender,Dojang,Belt
 John,Smith,M,Kim's TKD,Blue
 Jane,Doe,Male,Elite TKD,Green
 Bob,Jones,F,Test TKD,Blue
@@ -368,7 +380,8 @@ Alice,Wong,Female,Test TKD,Green''';
 
   group('weight validation', () {
     test('rejects negative weight', () async {
-      const fixture = '''FirstName,LastName,Dojang,Belt,Weight
+      const fixture = '''
+FirstName,LastName,Dojang,Belt,Weight
 John,Smith,Kim's TKD,Blue,-10''';
 
       final result = await service.parseCSV(
@@ -385,7 +398,8 @@ John,Smith,Kim's TKD,Blue,-10''';
     });
 
     test('rejects weight exceeding 150kg', () async {
-      const fixture = '''FirstName,LastName,Dojang,Belt,Weight
+      const fixture = '''
+FirstName,LastName,Dojang,Belt,Weight
 John,Smith,Kim's TKD,Blue,200''';
 
       final result = await service.parseCSV(
@@ -404,7 +418,8 @@ John,Smith,Kim's TKD,Blue,200''';
 
   group('date validation', () {
     test('rejects future dates', () async {
-      const fixture = '''FirstName,LastName,DOB,Dojang,Belt
+      const fixture = '''
+FirstName,LastName,DOB,Dojang,Belt
 John,Smith,2099-01-01,Kim's TKD,Blue''';
 
       final result = await service.parseCSV(
@@ -492,7 +507,8 @@ John,Smith,$dobStr,Kim's TKD,Blue''';
 
   group('edge cases', () {
     test('handles row with fewer columns than headers', () async {
-      const fixture = '''FirstName,LastName,Dojang,Belt,Notes
+      const fixture = '''
+FirstName,LastName,Dojang,Belt,Notes
 John,Smith,Kim's TKD,Blue''';
 
       final result = await service.parseCSV(
@@ -511,7 +527,7 @@ John,Smith,Kim's TKD,Blue''';
 
   group('CSVImportResult', () {
     test('computed properties work correctly', () {
-      final result = CSVImportResult(
+      const result = CSVImportResult(
         validRows: [
           CSVRowData(
             firstName: 'John',
@@ -522,7 +538,7 @@ John,Smith,Kim's TKD,Blue''';
           ),
         ],
         errors: [
-          const CSVRowError(
+          CSVRowError(
             rowNumber: 2,
             fieldName: 'beltRank',
             errorMessage: 'Invalid belt rank',
@@ -538,7 +554,7 @@ John,Smith,Kim's TKD,Blue''';
     });
 
     test('isEmpty is true when totalRows is 0', () {
-      final result = CSVImportResult(validRows: [], errors: [], totalRows: 0);
+      const result = CSVImportResult(validRows: [], errors: [], totalRows: 0);
 
       expect(result.isEmpty, isTrue);
       expect(result.hasErrors, isFalse);

@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/update_custom_division_usecase.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/update_custom_division_params.dart';
-import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
-import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
+import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
+import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/update_custom_division_params.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/update_custom_division_usecase.dart';
 
 class MockDivisionRepository extends Mock implements DivisionRepository {}
 
@@ -48,7 +48,7 @@ void main() {
         updatedAtTimestamp: DateTime.now(),
       );
 
-      final params = UpdateCustomDivisionParams(
+      const params = UpdateCustomDivisionParams(
         divisionId: 'division-1',
         name: 'Updated Division',
       );
@@ -88,7 +88,7 @@ void main() {
         updatedAtTimestamp: DateTime.now(),
       );
 
-      final params = UpdateCustomDivisionParams(
+      const params = UpdateCustomDivisionParams(
         divisionId: 'division-1',
         name: 'Try to Update',
       );
@@ -127,7 +127,7 @@ void main() {
         updatedAtTimestamp: DateTime.now(),
       );
 
-      final params = UpdateCustomDivisionParams(
+      const params = UpdateCustomDivisionParams(
         divisionId: 'division-1',
         name: '',
       );
@@ -164,7 +164,7 @@ void main() {
         updatedAtTimestamp: DateTime.now(),
       );
 
-      final params = UpdateCustomDivisionParams(
+      const params = UpdateCustomDivisionParams(
         divisionId: 'division-1',
         ageMin: 20,
         ageMax: 10,
@@ -200,10 +200,10 @@ void main() {
           updatedAtTimestamp: DateTime.now(),
         );
 
-        final params = UpdateCustomDivisionParams(
+        const params = UpdateCustomDivisionParams(
           divisionId: 'division-1',
-          weightMinKg: 100.0,
-          weightMaxKg: 50.0,
+          weightMinKg: 100,
+          weightMaxKg: 50,
         );
 
         when(
@@ -237,7 +237,7 @@ void main() {
           updatedAtTimestamp: DateTime.now(),
         );
 
-        final params = UpdateCustomDivisionParams(
+        const params = UpdateCustomDivisionParams(
           divisionId: 'division-1',
           judgeCount: 10,
         );
@@ -255,14 +255,14 @@ void main() {
 
   group('UpdateCustomDivisionUseCase - Repository Failures', () {
     test('should return failure when division not found', () async {
-      final params = UpdateCustomDivisionParams(
+      const params = UpdateCustomDivisionParams(
         divisionId: 'non-existent',
         name: 'Updated Division',
       );
 
       when(
         () => mockRepository.getDivisionById('non-existent'),
-      ).thenAnswer((_) async => Left(const NotFoundFailure()));
+      ).thenAnswer((_) async => const Left(NotFoundFailure()));
 
       final result = await useCase(params);
 

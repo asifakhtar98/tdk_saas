@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:tkd_brackets/features/division/domain/services/conflict_detection_service.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:tkd_brackets/core/database/app_database.dart';
+import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/features/division/domain/entities/conflict_warning.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
-import 'package:tkd_brackets/core/database/app_database.dart';
-import 'package:tkd_brackets/core/error/failures.dart';
+import 'package:tkd_brackets/features/division/domain/services/conflict_detection_service.dart';
 
 class MockDivisionRepository extends Mock implements DivisionRepository {}
 
@@ -349,9 +349,9 @@ void main() {
       when(
         () => mockDivisionRepository.getDivisionsForTournament(tournamentId),
       ).thenAnswer(
-        (_) async => Left(const LocalCacheAccessFailure(
-          technicalDetails: 'Database error',
-        )),
+        (_) async => const Left(
+          LocalCacheAccessFailure(technicalDetails: 'Database error'),
+        ),
       );
 
       final result = await service.detectConflicts(tournamentId);
@@ -377,9 +377,9 @@ void main() {
       when(
         () => mockDivisionRepository.getParticipantsForDivisions(any()),
       ).thenAnswer(
-        (_) async => Left(const LocalCacheAccessFailure(
-          technicalDetails: 'Database error',
-        )),
+        (_) async => const Left(
+          LocalCacheAccessFailure(technicalDetails: 'Database error'),
+        ),
       );
 
       final result = await service.detectConflicts(tournamentId);

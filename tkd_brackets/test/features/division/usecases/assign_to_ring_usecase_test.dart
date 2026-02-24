@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/assign_to_ring_usecase.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/assign_to_ring_params.dart';
-import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
-import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
-import 'package:tkd_brackets/features/tournament/domain/repositories/tournament_repository.dart';
-import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
+import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
+import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/assign_to_ring_params.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/assign_to_ring_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
+import 'package:tkd_brackets/features/tournament/domain/repositories/tournament_repository.dart';
 
 class MockDivisionRepository extends Mock implements DivisionRepository {}
 
@@ -36,7 +36,7 @@ void main() {
     );
   });
 
-  DivisionEntity _createTestDivision({
+  DivisionEntity createTestDivision({
     required String id,
     required String tournamentId,
     int? assignedRingNumber,
@@ -63,7 +63,7 @@ void main() {
     );
   }
 
-  TournamentEntity _createTestTournament({
+  TournamentEntity createTestTournament({
     required String id,
     int numberOfRings = 4,
   }) {
@@ -87,16 +87,16 @@ void main() {
     test(
       'should assign division to ring with auto-generated display order',
       () async {
-        final params = AssignToRingParams(
+        const params = AssignToRingParams(
           divisionId: 'div-uuid-001',
           ringNumber: 1,
         );
 
-        final division = _createTestDivision(
+        final division = createTestDivision(
           id: 'div-uuid-001',
           tournamentId: 'tournament-uuid-001',
         );
-        final tournament = _createTestTournament(
+        final tournament = createTestTournament(
           id: 'tournament-uuid-001',
           numberOfRings: 4,
         );
@@ -134,17 +134,17 @@ void main() {
     );
 
     test('should use provided display order when specified', () async {
-      final params = AssignToRingParams(
+      const params = AssignToRingParams(
         divisionId: 'div-uuid-001',
         ringNumber: 1,
         displayOrder: 5,
       );
 
-      final division = _createTestDivision(
+      final division = createTestDivision(
         id: 'div-uuid-001',
         tournamentId: 'tournament-uuid-001',
       );
-      final tournament = _createTestTournament(
+      final tournament = createTestTournament(
         id: 'tournament-uuid-001',
         numberOfRings: 4,
       );
@@ -179,21 +179,21 @@ void main() {
     test(
       'should auto-increment display order when other divisions exist in ring',
       () async {
-        final params = AssignToRingParams(
+        const params = AssignToRingParams(
           divisionId: 'div-uuid-002',
           ringNumber: 1,
         );
 
-        final division = _createTestDivision(
+        final division = createTestDivision(
           id: 'div-uuid-002',
           tournamentId: 'tournament-uuid-001',
         );
-        final tournament = _createTestTournament(
+        final tournament = createTestTournament(
           id: 'tournament-uuid-001',
           numberOfRings: 4,
         );
 
-        final existingDivision = _createTestDivision(
+        final existingDivision = createTestDivision(
           id: 'div-uuid-001',
           tournamentId: 'tournament-uuid-001',
           assignedRingNumber: 1,
@@ -230,17 +230,17 @@ void main() {
     );
 
     test('should increment syncVersion on update', () async {
-      final params = AssignToRingParams(
+      const params = AssignToRingParams(
         divisionId: 'div-uuid-001',
         ringNumber: 1,
       );
 
-      final division = _createTestDivision(
+      final division = createTestDivision(
         id: 'div-uuid-001',
         tournamentId: 'tournament-uuid-001',
         syncVersion: 5,
       );
-      final tournament = _createTestTournament(
+      final tournament = createTestTournament(
         id: 'tournament-uuid-001',
         numberOfRings: 4,
       );
@@ -274,16 +274,16 @@ void main() {
     test(
       'should handle tournament with zero ring count (unlimited rings)',
       () async {
-        final params = AssignToRingParams(
+        const params = AssignToRingParams(
           divisionId: 'div-uuid-001',
           ringNumber: 100,
         );
 
-        final division = _createTestDivision(
+        final division = createTestDivision(
           id: 'div-uuid-001',
           tournamentId: 'tournament-uuid-001',
         );
-        final tournament = _createTestTournament(
+        final tournament = createTestTournament(
           id: 'tournament-uuid-001',
           numberOfRings: 0,
         );
@@ -316,7 +316,7 @@ void main() {
 
   group('AssignToRingUseCase - Validation Failures', () {
     test('should return ValidationFailure when ring number is zero', () async {
-      final params = AssignToRingParams(
+      const params = AssignToRingParams(
         divisionId: 'div-uuid-001',
         ringNumber: 0,
       );
@@ -336,7 +336,7 @@ void main() {
     test(
       'should return ValidationFailure when ring number is negative',
       () async {
-        final params = AssignToRingParams(
+        const params = AssignToRingParams(
           divisionId: 'div-uuid-001',
           ringNumber: -1,
         );
@@ -354,16 +354,16 @@ void main() {
     test(
       'should return ValidationFailure when ring number exceeds tournament rings',
       () async {
-        final params = AssignToRingParams(
+        const params = AssignToRingParams(
           divisionId: 'div-uuid-001',
           ringNumber: 10,
         );
 
-        final division = _createTestDivision(
+        final division = createTestDivision(
           id: 'div-uuid-001',
           tournamentId: 'tournament-uuid-001',
         );
-        final tournament = _createTestTournament(
+        final tournament = createTestTournament(
           id: 'tournament-uuid-001',
           numberOfRings: 4,
         );
@@ -391,7 +391,7 @@ void main() {
     );
 
     test('should return ValidationFailure when division not found', () async {
-      final params = AssignToRingParams(
+      const params = AssignToRingParams(
         divisionId: 'non-existent-id',
         ringNumber: 1,
       );
@@ -414,7 +414,7 @@ void main() {
     });
 
     test('should return ValidationFailure when division ID is empty', () async {
-      final params = AssignToRingParams(divisionId: '', ringNumber: 1);
+      const params = AssignToRingParams(divisionId: '', ringNumber: 1);
 
       final result = await useCase(params);
 
@@ -426,21 +426,21 @@ void main() {
     test(
       'should handle deleted divisions in display order calculation',
       () async {
-        final params = AssignToRingParams(
+        const params = AssignToRingParams(
           divisionId: 'div-uuid-002',
           ringNumber: 1,
         );
 
-        final division = _createTestDivision(
+        final division = createTestDivision(
           id: 'div-uuid-002',
           tournamentId: 'tournament-uuid-001',
         );
-        final tournament = _createTestTournament(
+        final tournament = createTestTournament(
           id: 'tournament-uuid-001',
           numberOfRings: 4,
         );
 
-        final deletedDivision = _createTestDivision(
+        final deletedDivision = createTestDivision(
           id: 'div-uuid-old',
           tournamentId: 'tournament-uuid-001',
           assignedRingNumber: 1,

@@ -3,10 +3,7 @@ import 'package:tkd_brackets/features/division/domain/entities/division_entity.d
 
 class RingAssignmentWidget extends StatelessWidget {
   const RingAssignmentWidget({
-    super.key,
-    required this.ringCount,
-    required this.divisions,
-    required this.onDivisionMoved,
+    required this.ringCount, required this.divisions, required this.onDivisionMoved, super.key,
   });
 
   final int ringCount;
@@ -18,7 +15,7 @@ class RingAssignmentWidget extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     final divisionsByRing = <int?, List<DivisionEntity>>{};
-    for (int i = 1; i <= ringCount; i++) {
+    for (var i = 1; i <= ringCount; i++) {
       divisionsByRing[i] = [];
     }
     divisionsByRing[null] = [];

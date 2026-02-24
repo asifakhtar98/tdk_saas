@@ -23,8 +23,9 @@ void main() {
     GetIt.instance.registerSingleton<SyncService>(mockSyncService);
 
     // Default mock setup
-    when(() => mockSyncService.statusStream)
-        .thenAnswer((_) => statusController.stream);
+    when(
+      () => mockSyncService.statusStream,
+    ).thenAnswer((_) => statusController.stream);
     when(() => mockSyncService.currentStatus).thenReturn(SyncStatus.synced);
     when(() => mockSyncService.currentError).thenReturn(null);
   });
@@ -36,9 +37,7 @@ void main() {
 
   Widget buildTestWidget({bool showLabel = false}) {
     return MaterialApp(
-      home: Scaffold(
-        body: SyncStatusIndicatorWidget(showLabel: showLabel),
-      ),
+      home: Scaffold(body: SyncStatusIndicatorWidget(showLabel: showLabel)),
     );
   }
 
@@ -52,8 +51,9 @@ void main() {
       expect(find.byIcon(Icons.cloud_done), findsOneWidget);
     });
 
-    testWidgets('displays CircularProgressIndicator when syncing',
-        (tester) async {
+    testWidgets('displays CircularProgressIndicator when syncing', (
+      tester,
+    ) async {
       when(() => mockSyncService.currentStatus).thenReturn(SyncStatus.syncing);
 
       await tester.pumpWidget(buildTestWidget());
@@ -62,10 +62,12 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('displays cloud_upload icon when pendingChanges',
-        (tester) async {
-      when(() => mockSyncService.currentStatus)
-          .thenReturn(SyncStatus.pendingChanges);
+    testWidgets('displays cloud_upload icon when pendingChanges', (
+      tester,
+    ) async {
+      when(
+        () => mockSyncService.currentStatus,
+      ).thenReturn(SyncStatus.pendingChanges);
 
       await tester.pumpWidget(buildTestWidget());
       await tester.pump();
@@ -75,9 +77,9 @@ void main() {
 
     testWidgets('displays cloud_off icon when error', (tester) async {
       when(() => mockSyncService.currentStatus).thenReturn(SyncStatus.error);
-      when(() => mockSyncService.currentError).thenReturn(
-        const SyncError(message: 'Test error'),
-      );
+      when(
+        () => mockSyncService.currentError,
+      ).thenReturn(const SyncError(message: 'Test error'));
 
       await tester.pumpWidget(buildTestWidget());
       await tester.pump();
@@ -109,8 +111,9 @@ void main() {
       await tester.pumpWidget(buildTestWidget());
       await tester.pump();
 
-      final semantics = find.byWidgetPredicate((widget) =>
-          widget is Semantics && widget.properties.label != null);
+      final semantics = find.byWidgetPredicate(
+        (widget) => widget is Semantics && widget.properties.label != null,
+      );
       expect(semantics, findsOneWidget);
     });
 

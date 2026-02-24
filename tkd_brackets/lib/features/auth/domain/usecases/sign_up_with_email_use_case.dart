@@ -32,9 +32,7 @@ class SignUpWithEmailUseCase extends UseCase<Unit, SignUpWithEmailParams> {
     final email = params.email.trim().toLowerCase();
     if (email.isEmpty || !_emailRegex.hasMatch(email)) {
       return const Left(
-        InvalidEmailFailure(
-          technicalDetails: 'Email failed regex validation',
-        ),
+        InvalidEmailFailure(technicalDetails: 'Email failed regex validation'),
       );
     }
 

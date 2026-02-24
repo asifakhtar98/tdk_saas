@@ -41,8 +41,9 @@ void main() {
   group('UserLocalDatasource', () {
     group('getUserById', () {
       test('returns UserModel when user exists', () async {
-        when(() => mockDatabase.getUserById('test-id'))
-            .thenAnswer((_) async => testUserEntry);
+        when(
+          () => mockDatabase.getUserById('test-id'),
+        ).thenAnswer((_) async => testUserEntry);
 
         final result = await datasource.getUserById('test-id');
 
@@ -53,8 +54,9 @@ void main() {
       });
 
       test('returns null when user does not exist', () async {
-        when(() => mockDatabase.getUserById('nonexistent'))
-            .thenAnswer((_) async => null);
+        when(
+          () => mockDatabase.getUserById('nonexistent'),
+        ).thenAnswer((_) async => null);
 
         final result = await datasource.getUserById('nonexistent');
 
@@ -64,8 +66,9 @@ void main() {
 
     group('getUserByEmail', () {
       test('returns UserModel when user exists', () async {
-        when(() => mockDatabase.getUserByEmail('test@example.com'))
-            .thenAnswer((_) async => testUserEntry);
+        when(
+          () => mockDatabase.getUserByEmail('test@example.com'),
+        ).thenAnswer((_) async => testUserEntry);
 
         final result = await datasource.getUserByEmail('test@example.com');
 
@@ -74,11 +77,13 @@ void main() {
       });
 
       test('returns null when user does not exist', () async {
-        when(() => mockDatabase.getUserByEmail('nonexistent@example.com'))
-            .thenAnswer((_) async => null);
+        when(
+          () => mockDatabase.getUserByEmail('nonexistent@example.com'),
+        ).thenAnswer((_) async => null);
 
-        final result =
-            await datasource.getUserByEmail('nonexistent@example.com');
+        final result = await datasource.getUserByEmail(
+          'nonexistent@example.com',
+        );
 
         expect(result, isNull);
       });
@@ -86,8 +91,9 @@ void main() {
 
     group('getUsersForOrganization', () {
       test('returns list of UserModels', () async {
-        when(() => mockDatabase.getUsersForOrganization('org-1'))
-            .thenAnswer((_) async => [testUserEntry]);
+        when(
+          () => mockDatabase.getUsersForOrganization('org-1'),
+        ).thenAnswer((_) async => [testUserEntry]);
 
         final result = await datasource.getUsersForOrganization('org-1');
 
@@ -96,8 +102,9 @@ void main() {
       });
 
       test('returns empty list when no users exist', () async {
-        when(() => mockDatabase.getUsersForOrganization('empty-org'))
-            .thenAnswer((_) async => []);
+        when(
+          () => mockDatabase.getUsersForOrganization('empty-org'),
+        ).thenAnswer((_) async => []);
 
         final result = await datasource.getUsersForOrganization('empty-org');
 
@@ -119,8 +126,9 @@ void main() {
     group('updateUser', () {
       test('calls database updateUser with id and companion', () async {
         final model = UserModel.fromDriftEntry(testUserEntry);
-        when(() => mockDatabase.updateUser(any(), any()))
-            .thenAnswer((_) async => true);
+        when(
+          () => mockDatabase.updateUser(any(), any()),
+        ).thenAnswer((_) async => true);
 
         await datasource.updateUser(model);
 
@@ -130,8 +138,9 @@ void main() {
 
     group('deleteUser', () {
       test('calls database softDeleteUser', () async {
-        when(() => mockDatabase.softDeleteUser('test-id'))
-            .thenAnswer((_) async => true);
+        when(
+          () => mockDatabase.softDeleteUser('test-id'),
+        ).thenAnswer((_) async => true);
 
         await datasource.deleteUser('test-id');
 

@@ -83,7 +83,7 @@ void main() {
           ).thenAnswer((_) async => Right(testAdmin));
 
           final result = await useCase(
-            DeleteTournamentParams(tournamentId: 'tournament-123'),
+            const DeleteTournamentParams(tournamentId: 'tournament-123'),
           );
 
           expect(result.isLeft(), isTrue);
@@ -113,7 +113,7 @@ void main() {
         });
 
         final result = await useCase(
-          DeleteTournamentParams(tournamentId: 'tournament-123'),
+          const DeleteTournamentParams(tournamentId: 'tournament-123'),
         );
 
         expect(result.isRight(), isTrue);
@@ -142,7 +142,7 @@ void main() {
           });
 
           final result = await useCase(
-            DeleteTournamentParams(
+            const DeleteTournamentParams(
               tournamentId: 'tournament-123',
               hardDelete: false,
             ),
@@ -173,7 +173,7 @@ void main() {
         ).thenAnswer((_) async => const Right(unit));
 
         final result = await useCase(
-          DeleteTournamentParams(
+          const DeleteTournamentParams(
             tournamentId: 'tournament-123',
             hardDelete: true,
           ),
@@ -221,7 +221,7 @@ void main() {
         });
 
         final result = await useCase(
-          DeleteTournamentParams(tournamentId: 'tournament-123'),
+          const DeleteTournamentParams(tournamentId: 'tournament-123'),
         );
 
         expect(result.isRight(), isTrue);
@@ -239,7 +239,7 @@ void main() {
         );
 
         final result = await useCase(
-          DeleteTournamentParams(tournamentId: 'nonexistent'),
+          const DeleteTournamentParams(tournamentId: 'nonexistent'),
         );
 
         expect(result.isLeft(), isTrue);
@@ -264,7 +264,7 @@ void main() {
           ).thenAnswer((_) async => Right(testOwner));
 
           final result = await useCase(
-            DeleteTournamentParams(tournamentId: 'tournament-123'),
+            const DeleteTournamentParams(tournamentId: 'tournament-123'),
           );
 
           expect(result.isLeft(), isTrue);

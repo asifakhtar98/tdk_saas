@@ -7,9 +7,7 @@ import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 @lazySingleton
 class RbacPermissionService {
   /// All permissions available in the system.
-  static const Set<Permission> _allPermissions = {
-    ...Permission.values,
-  };
+  static const Set<Permission> _allPermissions = {...Permission.values};
 
   /// Permissions shared by Owner and Admin (full CRUD minus billing).
   static const Set<Permission> _adminPermissions = {
@@ -37,9 +35,7 @@ class RbacPermissionService {
   };
 
   /// Viewer permissions: read-only.
-  static const Set<Permission> _viewerPermissions = {
-    Permission.viewData,
-  };
+  static const Set<Permission> _viewerPermissions = {Permission.viewData};
 
   /// Static permission matrix mapping roles to their allowed permissions.
   ///
@@ -63,10 +59,7 @@ class RbacPermissionService {
   ///
   /// Returns [Right(unit)] if allowed, or
   /// [Left(AuthorizationPermissionDeniedFailure)] if denied.
-  Either<Failure, Unit> assertPermission(
-    UserRole role,
-    Permission permission,
-  ) {
+  Either<Failure, Unit> assertPermission(UserRole role, Permission permission) {
     if (canPerform(role, permission)) {
       return const Right(unit);
     }

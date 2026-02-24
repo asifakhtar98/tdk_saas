@@ -1,12 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/merge_divisions_usecase.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/merge_divisions_params.dart';
-import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
-import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
-import 'package:tkd_brackets/core/database/app_database.dart';
+import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
+import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/merge_divisions_params.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/merge_divisions_usecase.dart';
 import 'package:uuid/uuid.dart';
 
 class MockDivisionRepository extends Mock implements DivisionRepository {}
@@ -30,7 +29,7 @@ void main() {
     useCase = MergeDivisionsUseCase(mockRepository, mockUuid);
   });
 
-  DivisionEntity _createTestDivision({
+  DivisionEntity createTestDivision({
     required String id,
     required String tournamentId,
     String name = 'Test Division',
@@ -67,22 +66,22 @@ void main() {
     test('should merge two divisions with broadened criteria', () async {
       when(() => mockUuid.v4()).thenReturn('new-uuid-123');
 
-      final params = MergeDivisionsParams(
+      const params = MergeDivisionsParams(
         divisionIdA: 'div-a',
         divisionIdB: 'div-b',
       );
 
-      final divisionA = _createTestDivision(
+      final divisionA = createTestDivision(
         id: 'div-a',
         tournamentId: 'tournament-1',
-        weightMin: 40.0,
-        weightMax: 45.0,
+        weightMin: 40,
+        weightMax: 45,
       );
-      final divisionB = _createTestDivision(
+      final divisionB = createTestDivision(
         id: 'div-b',
         tournamentId: 'tournament-1',
-        weightMin: 45.0,
-        weightMax: 50.0,
+        weightMin: 45,
+        weightMax: 50,
       );
 
       when(
@@ -124,17 +123,17 @@ void main() {
     test('should use custom name when provided', () async {
       when(() => mockUuid.v4()).thenReturn('new-uuid-123');
 
-      final params = MergeDivisionsParams(
+      const params = MergeDivisionsParams(
         divisionIdA: 'div-a',
         divisionIdB: 'div-b',
         name: 'Custom Merged Name',
       );
 
-      final divisionA = _createTestDivision(
+      final divisionA = createTestDivision(
         id: 'div-a',
         tournamentId: 'tournament-1',
       );
-      final divisionB = _createTestDivision(
+      final divisionB = createTestDivision(
         id: 'div-b',
         tournamentId: 'tournament-1',
       );
@@ -180,7 +179,7 @@ void main() {
     test(
       'should return ValidationFailure when merging same division',
       () async {
-        final params = MergeDivisionsParams(
+        const params = MergeDivisionsParams(
           divisionIdA: 'div-a',
           divisionIdB: 'div-a',
         );
@@ -198,16 +197,16 @@ void main() {
     test(
       'should return ValidationFailure when divisions in different tournaments',
       () async {
-        final params = MergeDivisionsParams(
+        const params = MergeDivisionsParams(
           divisionIdA: 'div-a',
           divisionIdB: 'div-b',
         );
 
-        final divisionA = _createTestDivision(
+        final divisionA = createTestDivision(
           id: 'div-a',
           tournamentId: 'tournament-1',
         );
-        final divisionB = _createTestDivision(
+        final divisionB = createTestDivision(
           id: 'div-b',
           tournamentId: 'tournament-2',
         );
@@ -233,17 +232,17 @@ void main() {
     );
 
     test('should return ValidationFailure for category mismatch', () async {
-      final params = MergeDivisionsParams(
+      const params = MergeDivisionsParams(
         divisionIdA: 'div-a',
         divisionIdB: 'div-b',
       );
 
-      final divisionA = _createTestDivision(
+      final divisionA = createTestDivision(
         id: 'div-a',
         tournamentId: 't1',
         category: DivisionCategory.sparring,
       );
-      final divisionB = _createTestDivision(
+      final divisionB = createTestDivision(
         id: 'div-b',
         tournamentId: 't1',
         category: DivisionCategory.poomsae,
@@ -271,17 +270,17 @@ void main() {
     test(
       'should return ValidationFailure for already combined divisions',
       () async {
-        final params = MergeDivisionsParams(
+        const params = MergeDivisionsParams(
           divisionIdA: 'div-a',
           divisionIdB: 'div-b',
         );
 
-        final divisionA = _createTestDivision(
+        final divisionA = createTestDivision(
           id: 'div-a',
           tournamentId: 't1',
           isCombined: true,
         );
-        final divisionB = _createTestDivision(id: 'div-b', tournamentId: 't1');
+        final divisionB = createTestDivision(id: 'div-b', tournamentId: 't1');
 
         when(
           () => mockRepository.getDivision('div-a'),
@@ -297,17 +296,17 @@ void main() {
     );
 
     test('should return ValidationFailure for deleted divisions', () async {
-      final params = MergeDivisionsParams(
+      const params = MergeDivisionsParams(
         divisionIdA: 'div-a',
         divisionIdB: 'div-b',
       );
 
-      final divisionA = _createTestDivision(
+      final divisionA = createTestDivision(
         id: 'div-a',
         tournamentId: 't1',
         isDeleted: true,
       );
-      final divisionB = _createTestDivision(id: 'div-b', tournamentId: 't1');
+      final divisionB = createTestDivision(id: 'div-b', tournamentId: 't1');
 
       when(
         () => mockRepository.getDivision('div-a'),
@@ -322,14 +321,14 @@ void main() {
     });
 
     test('should return ValidationFailure for duplicate name', () async {
-      final params = MergeDivisionsParams(
+      const params = MergeDivisionsParams(
         divisionIdA: 'div-a',
         divisionIdB: 'div-b',
         name: 'Existing Name',
       );
 
-      final divisionA = _createTestDivision(id: 'div-a', tournamentId: 't1');
-      final divisionB = _createTestDivision(id: 'div-b', tournamentId: 't1');
+      final divisionA = createTestDivision(id: 'div-a', tournamentId: 't1');
+      final divisionB = createTestDivision(id: 'div-b', tournamentId: 't1');
 
       when(
         () => mockRepository.getDivision('div-a'),

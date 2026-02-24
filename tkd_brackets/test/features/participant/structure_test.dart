@@ -71,7 +71,8 @@ void main() {
                   content.contains("import 'package:drift") ||
                   content.contains("import 'package:supabase_flutter"),
               isFalse,
-              reason: 'Domain file ${file.path} should not '
+              reason:
+                  'Domain file ${file.path} should not '
                   'import data layer or infrastructure',
             );
           }
@@ -97,7 +98,6 @@ void main() {
           isTrue,
           reason: 'Barrel file should have Presentation exports section',
         );
-
       });
 
       test('parent directories should have .gitkeep for consistency', () {

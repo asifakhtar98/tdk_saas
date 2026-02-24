@@ -18,9 +18,8 @@ class AuthenticationEvent with _$AuthenticationEvent {
   /// User authenticated externally (from auth state stream).
   /// Only dispatched by the BLoC's own stream subscription.
   /// UI widgets should NEVER add this event directly.
-  const factory AuthenticationEvent.userChanged(
-    UserEntity? user,
-  ) = AuthenticationUserChanged;
+  const factory AuthenticationEvent.userChanged(UserEntity? user) =
+      AuthenticationUserChanged;
 
   /// User requested sign out.
   const factory AuthenticationEvent.signOutRequested() =

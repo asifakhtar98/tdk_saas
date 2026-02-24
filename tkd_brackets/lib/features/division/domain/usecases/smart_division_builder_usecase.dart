@@ -10,15 +10,15 @@ import 'package:tkd_brackets/features/division/domain/usecases/smart_division_na
 import 'package:uuid/uuid.dart';
 
 class _ParticipantData {
-  final int age;
-  final double weightKg;
-  final DivisionGenderType gender;
 
   _ParticipantData({
     required this.age,
     required this.weightKg,
     required this.gender,
   });
+  final int age;
+  final double weightKg;
+  final DivisionGenderType gender;
 }
 
 @injectable
@@ -58,7 +58,7 @@ class SmartDivisionBuilderUseCase
         final result = await _divisionRepository.createDivision(division);
         result.fold(
           (failure) => savedDivisions.add(division),
-          (saved) => savedDivisions.add(saved),
+          savedDivisions.add,
         );
       }
 
@@ -66,7 +66,7 @@ class SmartDivisionBuilderUseCase
     } catch (e) {
       return Left(
         ServerResponseFailure(
-          userFriendlyMessage: 'Failed to generate divisions: ${e.toString()}',
+          userFriendlyMessage: 'Failed to generate divisions: $e',
         ),
       );
     }
@@ -133,7 +133,7 @@ class SmartDivisionBuilderUseCase
   int _calculateAge(DateTime? dateOfBirth) {
     if (dateOfBirth == null) return 0;
     final now = DateTime.now();
-    int age = now.year - dateOfBirth.year;
+    var age = now.year - dateOfBirth.year;
     if (now.month < dateOfBirth.month ||
         (now.month == dateOfBirth.month && now.day < dateOfBirth.day)) {
       age--;

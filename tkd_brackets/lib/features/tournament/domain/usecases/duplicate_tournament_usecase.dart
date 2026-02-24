@@ -1,15 +1,15 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
-import 'package:uuid/uuid.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/usecases/use_case.dart';
 import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/auth_repository.dart';
-import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
+import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 import 'package:tkd_brackets/features/tournament/domain/repositories/tournament_repository.dart';
 import 'package:tkd_brackets/features/tournament/domain/usecases/duplicate_tournament_params.dart';
+import 'package:uuid/uuid.dart';
 
 /// Use case for duplicating a tournament as a template.
 ///
@@ -172,7 +172,7 @@ class DuplicateTournamentUseCase
     }
 
     // STEP 6: Duplicate divisions with new UUIDs
-    final List<DivisionEntity> createdDivisions = [];
+    final createdDivisions = <DivisionEntity>[];
 
     for (final sourceDivision in sourceDivisions) {
       final newDivisionId = _uuid.v4();
@@ -210,7 +210,7 @@ class DuplicateTournamentUseCase
       createDivisionResult.fold((failure) {
         // Log division creation failure but continue
         // Tournament duplication succeeded, divisions are optional
-      }, (created) => createdDivisions.add(created));
+      }, createdDivisions.add);
     }
 
     // STEP 7: Return the newly created tournament

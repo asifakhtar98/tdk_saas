@@ -118,7 +118,7 @@ class _TournamentFormDialogState extends State<TournamentFormDialog> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<FederationType>(
-                  value: _selectedFederation,
+                  initialValue: _selectedFederation,
                   decoration: const InputDecoration(
                     labelText: 'Federation Type',
                     border: OutlineInputBorder(),

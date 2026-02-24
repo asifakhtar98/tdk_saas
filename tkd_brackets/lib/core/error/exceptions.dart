@@ -2,18 +2,14 @@
 /// These are thrown by data sources and caught by repositories.
 /// Repositories convert exceptions to Failure types for the domain layer.
 abstract class AppException implements Exception {
-  const AppException({
-    required this.message,
-    this.code,
-    this.originalError,
-  });
+  const AppException({required this.message, this.code, this.originalError});
 
   /// Error message describing what went wrong.
   final String message;
-  
+
   /// Error code for categorization.
   final String? code;
-  
+
   /// Original error that caused this exception.
   final dynamic originalError;
 

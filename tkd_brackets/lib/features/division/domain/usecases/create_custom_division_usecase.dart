@@ -155,7 +155,7 @@ class CreateCustomDivisionUseCase
     );
 
     if (nameExists) {
-      return ValidationFailure(
+      return const ValidationFailure(
         userFriendlyMessage: 'Division name already exists in this tournament',
         fieldErrors: {'name': 'A division with this name already exists'},
       );

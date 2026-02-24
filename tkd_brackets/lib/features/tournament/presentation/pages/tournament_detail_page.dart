@@ -3,20 +3,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tkd_brackets/core/di/injection.dart';
 import 'package:tkd_brackets/core/widgets/sync_status_indicator_widget.dart';
+import 'package:tkd_brackets/features/division/domain/services/conflict_detection_service.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/get_divisions_usecase.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_usecase.dart';
 import 'package:tkd_brackets/features/tournament/domain/usecases/get_tournament_usecase.dart';
 import 'package:tkd_brackets/features/tournament/domain/usecases/update_tournament_settings_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/get_divisions_usecase.dart';
-import 'package:tkd_brackets/features/division/domain/services/conflict_detection_service.dart';
 import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_detail_bloc.dart';
 import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_detail_event.dart';
 import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_detail_state.dart';
 import 'package:tkd_brackets/features/tournament/presentation/widgets/conflict_warning_banner.dart';
 
 class TournamentDetailPage extends StatelessWidget {
-  const TournamentDetailPage({super.key, required this.tournamentId});
+  const TournamentDetailPage({required this.tournamentId, super.key});
 
   final String tournamentId;
 
@@ -448,23 +448,18 @@ class _TournamentDetailViewState extends State<_TournamentDetailView>
       case TournamentStatus.draft:
         backgroundColor = colorScheme.surfaceContainerHighest;
         foregroundColor = colorScheme.onSurfaceVariant;
-        break;
       case TournamentStatus.active:
         backgroundColor = colorScheme.primaryContainer;
         foregroundColor = colorScheme.onPrimaryContainer;
-        break;
       case TournamentStatus.completed:
         backgroundColor = colorScheme.tertiaryContainer;
         foregroundColor = colorScheme.onTertiaryContainer;
-        break;
       case TournamentStatus.archived:
         backgroundColor = colorScheme.surfaceContainerHighest;
         foregroundColor = colorScheme.onSurfaceVariant;
-        break;
       case TournamentStatus.cancelled:
         backgroundColor = colorScheme.errorContainer;
         foregroundColor = colorScheme.onErrorContainer;
-        break;
     }
 
     return Container(

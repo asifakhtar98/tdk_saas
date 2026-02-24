@@ -50,7 +50,7 @@ class ArchiveTournamentUseCase
     }
 
     if (tournament.status == TournamentStatus.active) {
-      return Left(
+      return const Left(
         TournamentActiveFailure(
           userFriendlyMessage: 'Cannot archive tournament with active matches',
           technicalDetails: 'Tournament has active status',
@@ -73,7 +73,7 @@ class ArchiveTournamentUseCase
     final canArchive =
         user.role == UserRole.owner || user.role == UserRole.admin;
     if (!canArchive) {
-      return Left(
+      return const Left(
         AuthorizationPermissionDeniedFailure(
           userFriendlyMessage: 'Only Owners and Admins can archive tournaments',
         ),
@@ -88,8 +88,8 @@ class ArchiveTournamentUseCase
     final updateResult = await _repository.updateTournament(archivedTournament);
 
     return updateResult.fold(
-      (failure) => Left(failure),
-      (savedTournament) => Right(savedTournament),
+      Left.new,
+      Right.new,
     );
   }
 }

@@ -11,17 +11,15 @@ part 'authentication_state.freezed.dart';
 @freezed
 class AuthenticationState with _$AuthenticationState {
   /// Initial state before any auth check.
-  const factory AuthenticationState.initial() =
-      AuthenticationInitial;
+  const factory AuthenticationState.initial() = AuthenticationInitial;
 
   /// Auth check is in progress (loading).
   const factory AuthenticationState.checkInProgress() =
       AuthenticationCheckInProgress;
 
   /// User is authenticated.
-  const factory AuthenticationState.authenticated(
-    UserEntity user,
-  ) = AuthenticationAuthenticated;
+  const factory AuthenticationState.authenticated(UserEntity user) =
+      AuthenticationAuthenticated;
 
   /// User is not authenticated.
   const factory AuthenticationState.unauthenticated() =
@@ -32,7 +30,6 @@ class AuthenticationState with _$AuthenticationState {
       AuthenticationSignOutInProgress;
 
   /// Authentication operation failed.
-  const factory AuthenticationState.failure(
-    Failure failure,
-  ) = AuthenticationFailure;
+  const factory AuthenticationState.failure(Failure failure) =
+      AuthenticationFailure;
 }

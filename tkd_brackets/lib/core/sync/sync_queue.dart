@@ -69,29 +69,35 @@ class SyncQueueImplementation implements SyncQueue {
     required String operation,
   }) async {
     // Check for existing pending entry for this record
-    final existing = await (_db.select(_db.syncQueueTable)
-          ..where((t) =>
-              t.tableName_.equals(tableName) &
-              t.recordId.equals(recordId) &
-              t.isSynced.equals(false)))
-        .getSingleOrNull();
+    final existing =
+        await (_db.select(_db.syncQueueTable)..where(
+              (t) =>
+                  t.tableName_.equals(tableName) &
+                  t.recordId.equals(recordId) &
+                  t.isSynced.equals(false),
+            ))
+            .getSingleOrNull();
 
     if (existing != null) {
       // Update existing entry's operation and timestamp
-      await (_db.update(_db.syncQueueTable)
-            ..where((t) => t.id.equals(existing.id)))
-          .write(SyncQueueTableCompanion(
-        operation: Value(operation),
-        createdAtTimestamp: Value(DateTime.now().toIso8601String()),
-        // Reset attempt count since this is a new change
-        attemptCount: const Value(0),
-        lastErrorMessage: const Value(null),
-        attemptedAtTimestamp: const Value(null),
-      ));
+      await (_db.update(
+        _db.syncQueueTable,
+      )..where((t) => t.id.equals(existing.id))).write(
+        SyncQueueTableCompanion(
+          operation: Value(operation),
+          createdAtTimestamp: Value(DateTime.now().toIso8601String()),
+          // Reset attempt count since this is a new change
+          attemptCount: const Value(0),
+          lastErrorMessage: const Value(null),
+          attemptedAtTimestamp: const Value(null),
+        ),
+      );
     } else {
       // Insert new entry with minimal payload
       // (actual data is fetched from local DB on push)
-      await _db.into(_db.syncQueueTable).insert(
+      await _db
+          .into(_db.syncQueueTable)
+          .insert(
             SyncQueueTableCompanion.insert(
               tableName_: tableName,
               recordId: recordId,
@@ -105,13 +111,16 @@ class SyncQueueImplementation implements SyncQueue {
 
   @override
   Future<bool> hasPendingForRecord(String tableName, String recordId) async {
-    final result = await (_db.select(_db.syncQueueTable)
-          ..where((t) =>
-              t.tableName_.equals(tableName) &
-              t.recordId.equals(recordId) &
-              t.isSynced.equals(false))
-          ..limit(1))
-        .get();
+    final result =
+        await (_db.select(_db.syncQueueTable)
+              ..where(
+                (t) =>
+                    t.tableName_.equals(tableName) &
+                    t.recordId.equals(recordId) &
+                    t.isSynced.equals(false),
+              )
+              ..limit(1))
+            .get();
     return result.isNotEmpty;
   }
 
@@ -125,41 +134,43 @@ class SyncQueueImplementation implements SyncQueue {
 
   @override
   Future<void> markSynced(int id) async {
-    await (_db.update(_db.syncQueueTable)..where((t) => t.id.equals(id)))
-        .write(const SyncQueueTableCompanion(
-      isSynced: Value(true),
-    ));
+    await (_db.update(_db.syncQueueTable)..where((t) => t.id.equals(id))).write(
+      const SyncQueueTableCompanion(isSynced: Value(true)),
+    );
   }
 
   @override
   Future<void> markFailed(int id, String errorMessage) async {
     // First get current attempt count
-    final entry = await (_db.select(_db.syncQueueTable)
-          ..where((t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final entry = await (_db.select(
+      _db.syncQueueTable,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
 
     if (entry != null) {
-      await (_db.update(_db.syncQueueTable)..where((t) => t.id.equals(id)))
-          .write(SyncQueueTableCompanion(
-        attemptCount: Value(entry.attemptCount + 1),
-        attemptedAtTimestamp: Value(DateTime.now().toIso8601String()),
-        lastErrorMessage: Value(errorMessage),
-      ));
+      await (_db.update(
+        _db.syncQueueTable,
+      )..where((t) => t.id.equals(id))).write(
+        SyncQueueTableCompanion(
+          attemptCount: Value(entry.attemptCount + 1),
+          attemptedAtTimestamp: Value(DateTime.now().toIso8601String()),
+          lastErrorMessage: Value(errorMessage),
+        ),
+      );
     }
   }
 
   @override
   Future<void> clearSynced() async {
-    await (_db.delete(_db.syncQueueTable)
-          ..where((t) => t.isSynced.equals(true)))
-        .go();
+    await (_db.delete(
+      _db.syncQueueTable,
+    )..where((t) => t.isSynced.equals(true))).go();
   }
 
   @override
   Future<int> get pendingCount async {
-    final result = await (_db.select(_db.syncQueueTable)
-          ..where((t) => t.isSynced.equals(false)))
-        .get();
+    final result = await (_db.select(
+      _db.syncQueueTable,
+    )..where((t) => t.isSynced.equals(false))).get();
     return result.length;
   }
 }

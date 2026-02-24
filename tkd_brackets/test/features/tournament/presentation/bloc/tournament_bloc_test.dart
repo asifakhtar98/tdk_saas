@@ -4,13 +4,13 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/get_tournaments_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart';
 import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_params.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_params.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/create_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart';
 import 'package:tkd_brackets/features/tournament/domain/usecases/create_tournament_params.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/create_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_params.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/get_tournaments_usecase.dart';
 import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_bloc.dart';
 import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_event.dart';
 import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_state.dart';
@@ -60,8 +60,8 @@ void main() {
   setUpAll(() {
     registerFallbackValue('test-org');
     registerFallbackValue(FakeTournamentEntity());
-    registerFallbackValue(ArchiveTournamentParams(tournamentId: ''));
-    registerFallbackValue(DeleteTournamentParams(tournamentId: ''));
+    registerFallbackValue(const ArchiveTournamentParams(tournamentId: ''));
+    registerFallbackValue(const DeleteTournamentParams(tournamentId: ''));
     registerFallbackValue(
       CreateTournamentParams(name: 'test', scheduledDate: DateTime.now()),
     );

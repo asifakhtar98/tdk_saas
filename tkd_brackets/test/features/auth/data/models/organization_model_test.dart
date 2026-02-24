@@ -120,8 +120,14 @@ void main() {
         expect(model.subscriptionStatus, testEntry.subscriptionStatus);
         expect(model.maxTournamentsPerMonth, testEntry.maxTournamentsPerMonth);
         expect(model.maxActiveBrackets, testEntry.maxActiveBrackets);
-        expect(model.maxParticipantsPerBracket, testEntry.maxParticipantsPerBracket);
-        expect(model.maxParticipantsPerTournament, testEntry.maxParticipantsPerTournament);
+        expect(
+          model.maxParticipantsPerBracket,
+          testEntry.maxParticipantsPerBracket,
+        );
+        expect(
+          model.maxParticipantsPerTournament,
+          testEntry.maxParticipantsPerTournament,
+        );
         expect(model.maxScorers, testEntry.maxScorers);
         expect(model.isActive, testEntry.isActive);
         expect(model.createdAtTimestamp, testEntry.createdAtTimestamp);
@@ -247,10 +253,19 @@ void main() {
         expect(roundtripEntity.slug, entity.slug);
         expect(roundtripEntity.subscriptionTier, entity.subscriptionTier);
         expect(roundtripEntity.subscriptionStatus, entity.subscriptionStatus);
-        expect(roundtripEntity.maxTournamentsPerMonth, entity.maxTournamentsPerMonth);
+        expect(
+          roundtripEntity.maxTournamentsPerMonth,
+          entity.maxTournamentsPerMonth,
+        );
         expect(roundtripEntity.maxActiveBrackets, entity.maxActiveBrackets);
-        expect(roundtripEntity.maxParticipantsPerBracket, entity.maxParticipantsPerBracket);
-        expect(roundtripEntity.maxParticipantsPerTournament, entity.maxParticipantsPerTournament);
+        expect(
+          roundtripEntity.maxParticipantsPerBracket,
+          entity.maxParticipantsPerBracket,
+        );
+        expect(
+          roundtripEntity.maxParticipantsPerTournament,
+          entity.maxParticipantsPerTournament,
+        );
         expect(roundtripEntity.maxScorers, entity.maxScorers);
         expect(roundtripEntity.isActive, entity.isActive);
         expect(roundtripEntity.createdAt, entity.createdAt);
@@ -263,8 +278,14 @@ void main() {
 
         expect(roundtripJson['id'], json['id']);
         expect(roundtripJson['subscription_tier'], json['subscription_tier']);
-        expect(roundtripJson['subscription_status'], json['subscription_status']);
-        expect(roundtripJson['max_tournaments_per_month'], json['max_tournaments_per_month']);
+        expect(
+          roundtripJson['subscription_status'],
+          json['subscription_status'],
+        );
+        expect(
+          roundtripJson['max_tournaments_per_month'],
+          json['max_tournaments_per_month'],
+        );
       });
     });
   });

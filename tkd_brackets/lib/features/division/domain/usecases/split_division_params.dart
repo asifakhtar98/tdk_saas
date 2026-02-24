@@ -7,13 +7,13 @@ enum SplitDistributionMethod { random, alphabetical }
 
 @freezed
 class SplitDivisionParams with _$SplitDivisionParams {
-  const SplitDivisionParams._();
 
   const factory SplitDivisionParams({
     required String divisionId,
     required SplitDistributionMethod distributionMethod,
     String? baseName,
   }) = _SplitDivisionParams;
+  const SplitDivisionParams._();
 
   factory SplitDivisionParams.fromJson(Map<String, dynamic> json) =>
       _$SplitDivisionParamsFromJson(json);

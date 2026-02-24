@@ -1,8 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tkd_brackets/features/division/services/federation_template_registry.dart';
-import 'package:tkd_brackets/features/division/domain/entities/division_template.dart';
-import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
+import 'package:tkd_brackets/features/division/services/federation_template_registry.dart';
+import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 
 void main() {
   late FederationTemplateRegistry registry;

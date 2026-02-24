@@ -109,9 +109,7 @@ void main() {
 
       await database.updateOrganization(
         'org-update',
-        const OrganizationsCompanion(
-          name: Value('Updated Name'),
-        ),
+        const OrganizationsCompanion(name: Value('Updated Name')),
       );
 
       final updated = await database.getOrganizationById('org-update');
@@ -291,9 +289,7 @@ void main() {
 
       await database.updateUser(
         'user-update',
-        const UsersCompanion(
-          displayName: Value('Updated Name'),
-        ),
+        const UsersCompanion(displayName: Value('Updated Name')),
       );
 
       final updated = await database.getUserById('user-update');
@@ -366,13 +362,15 @@ void main() {
       final org = await database.getOrganizationById('ts-org');
 
       expect(
-          org!.createdAtTimestamp
-              .isAfter(before.subtract(const Duration(seconds: 1))),
-          true);
+        org!.createdAtTimestamp.isAfter(
+          before.subtract(const Duration(seconds: 1)),
+        ),
+        true,
+      );
       expect(
-          org.createdAtTimestamp
-              .isBefore(after.add(const Duration(seconds: 1))),
-          true);
+        org.createdAtTimestamp.isBefore(after.add(const Duration(seconds: 1))),
+        true,
+      );
     });
 
     test('should set updatedAtTimestamp on insert', () async {
@@ -390,13 +388,15 @@ void main() {
       final org = await database.getOrganizationById('ts-org-2');
 
       expect(
-          org!.updatedAtTimestamp
-              .isAfter(before.subtract(const Duration(seconds: 1))),
-          true);
+        org!.updatedAtTimestamp.isAfter(
+          before.subtract(const Duration(seconds: 1)),
+        ),
+        true,
+      );
       expect(
-          org.updatedAtTimestamp
-              .isBefore(after.add(const Duration(seconds: 1))),
-          true);
+        org.updatedAtTimestamp.isBefore(after.add(const Duration(seconds: 1))),
+        true,
+      );
     });
   });
 
@@ -425,9 +425,7 @@ void main() {
 
       await database.updateOrganization(
         'sync-update-org',
-        const OrganizationsCompanion(
-          name: Value('Updated Name'),
-        ),
+        const OrganizationsCompanion(name: Value('Updated Name')),
       );
 
       final org = await database.getOrganizationById('sync-update-org');
@@ -454,9 +452,7 @@ void main() {
 
       await database.updateUser(
         'sync-user',
-        const UsersCompanion(
-          displayName: Value('Updated User Name'),
-        ),
+        const UsersCompanion(displayName: Value('Updated User Name')),
       );
 
       final user = await database.getUserById('sync-user');

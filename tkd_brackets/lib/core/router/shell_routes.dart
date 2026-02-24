@@ -186,10 +186,8 @@ ShellRoute createAppShellRoute({
 }) {
   return ShellRoute(
     navigatorKey: shellNavigatorKey,
-    builder: (context, state, child) => AppShellScaffold(
-      currentLocation: state.matchedLocation,
-      child: child,
-    ),
+    builder: (context, state, child) =>
+        AppShellScaffold(currentLocation: state.matchedLocation, child: child),
     routes: routes,
   );
 }

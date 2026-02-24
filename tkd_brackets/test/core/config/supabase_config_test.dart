@@ -24,20 +24,14 @@ void main() {
     });
 
     test('should throw StateError when accessing auth before init', () {
-      expect(
-        () => SupabaseConfig.auth,
-        throwsA(isA<StateError>()),
-      );
+      expect(() => SupabaseConfig.auth, throwsA(isA<StateError>()));
     });
   });
 
   group('SupabaseConfig credential validation', () {
     test('should throw ArgumentError when url is empty', () async {
       expect(
-        () => SupabaseConfig.initialize(
-          url: '',
-          anonKey: 'valid-anon-key',
-        ),
+        () => SupabaseConfig.initialize(url: '', anonKey: 'valid-anon-key'),
         throwsA(
           isA<ArgumentError>().having(
             (e) => e.message,
@@ -64,20 +58,18 @@ void main() {
       );
     });
 
-    test('should throw ArgumentError when both url and anonKey are empty',
-        () async {
-      // First validation (url) should trigger
-      expect(
-        () => SupabaseConfig.initialize(url: '', anonKey: ''),
-        throwsA(
-          isA<ArgumentError>().having(
-            (e) => e.name,
-            'name',
-            equals('url'),
+    test(
+      'should throw ArgumentError when both url and anonKey are empty',
+      () async {
+        // First validation (url) should trigger
+        expect(
+          () => SupabaseConfig.initialize(url: '', anonKey: ''),
+          throwsA(
+            isA<ArgumentError>().having((e) => e.name, 'name', equals('url')),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   });
 
   group('SupabaseConfig resetForTesting', () {

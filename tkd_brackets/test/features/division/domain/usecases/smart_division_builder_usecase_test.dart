@@ -29,18 +29,18 @@ void main() {
     useCase = SmartDivisionBuilderUseCase(mockRepository, mockDatabase);
   });
 
-  final defaultParams = SmartDivisionBuilderParams(
+  const defaultParams = SmartDivisionBuilderParams(
     tournamentId: 'tournament-123',
     federationType: FederationType.wt,
-    categoryConfig: const DivisionCategoryConfig(
+    categoryConfig: DivisionCategoryConfig(
       category: DivisionCategoryType.sparring,
       applyWeightClasses: true,
     ),
-    ageGroups: const [
+    ageGroups: [
       AgeGroupConfig(name: '6-8', minAge: 6, maxAge: 8),
       AgeGroupConfig(name: '9-10', minAge: 9, maxAge: 10),
     ],
-    beltGroups: const [
+    beltGroups: [
       BeltGroupConfig(name: 'white-yellow', minOrder: 1, maxOrder: 2),
       BeltGroupConfig(name: 'green-blue', minOrder: 4, maxOrder: 5),
     ],
@@ -189,14 +189,14 @@ void main() {
         return Right(entity);
       });
 
-      final params = SmartDivisionBuilderParams(
+      const params = SmartDivisionBuilderParams(
         tournamentId: 'tournament-123',
         federationType: FederationType.wt,
-        categoryConfig: const DivisionCategoryConfig(
+        categoryConfig: DivisionCategoryConfig(
           category: DivisionCategoryType.sparring,
           applyWeightClasses: true,
         ),
-        ageGroups: const [
+        ageGroups: [
           AgeGroupConfig(name: '6-8', minAge: 6, maxAge: 8),
           AgeGroupConfig(name: '9-10', minAge: 9, maxAge: 10),
           AgeGroupConfig(name: '11-12', minAge: 11, maxAge: 12),
@@ -205,7 +205,7 @@ void main() {
           AgeGroupConfig(name: '18-32', minAge: 18, maxAge: 32),
           AgeGroupConfig(name: '33+', minAge: 33, maxAge: 99),
         ],
-        beltGroups: const [
+        beltGroups: [
           BeltGroupConfig(name: 'white-yellow', minOrder: 1, maxOrder: 2),
           BeltGroupConfig(name: 'green-blue', minOrder: 4, maxOrder: 5),
           BeltGroupConfig(name: 'red-black', minOrder: 6, maxOrder: 7),

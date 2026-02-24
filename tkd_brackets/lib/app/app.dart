@@ -20,9 +20,7 @@ class _AppState extends State<App> {
   void initState() {
     super.initState();
     // Dispatch initial auth check once, not on every build
-    getIt<AuthenticationBloc>().add(
-      const AuthenticationEvent.checkRequested(),
-    );
+    getIt<AuthenticationBloc>().add(const AuthenticationEvent.checkRequested());
     // Notify the web landing page that Flutter is ready
     // after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {

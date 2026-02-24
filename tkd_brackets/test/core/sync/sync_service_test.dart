@@ -49,17 +49,21 @@ void main() {
     connectivityController = StreamController<ConnectivityStatus>.broadcast();
 
     // Setup default mocks
-    when(() => mockConnectivityService.statusStream)
-        .thenAnswer((_) => connectivityController.stream);
-    when(() => mockConnectivityService.currentStatus)
-        .thenReturn(ConnectivityStatus.online);
+    when(
+      () => mockConnectivityService.statusStream,
+    ).thenAnswer((_) => connectivityController.stream);
+    when(
+      () => mockConnectivityService.currentStatus,
+    ).thenReturn(ConnectivityStatus.online);
     when(() => mockSyncQueue.pendingCount).thenAnswer((_) async => 0);
     when(() => mockSyncQueue.getPending()).thenAnswer((_) async => []);
-    when(() => mockErrorReportingService.addBreadcrumb(
-          message: any(named: 'message'),
-          category: any(named: 'category'),
-          data: any(named: 'data'),
-        )).thenReturn(null);
+    when(
+      () => mockErrorReportingService.addBreadcrumb(
+        message: any(named: 'message'),
+        category: any(named: 'category'),
+        data: any(named: 'data'),
+      ),
+    ).thenReturn(null);
 
     syncService = SyncServiceImplementation(
       mockSyncQueue,
@@ -101,8 +105,9 @@ void main() {
         final statuses = <SyncStatus>[];
         syncService.statusStream.listen(statuses.add);
 
-        when(() => mockConnectivityService.currentStatus)
-            .thenReturn(ConnectivityStatus.online);
+        when(
+          () => mockConnectivityService.currentStatus,
+        ).thenReturn(ConnectivityStatus.online);
         when(() => mockSyncQueue.getPending()).thenAnswer((_) async => []);
 
         await syncService.push();
@@ -121,11 +126,13 @@ void main() {
 
     group('queueForSync', () {
       test('calls syncQueue.enqueue', () async {
-        when(() => mockSyncQueue.enqueue(
-              tableName: any(named: 'tableName'),
-              recordId: any(named: 'recordId'),
-              operation: any(named: 'operation'),
-            )).thenAnswer((_) async {});
+        when(
+          () => mockSyncQueue.enqueue(
+            tableName: any(named: 'tableName'),
+            recordId: any(named: 'recordId'),
+            operation: any(named: 'operation'),
+          ),
+        ).thenAnswer((_) async {});
         when(() => mockSyncQueue.pendingCount).thenAnswer((_) async => 1);
 
         syncService.queueForSync(
@@ -137,19 +144,23 @@ void main() {
         // Allow async to complete
         await Future<void>.delayed(const Duration(milliseconds: 50));
 
-        verify(() => mockSyncQueue.enqueue(
-              tableName: 'organizations',
-              recordId: 'org-123',
-              operation: 'insert',
-            )).called(1);
+        verify(
+          () => mockSyncQueue.enqueue(
+            tableName: 'organizations',
+            recordId: 'org-123',
+            operation: 'insert',
+          ),
+        ).called(1);
       });
 
       test('adds breadcrumb on enqueue', () async {
-        when(() => mockSyncQueue.enqueue(
-              tableName: any(named: 'tableName'),
-              recordId: any(named: 'recordId'),
-              operation: any(named: 'operation'),
-            )).thenAnswer((_) async {});
+        when(
+          () => mockSyncQueue.enqueue(
+            tableName: any(named: 'tableName'),
+            recordId: any(named: 'recordId'),
+            operation: any(named: 'operation'),
+          ),
+        ).thenAnswer((_) async {});
         when(() => mockSyncQueue.pendingCount).thenAnswer((_) async => 1);
 
         syncService.queueForSync(
@@ -160,32 +171,38 @@ void main() {
 
         await Future<void>.delayed(const Duration(milliseconds: 50));
 
-        verify(() => mockErrorReportingService.addBreadcrumb(
-              message: any(named: 'message', that: contains('Queued for sync')),
-              category: 'sync',
-              data: any(named: 'data'),
-            )).called(1);
+        verify(
+          () => mockErrorReportingService.addBreadcrumb(
+            message: any(named: 'message', that: contains('Queued for sync')),
+            category: 'sync',
+            data: any(named: 'data'),
+          ),
+        ).called(1);
       });
     });
 
     group('push', () {
       test('skips when offline', () async {
-        when(() => mockConnectivityService.currentStatus)
-            .thenReturn(ConnectivityStatus.offline);
+        when(
+          () => mockConnectivityService.currentStatus,
+        ).thenReturn(ConnectivityStatus.offline);
 
         await syncService.push();
 
         verifyNever(() => mockSyncQueue.getPending());
-        verify(() => mockErrorReportingService.addBreadcrumb(
-              message: 'Push skipped: offline',
-              category: 'sync',
-              data: any(named: 'data'),
-            )).called(1);
+        verify(
+          () => mockErrorReportingService.addBreadcrumb(
+            message: 'Push skipped: offline',
+            category: 'sync',
+            data: any(named: 'data'),
+          ),
+        ).called(1);
       });
 
       test('returns synced status when no pending items', () async {
-        when(() => mockConnectivityService.currentStatus)
-            .thenReturn(ConnectivityStatus.online);
+        when(
+          () => mockConnectivityService.currentStatus,
+        ).thenReturn(ConnectivityStatus.online);
         when(() => mockSyncQueue.getPending()).thenAnswer((_) async => []);
 
         final statuses = <SyncStatus>[];
@@ -201,8 +218,9 @@ void main() {
       });
 
       test('emits syncing status during push', () async {
-        when(() => mockConnectivityService.currentStatus)
-            .thenReturn(ConnectivityStatus.online);
+        when(
+          () => mockConnectivityService.currentStatus,
+        ).thenReturn(ConnectivityStatus.online);
         when(() => mockSyncQueue.getPending()).thenAnswer((_) async => []);
 
         final statuses = <SyncStatus>[];
@@ -216,37 +234,45 @@ void main() {
 
     group('pull', () {
       test('skips when offline', () async {
-        when(() => mockConnectivityService.currentStatus)
-            .thenReturn(ConnectivityStatus.offline);
+        when(
+          () => mockConnectivityService.currentStatus,
+        ).thenReturn(ConnectivityStatus.offline);
 
         await syncService.pull();
 
-        verify(() => mockErrorReportingService.addBreadcrumb(
-              message: 'Pull skipped: offline',
-              category: 'sync',
-              data: any(named: 'data'),
-            )).called(1);
+        verify(
+          () => mockErrorReportingService.addBreadcrumb(
+            message: 'Pull skipped: offline',
+            category: 'sync',
+            data: any(named: 'data'),
+          ),
+        ).called(1);
       });
     });
 
     group('syncNow', () {
       test('calls push then pull', () async {
-        when(() => mockConnectivityService.currentStatus)
-            .thenReturn(ConnectivityStatus.offline);
+        when(
+          () => mockConnectivityService.currentStatus,
+        ).thenReturn(ConnectivityStatus.offline);
 
         await syncService.syncNow();
 
         // Both push and pull should be called (but skip due to offline)
-        verify(() => mockErrorReportingService.addBreadcrumb(
-              message: 'Push skipped: offline',
-              category: 'sync',
-              data: any(named: 'data'),
-            )).called(1);
-        verify(() => mockErrorReportingService.addBreadcrumb(
-              message: 'Pull skipped: offline',
-              category: 'sync',
-              data: any(named: 'data'),
-            )).called(1);
+        verify(
+          () => mockErrorReportingService.addBreadcrumb(
+            message: 'Push skipped: offline',
+            category: 'sync',
+            data: any(named: 'data'),
+          ),
+        ).called(1);
+        verify(
+          () => mockErrorReportingService.addBreadcrumb(
+            message: 'Pull skipped: offline',
+            category: 'sync',
+            data: any(named: 'data'),
+          ),
+        ).called(1);
       });
     });
 
@@ -320,10 +346,7 @@ void main() {
         );
 
         var streamClosed = false;
-        service.statusStream.listen(
-          (_) {},
-          onDone: () => streamClosed = true,
-        );
+        service.statusStream.listen((_) {}, onDone: () => streamClosed = true);
 
         service.dispose();
 

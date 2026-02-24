@@ -40,11 +40,7 @@ class SyncNotificationServiceImplementation implements SyncNotificationService {
     _errorReportingService.addBreadcrumb(
       message: 'Sync conflict resolved: $tableName/$recordId - $winner wins',
       category: 'sync',
-      data: {
-        'tableName': tableName,
-        'recordId': recordId,
-        'winner': winner,
-      },
+      data: {'tableName': tableName, 'recordId': recordId, 'winner': winner},
     );
   }
 }

@@ -21,15 +21,15 @@ class SmartDivisionBuilderParams with _$SmartDivisionBuilderParams {
 }
 
 class AgeGroupConfig {
-  final String name;
-  final int minAge;
-  final int maxAge;
 
   const AgeGroupConfig({
     required this.name,
     required this.minAge,
     required this.maxAge,
   });
+  final String name;
+  final int minAge;
+  final int maxAge;
 
   static const List<AgeGroupConfig> defaultAgeGroups = [
     AgeGroupConfig(name: 'Pediatric 1', minAge: 5, maxAge: 7),
@@ -55,15 +55,15 @@ class AgeGroupConfig {
 }
 
 class BeltGroupConfig {
-  final String name;
-  final int minOrder;
-  final int maxOrder;
 
   const BeltGroupConfig({
     required this.name,
     required this.minOrder,
     required this.maxOrder,
   });
+  final String name;
+  final int minOrder;
+  final int maxOrder;
 
   static const List<BeltGroupConfig> defaultBeltGroups = [
     BeltGroupConfig(name: 'white-yellow', minOrder: 1, maxOrder: 2),
@@ -79,13 +79,13 @@ class BeltGroupConfig {
 }
 
 class DivisionCategoryConfig {
-  final DivisionCategoryType category;
-  final bool applyWeightClasses;
 
   const DivisionCategoryConfig({
     required this.category,
     this.applyWeightClasses = true,
   });
+  final DivisionCategoryType category;
+  final bool applyWeightClasses;
 }
 
 enum DivisionCategoryType { sparring, poomsae, breaking, demoTeam }
@@ -93,15 +93,15 @@ enum DivisionCategoryType { sparring, poomsae, breaking, demoTeam }
 enum DivisionGenderType { male, female, mixed }
 
 class WeightClassConfig {
-  final FederationType federationType;
-  final List<WeightClass> maleClasses;
-  final List<WeightClass> femaleClasses;
 
   const WeightClassConfig({
     required this.federationType,
     required this.maleClasses,
     required this.femaleClasses,
   });
+  final FederationType federationType;
+  final List<WeightClass> maleClasses;
+  final List<WeightClass> femaleClasses;
 
   static const WeightClassConfig wt = WeightClassConfig(
     federationType: FederationType.wt,
@@ -181,10 +181,10 @@ class WeightClassConfig {
 }
 
 class WeightClass {
-  final String name;
-  final double maxWeight;
 
   const WeightClass({required this.name, required this.maxWeight});
+  final String name;
+  final double maxWeight;
 }
 
 enum NamingConventionType {

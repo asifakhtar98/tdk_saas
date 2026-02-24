@@ -1,6 +1,5 @@
 // Explicit configuration per Story 1.2 Technical Requirements to prevent drift.
 
-
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 

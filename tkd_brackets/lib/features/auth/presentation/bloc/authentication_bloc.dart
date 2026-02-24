@@ -31,14 +31,10 @@ class AuthenticationBloc
   ) : super(const AuthenticationState.initial()) {
     on<AuthenticationCheckRequested>(_onCheckRequested);
     on<AuthenticationUserChanged>(_onUserChanged);
-    on<AuthenticationSignOutRequested>(
-      _onSignOutRequested,
-    );
+    on<AuthenticationSignOutRequested>(_onSignOutRequested);
 
     // Subscribe to auth state changes stream
-    _authStateSubscription = _authRepository
-        .authStateChanges
-        .listen((either) {
+    _authStateSubscription = _authRepository.authStateChanges.listen((either) {
       either.fold(
         // Stream errors are deliberately ignored to
         // prevent transient auth state disruptions
@@ -57,8 +53,7 @@ class AuthenticationBloc
   final SignOutUseCase _signOutUseCase;
   final AuthRepository _authRepository;
 
-  StreamSubscription<Either<Failure, UserEntity?>>?
-      _authStateSubscription;
+  StreamSubscription<Either<Failure, UserEntity?>>? _authStateSubscription;
 
   Future<void> _onCheckRequested(
     AuthenticationCheckRequested event,
@@ -66,17 +61,11 @@ class AuthenticationBloc
   ) async {
     emit(const AuthenticationState.checkInProgress());
 
-    final result = await _getCurrentUserUseCase(
-      const NoParams(),
-    );
+    final result = await _getCurrentUserUseCase(const NoParams());
 
     result.fold(
-      (failure) => emit(
-        const AuthenticationState.unauthenticated(),
-      ),
-      (user) => emit(
-        AuthenticationState.authenticated(user),
-      ),
+      (failure) => emit(const AuthenticationState.unauthenticated()),
+      (user) => emit(AuthenticationState.authenticated(user)),
     );
   }
 
@@ -98,17 +87,11 @@ class AuthenticationBloc
   ) async {
     emit(const AuthenticationState.signOutInProgress());
 
-    final result = await _signOutUseCase(
-      const NoParams(),
-    );
+    final result = await _signOutUseCase(const NoParams());
 
     result.fold(
-      (failure) => emit(
-        AuthenticationState.failure(failure),
-      ),
-      (_) => emit(
-        const AuthenticationState.unauthenticated(),
-      ),
+      (failure) => emit(AuthenticationState.failure(failure)),
+      (_) => emit(const AuthenticationState.unauthenticated()),
     );
   }
 

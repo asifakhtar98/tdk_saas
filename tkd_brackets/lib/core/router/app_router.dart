@@ -19,8 +19,7 @@ import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_stat
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     notifyListeners();
-    _subscription =
-        stream.listen((_) => notifyListeners());
+    _subscription = stream.listen((_) => notifyListeners());
   }
 
   late final StreamSubscription<dynamic> _subscription;
@@ -40,8 +39,9 @@ class GoRouterRefreshStream extends ChangeNotifier {
 class AppRouter {
   AppRouter();
 
-  final GlobalKey<NavigatorState> _rootNavigatorKey =
-      GlobalKey<NavigatorState>(debugLabel: 'root');
+  final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'root',
+  );
 
   final GlobalKey<NavigatorState> _shellNavigatorKey =
       GlobalKey<NavigatorState>(debugLabel: 'shell');
@@ -82,17 +82,11 @@ class AppRouter {
   /// Includes SentryNavigatorObserver when Sentry is
   /// enabled.
   List<NavigatorObserver> _buildObservers() {
-    return [
-      if (SentryService.isEnabled)
-        SentryNavigatorObserver(),
-    ];
+    return [if (SentryService.isEnabled) SentryNavigatorObserver()];
   }
 
   /// Redirect guard with auth state checking.
-  String? _redirectGuard(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  String? _redirectGuard(BuildContext context, GoRouterState state) {
     final location = state.matchedLocation;
 
     // Redirect /app routes to dashboard for shell entry
@@ -100,16 +94,13 @@ class AppRouter {
       return '/dashboard';
     }
 
-    final authState =
-        getIt<AuthenticationBloc>().state;
+    final authState = getIt<AuthenticationBloc>().state;
 
     // Public routes that don't require auth
     const publicRoutes = ['/', '/demo'];
-    final isPublicRoute =
-        publicRoutes.contains(location);
+    final isPublicRoute = publicRoutes.contains(location);
 
-    final isAuthenticated =
-        authState is AuthenticationAuthenticated;
+    final isAuthenticated = authState is AuthenticationAuthenticated;
 
     // If authenticated and on public route, go to
     // dashboard
@@ -131,17 +122,13 @@ class AppRouter {
 
   /// Error page for unknown routes with accessibility
   /// support.
-  Widget _buildErrorPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Widget _buildErrorPage(BuildContext context, GoRouterState state) {
     return Scaffold(
       body: Center(
         child: Semantics(
           label: 'Page not found error',
           child: Column(
-            mainAxisAlignment:
-                MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(
                 Icons.error_outline,
@@ -151,9 +138,7 @@ class AppRouter {
               const SizedBox(height: 16),
               Text(
                 'Page not found: ${state.uri.path}',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 16),
               FilledButton.icon(

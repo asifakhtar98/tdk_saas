@@ -1,5 +1,5 @@
 /// Shared test utilities and helpers.
-/// 
+///
 /// Add common mocks, fixtures, and helper functions here.
 library;
 

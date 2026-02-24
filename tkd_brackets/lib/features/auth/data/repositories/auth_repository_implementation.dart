@@ -31,19 +31,12 @@ class AuthRepositoryImplementation implements AuthRepository {
     required String email,
   }) async {
     try {
-      await _authDatasource.sendMagicLink(
-        email: email,
-        shouldCreateUser: true,
-      );
+      await _authDatasource.sendMagicLink(email: email, shouldCreateUser: true);
       return const Right(unit);
     } on AuthException catch (e) {
       return Left(_mapAuthException(e));
     } on Exception catch (e) {
-      return Left(
-        ServerConnectionFailure(
-          technicalDetails: 'Exception: $e',
-        ),
-      );
+      return Left(ServerConnectionFailure(technicalDetails: 'Exception: $e'));
     }
   }
 
@@ -60,11 +53,7 @@ class AuthRepositoryImplementation implements AuthRepository {
     } on AuthException catch (e) {
       return Left(_mapAuthException(e));
     } on Exception catch (e) {
-      return Left(
-        ServerConnectionFailure(
-          technicalDetails: 'Exception: $e',
-        ),
-      );
+      return Left(ServerConnectionFailure(technicalDetails: 'Exception: $e'));
     }
   }
 
@@ -106,7 +95,8 @@ class AuthRepositoryImplementation implements AuthRepository {
         final newUser = UserModel(
           id: supabaseUser.id,
           email: supabaseUser.email ?? email,
-          displayName: supabaseUser.userMetadata?['display_name'] as String? ??
+          displayName:
+              supabaseUser.userMetadata?['display_name'] as String? ??
               email.split('@').first,
           organizationId: '', // Will be set in Story 2.7 (Create Organization)
           role: 'owner', // Default role for new users
@@ -164,15 +154,15 @@ class AuthRepositoryImplementation implements AuthRepository {
       }
 
       // Try local cache first
-      final localUser =
-          await _userLocalDatasource.getUserById(supabaseUser.id);
+      final localUser = await _userLocalDatasource.getUserById(supabaseUser.id);
       if (localUser != null) {
         return Right(localUser.convertToEntity());
       }
 
       // Fallback to remote - NOTE: returns UserModel? (nullable)
-      final remoteUser =
-          await _userRemoteDatasource.getUserById(supabaseUser.id);
+      final remoteUser = await _userRemoteDatasource.getUserById(
+        supabaseUser.id,
+      );
       if (remoteUser == null) {
         return const Left(
           UserNotFoundFailure(
@@ -185,11 +175,7 @@ class AuthRepositoryImplementation implements AuthRepository {
       await _userLocalDatasource.insertUser(remoteUser);
       return Right(remoteUser.convertToEntity());
     } on Exception catch (e) {
-      return Left(
-        ServerConnectionFailure(
-          technicalDetails: 'Exception: $e',
-        ),
-      );
+      return Left(ServerConnectionFailure(technicalDetails: 'Exception: $e'));
     }
   }
 
@@ -211,9 +197,7 @@ class AuthRepositoryImplementation implements AuthRepository {
         return Right<Failure, UserEntity?>(userModel.convertToEntity());
       } on Exception catch (e) {
         return Left<Failure, UserEntity?>(
-          ServerConnectionFailure(
-            technicalDetails: 'Exception: $e',
-          ),
+          ServerConnectionFailure(technicalDetails: 'Exception: $e'),
         );
       }
     });
@@ -226,16 +210,10 @@ class AuthRepositoryImplementation implements AuthRepository {
       return const Right(unit);
     } on AuthException catch (e) {
       return Left(
-        SignOutFailure(
-          technicalDetails: 'AuthException: ${e.message}',
-        ),
+        SignOutFailure(technicalDetails: 'AuthException: ${e.message}'),
       );
     } on Exception catch (e) {
-      return Left(
-        ServerConnectionFailure(
-          technicalDetails: 'Exception: $e',
-        ),
-      );
+      return Left(ServerConnectionFailure(technicalDetails: 'Exception: $e'));
     }
   }
 

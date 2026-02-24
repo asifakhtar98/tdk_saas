@@ -17,10 +17,7 @@ void main() {
 
   setUp(() {
     mockAuthBloc = createMockAuthenticationBloc();
-    GetIt.instance
-        .registerSingleton<AuthenticationBloc>(
-      mockAuthBloc,
-    );
+    GetIt.instance.registerSingleton<AuthenticationBloc>(mockAuthBloc);
   });
 
   tearDown(() async {
@@ -35,8 +32,7 @@ void main() {
 
     test('should have routes configured', () {
       final appRouter = AppRouter();
-      final routeConfig =
-          appRouter.router.configuration;
+      final routeConfig = appRouter.router.configuration;
       expect(routeConfig.routes.isNotEmpty, isTrue);
     });
   });
@@ -50,201 +46,119 @@ void main() {
       expect(const DemoRoute().location, '/demo');
     });
 
-    test(
-      'TournamentListRoute generates correct path',
-      () {
-        expect(
-          const TournamentListRoute().location,
-          '/tournaments',
-        );
-      },
-    );
+    test('TournamentListRoute generates correct path', () {
+      expect(const TournamentListRoute().location, '/tournaments');
+    });
 
-    test(
-      'TournamentDetailsRoute encodes parameter '
-      'in path',
-      () {
-        const route = TournamentDetailsRoute(
-          tournamentId: 'abc-123',
-        );
-        expect(
-          route.location,
-          '/tournaments/abc-123',
-        );
-      },
-    );
+    test('TournamentDetailsRoute encodes parameter '
+        'in path', () {
+      const route = TournamentDetailsRoute(tournamentId: 'abc-123');
+      expect(route.location, '/tournaments/abc-123');
+    });
 
-    test(
-      'TournamentDetailsRoute handles special '
-      'characters',
-      () {
-        const route = TournamentDetailsRoute(
-          tournamentId: 'test%20id',
-        );
-        expect(
-          route.location,
-          '/tournaments/test%2520id',
-        );
-      },
-    );
+    test('TournamentDetailsRoute handles special '
+        'characters', () {
+      const route = TournamentDetailsRoute(tournamentId: 'test%20id');
+      expect(route.location, '/tournaments/test%2520id');
+    });
 
-    test(
-      'TournamentDetailsRoute handles spaces '
-      'correctly',
-      () {
-        const route = TournamentDetailsRoute(
-          tournamentId: 'test id',
-        );
-        expect(
-          route.location,
-          '/tournaments/test%20id',
-        );
-      },
-    );
+    test('TournamentDetailsRoute handles spaces '
+        'correctly', () {
+      const route = TournamentDetailsRoute(tournamentId: 'test id');
+      expect(route.location, '/tournaments/test%20id');
+    });
   });
 
   group('Route Navigation', () {
-    testWidgets(
-      'navigates from Home to Demo',
-      (tester) async {
-        final router = AppRouter();
+    testWidgets('navigates from Home to Demo', (tester) async {
+      final router = AppRouter();
 
-        await tester.pumpWidget(
-          MaterialApp.router(
-            routerConfig: router.router,
-          ),
-        );
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router.router));
+      await tester.pumpAndSettle();
 
-        // Verify home page
-        expect(
-          find.text('TKD Brackets'),
-          findsOneWidget,
-        );
-        expect(
-          find.text('Try Demo'),
-          findsOneWidget,
-        );
+      // Verify home page
+      expect(find.text('TKD Brackets'), findsOneWidget);
+      expect(find.text('Try Demo'), findsOneWidget);
 
-        // Tap demo button
-        await tester.tap(find.text('Try Demo'));
-        await tester.pumpAndSettle();
+      // Tap demo button
+      await tester.tap(find.text('Try Demo'));
+      await tester.pumpAndSettle();
 
-        // Verify demo page
-        expect(
-          find.text('Demo Mode'),
-          findsWidgets,
-        );
-      },
-    );
+      // Verify demo page
+      expect(find.text('Demo Mode'), findsWidgets);
+    });
 
-    testWidgets(
-      'shows error page for unknown route',
-      (tester) async {
-        final router = AppRouter();
+    testWidgets('shows error page for unknown route', (tester) async {
+      final router = AppRouter();
 
-        await tester.pumpWidget(
-          MaterialApp.router(
-            routerConfig: router.router,
-          ),
-        );
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router.router));
+      await tester.pumpAndSettle();
 
-        // Navigate to unknown route
-        router.router.go('/unknown-route-xyz');
-        await tester.pumpAndSettle();
+      // Navigate to unknown route
+      router.router.go('/unknown-route-xyz');
+      await tester.pumpAndSettle();
 
-        // Verify error page
-        expect(
-          find.text('Go Home'),
-          findsOneWidget,
-        );
-      },
-    );
+      // Verify error page
+      expect(find.text('Go Home'), findsOneWidget);
+    });
   });
 
   group('Redirect Guard', () {
     setUp(() {
       final (mock, _) = createMockSyncService();
-      GetIt.instance
-          .registerSingleton<SyncService>(mock);
+      GetIt.instance.registerSingleton<SyncService>(mock);
     });
 
-    testWidgets(
-      'redirects /app to /dashboard',
-      (tester) async {
-        final router = AppRouter();
+    testWidgets('redirects /app to /dashboard', (tester) async {
+      final router = AppRouter();
 
-        await tester.pumpWidget(
-          MaterialApp.router(
-            routerConfig: router.router,
-          ),
-        );
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router.router));
+      await tester.pumpAndSettle();
 
-        router.router.go('/app');
-        await tester.pumpAndSettle();
+      router.router.go('/app');
+      await tester.pumpAndSettle();
 
-        expect(
-          router.router.routerDelegate
-              .currentConfiguration.fullPath,
-          equals('/dashboard'),
-        );
-      },
-    );
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/dashboard'),
+      );
+    });
 
-    testWidgets(
-      'redirects /app/ to /dashboard',
-      (tester) async {
-        final router = AppRouter();
+    testWidgets('redirects /app/ to /dashboard', (tester) async {
+      final router = AppRouter();
 
-        await tester.pumpWidget(
-          MaterialApp.router(
-            routerConfig: router.router,
-          ),
-        );
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router.router));
+      await tester.pumpAndSettle();
 
-        router.router.go('/app/');
-        await tester.pumpAndSettle();
+      router.router.go('/app/');
+      await tester.pumpAndSettle();
 
-        expect(
-          router.router.routerDelegate
-              .currentConfiguration.fullPath,
-          equals('/dashboard'),
-        );
-      },
-    );
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/dashboard'),
+      );
+    });
 
-    testWidgets(
-      'does not redirect normal shell routes',
-      (tester) async {
-        final router = AppRouter();
+    testWidgets('does not redirect normal shell routes', (tester) async {
+      final router = AppRouter();
 
-        await tester.pumpWidget(
-          MaterialApp.router(
-            routerConfig: router.router,
-          ),
-        );
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router.router));
+      await tester.pumpAndSettle();
 
-        router.router.go('/settings');
-        await tester.pumpAndSettle();
+      router.router.go('/settings');
+      await tester.pumpAndSettle();
 
-        expect(
-          router.router.routerDelegate
-              .currentConfiguration.fullPath,
-          equals('/settings'),
-        );
-      },
-    );
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/settings'),
+      );
+    });
   });
 
   group('Auth Redirect Guard', () {
     setUp(() {
       final (mock, _) = createMockSyncService();
-      GetIt.instance
-          .registerSingleton<SyncService>(mock);
+      GetIt.instance.registerSingleton<SyncService>(mock);
     });
 
     final testUser = UserEntity(
@@ -257,174 +171,115 @@ void main() {
       createdAt: DateTime(2026),
     );
 
-    testWidgets(
-      'redirects authenticated user from / '
-      'to /dashboard',
-      (tester) async {
-        mockAuthBloc.emitState(
-          AuthenticationState.authenticated(testUser),
-        );
+    testWidgets('redirects authenticated user from / '
+        'to /dashboard', (tester) async {
+      mockAuthBloc.emitState(AuthenticationState.authenticated(testUser));
 
-        final router = AppRouter();
+      final router = AppRouter();
 
-        await tester.pumpWidget(
-          MaterialApp.router(
-            routerConfig: router.router,
-          ),
-        );
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router.router));
+      await tester.pumpAndSettle();
 
-        // Initial location is /, should redirect
-        // to /dashboard for authenticated users
-        expect(
-          router.router.routerDelegate
-              .currentConfiguration.fullPath,
-          equals('/dashboard'),
-        );
-      },
-    );
+      // Initial location is /, should redirect
+      // to /dashboard for authenticated users
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/dashboard'),
+      );
+    });
 
-    testWidgets(
-      'redirects authenticated user from /demo '
-      'to /dashboard',
-      (tester) async {
-        mockAuthBloc.emitState(
-          AuthenticationState.authenticated(testUser),
-        );
+    testWidgets('redirects authenticated user from /demo '
+        'to /dashboard', (tester) async {
+      mockAuthBloc.emitState(AuthenticationState.authenticated(testUser));
 
-        final router = AppRouter();
+      final router = AppRouter();
 
-        await tester.pumpWidget(
-          MaterialApp.router(
-            routerConfig: router.router,
-          ),
-        );
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router.router));
+      await tester.pumpAndSettle();
 
-        router.router.go('/demo');
-        await tester.pumpAndSettle();
+      router.router.go('/demo');
+      await tester.pumpAndSettle();
 
-        expect(
-          router.router.routerDelegate
-              .currentConfiguration.fullPath,
-          equals('/dashboard'),
-        );
-      },
-    );
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/dashboard'),
+      );
+    });
 
-    testWidgets(
-      'redirects unauthenticated user from '
-      'protected route to /',
-      (tester) async {
-        mockAuthBloc.emitState(
-          const AuthenticationState.unauthenticated(),
-        );
+    testWidgets('redirects unauthenticated user from '
+        'protected route to /', (tester) async {
+      mockAuthBloc.emitState(const AuthenticationState.unauthenticated());
 
-        final router = AppRouter();
+      final router = AppRouter();
 
-        await tester.pumpWidget(
-          MaterialApp.router(
-            routerConfig: router.router,
-          ),
-        );
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router.router));
+      await tester.pumpAndSettle();
 
-        router.router.go('/dashboard');
-        await tester.pumpAndSettle();
+      router.router.go('/dashboard');
+      await tester.pumpAndSettle();
 
-        expect(
-          router.router.routerDelegate
-              .currentConfiguration.fullPath,
-          equals('/'),
-        );
-      },
-    );
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/'),
+      );
+    });
 
-    testWidgets(
-      'does not redirect during '
-      'checkInProgress state',
-      (tester) async {
-        mockAuthBloc.emitState(
-          const AuthenticationState.checkInProgress(),
-        );
+    testWidgets('does not redirect during '
+        'checkInProgress state', (tester) async {
+      mockAuthBloc.emitState(const AuthenticationState.checkInProgress());
 
-        final router = AppRouter();
+      final router = AppRouter();
 
-        await tester.pumpWidget(
-          MaterialApp.router(
-            routerConfig: router.router,
-          ),
-        );
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router.router));
+      await tester.pumpAndSettle();
 
-        // During check, should stay on initial route
-        // (/) without being redirected
-        expect(
-          router.router.routerDelegate
-              .currentConfiguration.fullPath,
-          equals('/'),
-        );
-      },
-    );
+      // During check, should stay on initial route
+      // (/) without being redirected
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/'),
+      );
+    });
 
-    testWidgets(
-      'does not redirect during initial state',
-      (tester) async {
-        // Default state is initial, so no need
-        // to call emitState
+    testWidgets('does not redirect during initial state', (tester) async {
+      // Default state is initial, so no need
+      // to call emitState
 
-        final router = AppRouter();
+      final router = AppRouter();
 
-        await tester.pumpWidget(
-          MaterialApp.router(
-            routerConfig: router.router,
-          ),
-        );
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router.router));
+      await tester.pumpAndSettle();
 
-        // During initial, should stay on /
-        expect(
-          router.router.routerDelegate
-              .currentConfiguration.fullPath,
-          equals('/'),
-        );
-      },
-    );
+      // During initial, should stay on /
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/'),
+      );
+    });
 
-    testWidgets(
-      'allows unauthenticated user to access '
-      'public routes',
-      (tester) async {
-        mockAuthBloc.emitState(
-          const AuthenticationState.unauthenticated(),
-        );
+    testWidgets('allows unauthenticated user to access '
+        'public routes', (tester) async {
+      mockAuthBloc.emitState(const AuthenticationState.unauthenticated());
 
-        final router = AppRouter();
+      final router = AppRouter();
 
-        await tester.pumpWidget(
-          MaterialApp.router(
-            routerConfig: router.router,
-          ),
-        );
-        await tester.pumpAndSettle();
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router.router));
+      await tester.pumpAndSettle();
 
-        // Should stay on / (public route)
-        expect(
-          router.router.routerDelegate
-              .currentConfiguration.fullPath,
-          equals('/'),
-        );
+      // Should stay on / (public route)
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/'),
+      );
 
-        // Navigate to /demo (also public)
-        router.router.go('/demo');
-        await tester.pumpAndSettle();
+      // Navigate to /demo (also public)
+      router.router.go('/demo');
+      await tester.pumpAndSettle();
 
-        expect(
-          router.router.routerDelegate
-              .currentConfiguration.fullPath,
-          equals('/demo'),
-        );
-      },
-    );
+      expect(
+        router.router.routerDelegate.currentConfiguration.fullPath,
+        equals('/demo'),
+      );
+    });
   });
 }

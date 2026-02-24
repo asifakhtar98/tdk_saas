@@ -91,10 +91,7 @@ void main() {
 
     group('demo user constants', () {
       test('demoUserEmail has valid local domain', () {
-        expect(
-          DemoDataConstants.demoUserEmail,
-          contains('@tkdbrackets.local'),
-        );
+        expect(DemoDataConstants.demoUserEmail, contains('@tkdbrackets.local'));
       });
 
       test('demoUserDisplayName is non-empty', () {
@@ -129,10 +126,12 @@ void main() {
       });
 
       test('demoTournamentFederation is valid type', () {
-        expect(
-          ['wt', 'itf', 'ata', 'custom'],
-          contains(DemoDataConstants.demoTournamentFederation),
-        );
+        expect([
+          'wt',
+          'itf',
+          'ata',
+          'custom',
+        ], contains(DemoDataConstants.demoTournamentFederation));
       });
 
       test('demoTournamentStatus is valid status', () {
@@ -144,10 +143,7 @@ void main() {
           'completed',
           'cancelled',
         ];
-        expect(
-          validStatuses,
-          contains(DemoDataConstants.demoTournamentStatus),
-        );
+        expect(validStatuses, contains(DemoDataConstants.demoTournamentStatus));
       });
 
       test('demoTournamentDaysFromNow is positive', () {
@@ -174,10 +170,11 @@ void main() {
       });
 
       test('demoDivisionGender is valid gender', () {
-        expect(
-          ['male', 'female', 'mixed'],
-          contains(DemoDataConstants.demoDivisionGender),
-        );
+        expect([
+          'male',
+          'female',
+          'mixed',
+        ], contains(DemoDataConstants.demoDivisionGender));
       });
 
       test('demoDivisionAgeMin is less than demoDivisionAgeMax', () {
@@ -209,19 +206,16 @@ void main() {
 
       test('demoDivisionStatus is valid status', () {
         final validStatuses = ['setup', 'ready', 'in_progress', 'completed'];
-        expect(
-          validStatuses,
-          contains(DemoDataConstants.demoDivisionStatus),
-        );
+        expect(validStatuses, contains(DemoDataConstants.demoDivisionStatus));
       });
     });
 
     group('demo participant gender constant', () {
       test('demoParticipantGender is valid gender', () {
-        expect(
-          ['male', 'female'],
-          contains(DemoDataConstants.demoParticipantGender),
-        );
+        expect([
+          'male',
+          'female',
+        ], contains(DemoDataConstants.demoParticipantGender));
       });
     });
   });

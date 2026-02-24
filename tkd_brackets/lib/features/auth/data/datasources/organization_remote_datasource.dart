@@ -6,37 +6,25 @@ import 'package:tkd_brackets/features/auth/data/models/organization_model.dart';
 ///
 /// All queries go through RLS-protected tables.
 abstract class OrganizationRemoteDatasource {
-  Future<OrganizationModel?> getOrganizationById(
-    String id,
-  );
-  Future<OrganizationModel?> getOrganizationBySlug(
-    String slug,
-  );
+  Future<OrganizationModel?> getOrganizationById(String id);
+  Future<OrganizationModel?> getOrganizationBySlug(String slug);
   Future<List<OrganizationModel>> getActiveOrganizations();
-  Future<OrganizationModel> insertOrganization(
-    OrganizationModel organization,
-  );
-  Future<OrganizationModel> updateOrganization(
-    OrganizationModel organization,
-  );
+  Future<OrganizationModel> insertOrganization(OrganizationModel organization);
+  Future<OrganizationModel> updateOrganization(OrganizationModel organization);
   Future<void> deleteOrganization(String id);
 }
 
 @LazySingleton(as: OrganizationRemoteDatasource)
 class OrganizationRemoteDatasourceImplementation
     implements OrganizationRemoteDatasource {
-  OrganizationRemoteDatasourceImplementation(
-    this._supabase,
-  );
+  OrganizationRemoteDatasourceImplementation(this._supabase);
 
   final SupabaseClient _supabase;
 
   static const String _tableName = 'organizations';
 
   @override
-  Future<OrganizationModel?> getOrganizationById(
-    String id,
-  ) async {
+  Future<OrganizationModel?> getOrganizationById(String id) async {
     final response = await _supabase
         .from(_tableName)
         .select()
@@ -49,9 +37,7 @@ class OrganizationRemoteDatasourceImplementation
   }
 
   @override
-  Future<OrganizationModel?> getOrganizationBySlug(
-    String slug,
-  ) async {
+  Future<OrganizationModel?> getOrganizationBySlug(String slug) async {
     final response = await _supabase
         .from(_tableName)
         .select()
@@ -64,19 +50,14 @@ class OrganizationRemoteDatasourceImplementation
   }
 
   @override
-  Future<List<OrganizationModel>>
-      getActiveOrganizations() async {
+  Future<List<OrganizationModel>> getActiveOrganizations() async {
     final response = await _supabase
         .from(_tableName)
         .select()
         .eq('is_deleted', false)
         .order('name');
 
-    return response
-        .map<OrganizationModel>(
-          OrganizationModel.fromJson,
-        )
-        .toList();
+    return response.map<OrganizationModel>(OrganizationModel.fromJson).toList();
   }
 
   @override
@@ -109,10 +90,12 @@ class OrganizationRemoteDatasourceImplementation
   @override
   Future<void> deleteOrganization(String id) async {
     // Soft delete by setting is_deleted = true
-    await _supabase.from(_tableName).update({
-      'is_deleted': true,
-      'deleted_at_timestamp':
-          DateTime.now().toIso8601String(),
-    }).eq('id', id);
+    await _supabase
+        .from(_tableName)
+        .update({
+          'is_deleted': true,
+          'deleted_at_timestamp': DateTime.now().toIso8601String(),
+        })
+        .eq('id', id);
   }
 }

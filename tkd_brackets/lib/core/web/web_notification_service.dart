@@ -15,10 +15,7 @@ abstract class WebNotificationService {
     // Dispatch a custom event that the landing page JavaScript listens for
     final event = web.CustomEvent(
       'flutter-initialized',
-      web.CustomEventInit(
-        bubbles: true,
-        cancelable: false,
-      ),
+      web.CustomEventInit(bubbles: true, cancelable: false),
     );
     web.document.dispatchEvent(event);
   }

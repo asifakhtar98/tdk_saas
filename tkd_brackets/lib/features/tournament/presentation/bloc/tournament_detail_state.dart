@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
-import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/entities/conflict_warning.dart';
+import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
+import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 
 part 'tournament_detail_state.freezed.dart';
 

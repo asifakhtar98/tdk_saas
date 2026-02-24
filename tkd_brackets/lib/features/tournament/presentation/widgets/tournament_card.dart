@@ -3,9 +3,7 @@ import 'package:tkd_brackets/features/tournament/domain/entities/tournament_enti
 
 class TournamentCard extends StatelessWidget {
   const TournamentCard({
-    super.key,
-    required this.tournament,
-    required this.onTap,
+    required this.tournament, required this.onTap, super.key,
     this.onDelete,
     this.onArchive,
   });
@@ -167,23 +165,18 @@ class TournamentCard extends StatelessWidget {
       case TournamentStatus.draft:
         backgroundColor = colorScheme.surfaceContainerHighest;
         foregroundColor = colorScheme.onSurfaceVariant;
-        break;
       case TournamentStatus.active:
         backgroundColor = colorScheme.primaryContainer;
         foregroundColor = colorScheme.onPrimaryContainer;
-        break;
       case TournamentStatus.completed:
         backgroundColor = colorScheme.tertiaryContainer;
         foregroundColor = colorScheme.onTertiaryContainer;
-        break;
       case TournamentStatus.archived:
         backgroundColor = colorScheme.surfaceContainerHighest;
         foregroundColor = colorScheme.onSurfaceVariant;
-        break;
       case TournamentStatus.cancelled:
         backgroundColor = colorScheme.errorContainer;
         foregroundColor = colorScheme.onErrorContainer;
-        break;
     }
 
     return Container(

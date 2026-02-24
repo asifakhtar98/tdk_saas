@@ -1,7 +1,7 @@
 import 'dart:math';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
-import 'package:uuid/uuid.dart';
 import 'package:tkd_brackets/core/database/app_database.dart'
     show ParticipantEntry;
 import 'package:tkd_brackets/core/error/failures.dart';
@@ -9,6 +9,7 @@ import 'package:tkd_brackets/core/usecases/use_case.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
 import 'package:tkd_brackets/features/division/domain/usecases/split_division_params.dart';
+import 'package:uuid/uuid.dart';
 
 @injectable
 class SplitDivisionUseCase

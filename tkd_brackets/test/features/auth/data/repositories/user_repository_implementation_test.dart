@@ -57,8 +57,9 @@ void main() {
 
   group('getUserById', () {
     test('returns user from local datasource when available', () async {
-      when(() => mockLocalDatasource.getUserById('test-id'))
-          .thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.getUserById('test-id'),
+      ).thenAnswer((_) async => testModel);
 
       final result = await repository.getUserById('test-id');
 
@@ -71,14 +72,18 @@ void main() {
     });
 
     test('fetches from remote when local not found and online', () async {
-      when(() => mockLocalDatasource.getUserById('test-id'))
-          .thenAnswer((_) async => null);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.getUserById('test-id'))
-          .thenAnswer((_) async => testModel);
-      when(() => mockLocalDatasource.insertUser(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDatasource.getUserById('test-id'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.getUserById('test-id'),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.insertUser(any()),
+      ).thenAnswer((_) async {});
 
       final result = await repository.getUserById('test-id');
 
@@ -87,10 +92,12 @@ void main() {
     });
 
     test('returns failure when user not found locally and offline', () async {
-      when(() => mockLocalDatasource.getUserById('test-id'))
-          .thenAnswer((_) async => null);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.getUserById('test-id'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final result = await repository.getUserById('test-id');
 
@@ -98,12 +105,15 @@ void main() {
     });
 
     test('returns failure when user not found in both sources', () async {
-      when(() => mockLocalDatasource.getUserById('test-id'))
-          .thenAnswer((_) async => null);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.getUserById('test-id'))
-          .thenAnswer((_) async => null);
+      when(
+        () => mockLocalDatasource.getUserById('test-id'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.getUserById('test-id'),
+      ).thenAnswer((_) async => null);
 
       final result = await repository.getUserById('test-id');
 
@@ -113,8 +123,9 @@ void main() {
 
   group('getUserByEmail', () {
     test('returns user from local datasource when available', () async {
-      when(() => mockLocalDatasource.getUserByEmail('test@example.com'))
-          .thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.getUserByEmail('test@example.com'),
+      ).thenAnswer((_) async => testModel);
 
       final result = await repository.getUserByEmail('test@example.com');
 
@@ -126,14 +137,18 @@ void main() {
     });
 
     test('fetches from remote when local not found and online', () async {
-      when(() => mockLocalDatasource.getUserByEmail('test@example.com'))
-          .thenAnswer((_) async => null);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.getUserByEmail('test@example.com'))
-          .thenAnswer((_) async => testModel);
-      when(() => mockLocalDatasource.insertUser(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDatasource.getUserByEmail('test@example.com'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.getUserByEmail('test@example.com'),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.insertUser(any()),
+      ).thenAnswer((_) async {});
 
       final result = await repository.getUserByEmail('test@example.com');
 
@@ -143,12 +158,15 @@ void main() {
 
   group('createUser', () {
     test('saves locally first then syncs to remote', () async {
-      when(() => mockLocalDatasource.insertUser(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.insertUser(any()))
-          .thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.insertUser(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.insertUser(any()),
+      ).thenAnswer((_) async => testModel);
 
       final entity = testModel.convertToEntity();
       final result = await repository.createUser(entity);
@@ -159,10 +177,12 @@ void main() {
     });
 
     test('succeeds with local only when offline', () async {
-      when(() => mockLocalDatasource.insertUser(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.insertUser(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final entity = testModel.convertToEntity();
       final result = await repository.createUser(entity);
@@ -175,14 +195,18 @@ void main() {
 
   group('updateUser', () {
     test('updates locally and syncs to remote when online', () async {
-      when(() => mockLocalDatasource.getUserById('test-id'))
-          .thenAnswer((_) async => testModel);
-      when(() => mockLocalDatasource.updateUser(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.updateUser(any()))
-          .thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.getUserById('test-id'),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.updateUser(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.updateUser(any()),
+      ).thenAnswer((_) async => testModel);
 
       final entity = testModel.convertToEntity();
       final result = await repository.updateUser(entity);
@@ -193,32 +217,39 @@ void main() {
     });
 
     test('increments sync version on update', () async {
-      when(() => mockLocalDatasource.getUserById('test-id'))
-          .thenAnswer((_) async => testModel);
-      when(() => mockLocalDatasource.updateUser(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.getUserById('test-id'),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.updateUser(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final entity = testModel.convertToEntity();
       await repository.updateUser(entity);
 
       final captured =
-          verify(() => mockLocalDatasource.updateUser(captureAny()))
-              .captured
-              .first as UserModel;
+          verify(
+                () => mockLocalDatasource.updateUser(captureAny()),
+              ).captured.first
+              as UserModel;
       expect(captured.syncVersion, 2);
     });
   });
 
   group('deleteUser', () {
     test('deletes locally and syncs to remote when online', () async {
-      when(() => mockLocalDatasource.deleteUser('test-id'))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.deleteUser('test-id'))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDatasource.deleteUser('test-id'),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.deleteUser('test-id'),
+      ).thenAnswer((_) async {});
 
       final result = await repository.deleteUser('test-id');
 
@@ -228,10 +259,12 @@ void main() {
     });
 
     test('succeeds with local only when offline', () async {
-      when(() => mockLocalDatasource.deleteUser('test-id'))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.deleteUser('test-id'),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final result = await repository.deleteUser('test-id');
 
@@ -243,10 +276,12 @@ void main() {
 
   group('getUsersForOrganization', () {
     test('returns users from local when offline', () async {
-      when(() => mockLocalDatasource.getUsersForOrganization('org-1'))
-          .thenAnswer((_) async => [testModel]);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.getUsersForOrganization('org-1'),
+      ).thenAnswer((_) async => [testModel]);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final result = await repository.getUsersForOrganization('org-1');
 
@@ -258,16 +293,21 @@ void main() {
     });
 
     test('syncs from remote when online', () async {
-      when(() => mockLocalDatasource.getUsersForOrganization('org-1'))
-          .thenAnswer((_) async => []);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.getUsersForOrganization('org-1'))
-          .thenAnswer((_) async => [testModel]);
-      when(() => mockLocalDatasource.getUserById(any()))
-          .thenAnswer((_) async => null);
-      when(() => mockLocalDatasource.insertUser(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDatasource.getUsersForOrganization('org-1'),
+      ).thenAnswer((_) async => []);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.getUsersForOrganization('org-1'),
+      ).thenAnswer((_) async => [testModel]);
+      when(
+        () => mockLocalDatasource.getUserById(any()),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockLocalDatasource.insertUser(any()),
+      ).thenAnswer((_) async {});
 
       final result = await repository.getUsersForOrganization('org-1');
 
@@ -280,28 +320,31 @@ void main() {
   });
 
   group('getCurrentUser', () {
-    final mockUser = User(
+    const mockUser = User(
       id: 'test-id',
-      appMetadata: const {},
-      userMetadata: const {},
+      appMetadata: {},
+      userMetadata: {},
       aud: 'authenticated',
       createdAt: '2024-01-01T00:00:00.000Z',
     );
 
-    test('returns user from local when auth user exists and local has data',
-        () async {
-      when(() => mockRemoteDatasource.currentAuthUser).thenReturn(mockUser);
-      when(() => mockLocalDatasource.getUserById('test-id'))
-          .thenAnswer((_) async => testModel);
+    test(
+      'returns user from local when auth user exists and local has data',
+      () async {
+        when(() => mockRemoteDatasource.currentAuthUser).thenReturn(mockUser);
+        when(
+          () => mockLocalDatasource.getUserById('test-id'),
+        ).thenAnswer((_) async => testModel);
 
-      final result = await repository.getCurrentUser();
+        final result = await repository.getCurrentUser();
 
-      expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Expected Right'),
-        (user) => expect(user.id, 'test-id'),
-      );
-    });
+        expect(result.isRight(), true);
+        result.fold(
+          (failure) => fail('Expected Right'),
+          (user) => expect(user.id, 'test-id'),
+        );
+      },
+    );
 
     test('returns failure when no auth user', () async {
       when(() => mockRemoteDatasource.currentAuthUser).thenReturn(null);
@@ -313,14 +356,18 @@ void main() {
 
     test('fetches from remote when local returns null', () async {
       when(() => mockRemoteDatasource.currentAuthUser).thenReturn(mockUser);
-      when(() => mockLocalDatasource.getUserById('test-id'))
-          .thenAnswer((_) async => null);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.getUserById('test-id'))
-          .thenAnswer((_) async => testModel);
-      when(() => mockLocalDatasource.insertUser(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDatasource.getUserById('test-id'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.getUserById('test-id'),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.insertUser(any()),
+      ).thenAnswer((_) async {});
 
       final result = await repository.getCurrentUser();
 
@@ -330,10 +377,10 @@ void main() {
 
   group('watchCurrentUser', () {
     test('emits Right with user entity when session has user', () async {
-      final mockUser = User(
+      const mockUser = User(
         id: 'test-id',
-        appMetadata: const {},
-        userMetadata: const {},
+        appMetadata: {},
+        userMetadata: {},
         aud: 'authenticated',
         createdAt: '2024-01-01T00:00:00.000Z',
       );
@@ -342,15 +389,14 @@ void main() {
         tokenType: 'bearer',
         user: mockUser,
       );
-      final authState = AuthState(
-        AuthChangeEvent.signedIn,
-        mockSession,
-      );
+      final authState = AuthState(AuthChangeEvent.signedIn, mockSession);
 
-      when(() => mockRemoteDatasource.authStateChanges)
-          .thenAnswer((_) => Stream.value(authState));
-      when(() => mockLocalDatasource.getUserById('test-id'))
-          .thenAnswer((_) async => testModel);
+      when(
+        () => mockRemoteDatasource.authStateChanges,
+      ).thenAnswer((_) => Stream.value(authState));
+      when(
+        () => mockLocalDatasource.getUserById('test-id'),
+      ).thenAnswer((_) async => testModel);
 
       final stream = repository.watchCurrentUser();
 
@@ -361,10 +407,11 @@ void main() {
     });
 
     test('emits Left with failure when no session', () async {
-      final authState = AuthState(AuthChangeEvent.signedOut, null);
+      const authState = AuthState(AuthChangeEvent.signedOut, null);
 
-      when(() => mockRemoteDatasource.authStateChanges)
-          .thenAnswer((_) => Stream.value(authState));
+      when(
+        () => mockRemoteDatasource.authStateChanges,
+      ).thenAnswer((_) => Stream.value(authState));
 
       final stream = repository.watchCurrentUser();
 

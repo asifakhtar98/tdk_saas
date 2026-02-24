@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tkd_brackets/features/division/domain/entities/belt_rank.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/participant/domain/entities/participant_entity.dart';
 import 'package:tkd_brackets/features/participant/domain/services/auto_assignment_service.dart';
@@ -214,11 +213,11 @@ void main() {
 
   group('evaluateMatch - weight criteria', () {
     test('matches when weight within range', () {
-      final participant = createTestParticipant(id: 'p1', weightKg: 35.0);
+      final participant = createTestParticipant(id: 'p1', weightKg: 35);
       final division = createTestDivision(
         id: 'd1',
-        weightMinKg: 30.0,
-        weightMaxKg: 40.0,
+        weightMinKg: 30,
+        weightMaxKg: 40,
       );
 
       final match = service.evaluateMatch(participant, division);
@@ -228,11 +227,11 @@ void main() {
     });
 
     test('returns null when weight below min', () {
-      final participant = createTestParticipant(id: 'p1', weightKg: 25.0);
+      final participant = createTestParticipant(id: 'p1', weightKg: 25);
       final division = createTestDivision(
         id: 'd1',
-        weightMinKg: 30.0,
-        weightMaxKg: 40.0,
+        weightMinKg: 30,
+        weightMaxKg: 40,
       );
 
       final match = service.evaluateMatch(participant, division);
@@ -241,11 +240,11 @@ void main() {
     });
 
     test('returns null when weight above max', () {
-      final participant = createTestParticipant(id: 'p1', weightKg: 45.0);
+      final participant = createTestParticipant(id: 'p1', weightKg: 45);
       final division = createTestDivision(
         id: 'd1',
-        weightMinKg: 30.0,
-        weightMaxKg: 40.0,
+        weightMinKg: 30,
+        weightMaxKg: 40,
       );
 
       final match = service.evaluateMatch(participant, division);
@@ -257,8 +256,8 @@ void main() {
       final participant = createTestParticipant(id: 'p1', weightKg: null);
       final division = createTestDivision(
         id: 'd1',
-        weightMinKg: 30.0,
-        weightMaxKg: 40.0,
+        weightMinKg: 30,
+        weightMaxKg: 40,
       );
 
       final match = service.evaluateMatch(participant, division);
@@ -268,7 +267,7 @@ void main() {
     });
 
     test('matches when division has no weight constraints', () {
-      final participant = createTestParticipant(id: 'p1', weightKg: 35.0);
+      final participant = createTestParticipant(id: 'p1', weightKg: 35);
       final division = createTestDivision(id: 'd1');
 
       final match = service.evaluateMatch(participant, division);
@@ -391,7 +390,7 @@ void main() {
         id: 'p1',
         gender: Gender.male,
         dateOfBirth: dateAtAge(10),
-        weightKg: 35.0,
+        weightKg: 35,
         beltRank: 'blue',
       );
       final division = createTestDivision(
@@ -399,8 +398,8 @@ void main() {
         gender: DivisionGender.male,
         ageMin: 8,
         ageMax: 12,
-        weightMinKg: 30.0,
-        weightMaxKg: 40.0,
+        weightMinKg: 30,
+        weightMaxKg: 40,
         beltRankMin: 'green',
         beltRankMax: 'red',
       );
@@ -481,14 +480,14 @@ void main() {
       final participant = createTestParticipant(
         id: 'p1',
         gender: Gender.male,
-        weightKg: 50.0,
+        weightKg: 50,
       );
       final divisions = [
         createTestDivision(
           id: 'd1',
           gender: DivisionGender.male,
-          weightMinKg: 30.0,
-          weightMaxKg: 40.0,
+          weightMinKg: 30,
+          weightMaxKg: 40,
         ),
       ];
 
@@ -529,8 +528,8 @@ void main() {
           gender: DivisionGender.male,
           ageMin: 8,
           ageMax: 12,
-          weightMinKg: 50.0,
-          weightMaxKg: 60.0,
+          weightMinKg: 50,
+          weightMaxKg: 60,
         ),
       ];
 
@@ -556,8 +555,8 @@ void main() {
           gender: DivisionGender.male,
           ageMin: 8,
           ageMax: 12,
-          weightMinKg: 30.0,
-          weightMaxKg: 40.0,
+          weightMinKg: 30,
+          weightMaxKg: 40,
           beltRankMin: 'green',
           beltRankMax: 'red',
         );
@@ -577,12 +576,12 @@ void main() {
       final participant = createTestParticipant(
         id: 'p1',
         dateOfBirth: dateAtAge(10),
-        weightKg: 35.0,
+        weightKg: 35,
       );
       final division = createTestDivision(
         id: 'd1',
         ageMin: 8,
-        weightMinKg: 30.0,
+        weightMinKg: 30,
       );
 
       final match = service.evaluateMatch(participant, division);
@@ -594,12 +593,12 @@ void main() {
       final participant = createTestParticipant(
         id: 'p1',
         dateOfBirth: dateAtAge(10),
-        weightKg: 35.0,
+        weightKg: 35,
       );
       final division = createTestDivision(
         id: 'd1',
         ageMax: 12,
-        weightMaxKg: 40.0,
+        weightMaxKg: 40,
       );
 
       final match = service.evaluateMatch(participant, division);

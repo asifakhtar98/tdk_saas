@@ -9,9 +9,7 @@ import 'package:tkd_brackets/features/auth/domain/entities/organization_entity.d
 abstract class OrganizationRepository {
   /// Get organization by ID.
   /// Returns [Left(Failure)] if not found or error occurs.
-  Future<Either<Failure, OrganizationEntity>> getOrganizationById(
-    String id,
-  );
+  Future<Either<Failure, OrganizationEntity>> getOrganizationById(String id);
 
   /// Get organization by slug.
   /// Returns [Left(Failure)] if not found or error occurs.
@@ -20,8 +18,7 @@ abstract class OrganizationRepository {
   );
 
   /// Get all active (non-deleted) organizations.
-  Future<Either<Failure, List<OrganizationEntity>>>
-      getActiveOrganizations();
+  Future<Either<Failure, List<OrganizationEntity>>> getActiveOrganizations();
 
   /// Create a new organization (local + remote sync).
   /// Returns created organization on success.

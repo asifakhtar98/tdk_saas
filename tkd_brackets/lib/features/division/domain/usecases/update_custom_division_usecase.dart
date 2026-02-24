@@ -22,7 +22,7 @@ class UpdateCustomDivisionUseCase
       params.divisionId,
     );
 
-    return existingResult.fold((failure) => Left(failure), (
+    return existingResult.fold(Left.new, (
       existingDivision,
     ) async {
       if (existingDivision.isCustom == false) {

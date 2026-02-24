@@ -4,11 +4,7 @@ import 'package:tkd_brackets/features/tournament/tournament.dart';
 
 void main() {
   Widget buildTestWidget() {
-    return const MaterialApp(
-      home: Scaffold(
-        body: TournamentListPage(),
-      ),
-    );
+    return const MaterialApp(home: Scaffold(body: TournamentListPage()));
   }
 
   group('TournamentListPage', () {
@@ -47,8 +43,9 @@ void main() {
       await tester.pumpWidget(buildTestWidget());
       await tester.pump();
 
-      final icon =
-          tester.widget<Icon>(find.byIcon(Icons.emoji_events_outlined));
+      final icon = tester.widget<Icon>(
+        find.byIcon(Icons.emoji_events_outlined),
+      );
       expect(icon.semanticLabel, equals('Tournaments icon'));
     });
   });

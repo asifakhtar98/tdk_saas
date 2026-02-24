@@ -19,8 +19,7 @@ void main() {
           expect(
             service.canPerform(UserRole.owner, permission),
             isTrue,
-            reason:
-                'Owner should have ${permission.value}',
+            reason: 'Owner should have ${permission.value}',
           );
         }
       });
@@ -97,10 +96,7 @@ void main() {
     group('Viewer permissions', () {
       test('has only read permission', () {
         expect(
-          service.canPerform(
-            UserRole.viewer,
-            Permission.viewData,
-          ),
+          service.canPerform(UserRole.viewer, Permission.viewData),
           isTrue,
         );
 
@@ -108,10 +104,7 @@ void main() {
         for (final permission in Permission.values) {
           if (permission == Permission.viewData) continue;
           expect(
-            service.canPerform(
-              UserRole.viewer,
-              permission,
-            ),
+            service.canPerform(UserRole.viewer, permission),
             isFalse,
             reason:
                 'Viewer should NOT have '
@@ -122,35 +115,27 @@ void main() {
     });
 
     group('assertPermission', () {
-      test(
-        'returns Right(unit) when permission is granted',
-        () {
-           final result = service.assertPermission(
-            UserRole.owner,
-            Permission.manageBilling,
-          );
-          expect(result, const Right<Failure, Unit>(unit));
-        },
-      );
+      test('returns Right(unit) when permission is granted', () {
+        final result = service.assertPermission(
+          UserRole.owner,
+          Permission.manageBilling,
+        );
+        expect(result, const Right<Failure, Unit>(unit));
+      });
 
-      test(
-        'returns Left(AuthorizationPermissionDeniedFailure) '
-        'when permission is denied',
-        () {
-          final result = service.assertPermission(
-            UserRole.viewer,
-            Permission.manageBilling,
-          );
-          expect(result.isLeft(), isTrue);
-          result.fold(
-            (failure) => expect(
-              failure,
-              isA<AuthorizationPermissionDeniedFailure>(),
-            ),
-            (_) => fail('Expected Left'),
-          );
-        },
-      );
+      test('returns Left(AuthorizationPermissionDeniedFailure) '
+          'when permission is denied', () {
+        final result = service.assertPermission(
+          UserRole.viewer,
+          Permission.manageBilling,
+        );
+        expect(result.isLeft(), isTrue);
+        result.fold(
+          (failure) =>
+              expect(failure, isA<AuthorizationPermissionDeniedFailure>()),
+          (_) => fail('Expected Left'),
+        );
+      });
     });
   });
 }

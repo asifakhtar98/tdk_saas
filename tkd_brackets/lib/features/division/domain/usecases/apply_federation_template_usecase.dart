@@ -57,7 +57,7 @@ class ApplyFederationTemplateUseCase
         final result = await _divisionRepository.createDivision(division);
         result.fold(
           (failure) => divisions.add(division),
-          (saved) => divisions.add(saved),
+          divisions.add,
         );
       }
 
@@ -65,7 +65,7 @@ class ApplyFederationTemplateUseCase
     } catch (e) {
       return Left(
         ServerResponseFailure(
-          userFriendlyMessage: 'Failed to apply templates: ${e.toString()}',
+          userFriendlyMessage: 'Failed to apply templates: $e',
         ),
       );
     }

@@ -15,8 +15,7 @@ import 'package:tkd_brackets/features/auth/domain/repositories/organization_repo
 /// - Write: Write to local, queue for sync if offline
 /// - Sync: Last-Write-Wins based on sync_version
 @LazySingleton(as: OrganizationRepository)
-class OrganizationRepositoryImplementation
-    implements OrganizationRepository {
+class OrganizationRepositoryImplementation implements OrganizationRepository {
   OrganizationRepositoryImplementation(
     this._localDatasource,
     this._remoteDatasource,
@@ -28,33 +27,29 @@ class OrganizationRepositoryImplementation
   final ConnectivityService _connectivityService;
 
   @override
-  Future<Either<Failure, OrganizationEntity>>
-      getOrganizationById(String id) async {
+  Future<Either<Failure, OrganizationEntity>> getOrganizationById(
+    String id,
+  ) async {
     try {
       // Try local first
-      final localOrg =
-          await _localDatasource.getOrganizationById(id);
+      final localOrg = await _localDatasource.getOrganizationById(id);
       if (localOrg != null) {
         return Right(localOrg.convertToEntity());
       }
 
       // Fallback to remote if online
-      if (await _connectivityService
-          .hasInternetConnection()) {
-        final remoteOrg = await _remoteDatasource
-            .getOrganizationById(id);
+      if (await _connectivityService.hasInternetConnection()) {
+        final remoteOrg = await _remoteDatasource.getOrganizationById(id);
         if (remoteOrg != null) {
           // Cache locally
-          await _localDatasource
-              .insertOrganization(remoteOrg);
+          await _localDatasource.insertOrganization(remoteOrg);
           return Right(remoteOrg.convertToEntity());
         }
       }
 
       return const Left(
         LocalCacheAccessFailure(
-          userFriendlyMessage:
-              'Organization not found.',
+          userFriendlyMessage: 'Organization not found.',
           technicalDetails:
               'No organization found with the given ID '
               'in local or remote.',
@@ -63,8 +58,7 @@ class OrganizationRepositoryImplementation
     } on Exception catch (e) {
       return Left(
         LocalCacheAccessFailure(
-          userFriendlyMessage:
-              'Failed to retrieve organization.',
+          userFriendlyMessage: 'Failed to retrieve organization.',
           technicalDetails: e.toString(),
         ),
       );
@@ -72,33 +66,29 @@ class OrganizationRepositoryImplementation
   }
 
   @override
-  Future<Either<Failure, OrganizationEntity>>
-      getOrganizationBySlug(String slug) async {
+  Future<Either<Failure, OrganizationEntity>> getOrganizationBySlug(
+    String slug,
+  ) async {
     try {
       // Try local first (offline-first)
-      final localOrg = await _localDatasource
-          .getOrganizationBySlug(slug);
+      final localOrg = await _localDatasource.getOrganizationBySlug(slug);
       if (localOrg != null) {
         return Right(localOrg.convertToEntity());
       }
 
       // Fallback to remote if online
-      if (await _connectivityService
-          .hasInternetConnection()) {
-        final remoteOrg = await _remoteDatasource
-            .getOrganizationBySlug(slug);
+      if (await _connectivityService.hasInternetConnection()) {
+        final remoteOrg = await _remoteDatasource.getOrganizationBySlug(slug);
         if (remoteOrg != null) {
           // Cache locally
-          await _localDatasource
-              .insertOrganization(remoteOrg);
+          await _localDatasource.insertOrganization(remoteOrg);
           return Right(remoteOrg.convertToEntity());
         }
       }
 
       return const Left(
         LocalCacheAccessFailure(
-          userFriendlyMessage:
-              'Organization not found.',
+          userFriendlyMessage: 'Organization not found.',
           technicalDetails:
               'No organization found with the given '
               'slug.',
@@ -107,8 +97,7 @@ class OrganizationRepositoryImplementation
     } on Exception catch (e) {
       return Left(
         LocalCacheAccessFailure(
-          userFriendlyMessage:
-              'Failed to retrieve organization.',
+          userFriendlyMessage: 'Failed to retrieve organization.',
           technicalDetails: e.toString(),
         ),
       );
@@ -117,30 +106,23 @@ class OrganizationRepositoryImplementation
 
   @override
   Future<Either<Failure, List<OrganizationEntity>>>
-      getActiveOrganizations() async {
+  getActiveOrganizations() async {
     try {
       // Try local first
-      var organizations = await _localDatasource
-          .getActiveOrganizations();
+      var organizations = await _localDatasource.getActiveOrganizations();
 
       // If online, fetch from remote and update local
       // cache
-      if (await _connectivityService
-          .hasInternetConnection()) {
+      if (await _connectivityService.hasInternetConnection()) {
         try {
-          final remoteOrgs = await _remoteDatasource
-              .getActiveOrganizations();
+          final remoteOrgs = await _remoteDatasource.getActiveOrganizations();
           // Sync remote to local
           for (final org in remoteOrgs) {
-            final existing = await _localDatasource
-                .getOrganizationById(org.id);
+            final existing = await _localDatasource.getOrganizationById(org.id);
             if (existing == null) {
-              await _localDatasource
-                  .insertOrganization(org);
-            } else if (org.syncVersion >
-                existing.syncVersion) {
-              await _localDatasource
-                  .updateOrganization(org);
+              await _localDatasource.insertOrganization(org);
+            } else if (org.syncVersion > existing.syncVersion) {
+              await _localDatasource.updateOrganization(org);
             }
           }
           organizations = remoteOrgs;
@@ -149,16 +131,11 @@ class OrganizationRepositoryImplementation
         }
       }
 
-      return Right(
-        organizations
-            .map((m) => m.convertToEntity())
-            .toList(),
-      );
+      return Right(organizations.map((m) => m.convertToEntity()).toList());
     } on Exception catch (e) {
       return Left(
         LocalCacheAccessFailure(
-          userFriendlyMessage:
-              'Failed to retrieve organizations.',
+          userFriendlyMessage: 'Failed to retrieve organizations.',
           technicalDetails: e.toString(),
         ),
       );
@@ -166,26 +143,19 @@ class OrganizationRepositoryImplementation
   }
 
   @override
-  Future<Either<Failure, OrganizationEntity>>
-      createOrganization(
+  Future<Either<Failure, OrganizationEntity>> createOrganization(
     OrganizationEntity organization,
   ) async {
     try {
-      final model =
-          OrganizationModel.convertFromEntity(
-        organization,
-      );
+      final model = OrganizationModel.convertFromEntity(organization);
 
       // Always save locally first
-      await _localDatasource
-          .insertOrganization(model);
+      await _localDatasource.insertOrganization(model);
 
       // Sync to remote if online
-      if (await _connectivityService
-          .hasInternetConnection()) {
+      if (await _connectivityService.hasInternetConnection()) {
         try {
-          await _remoteDatasource
-              .insertOrganization(model);
+          await _remoteDatasource.insertOrganization(model);
         } on Exception catch (_) {
           // Queued for sync — continue with local
           // success
@@ -196,8 +166,7 @@ class OrganizationRepositoryImplementation
     } on Exception catch (e) {
       return Left(
         LocalCacheWriteFailure(
-          userFriendlyMessage:
-              'Failed to create organization.',
+          userFriendlyMessage: 'Failed to create organization.',
           technicalDetails: e.toString(),
         ),
       );
@@ -205,8 +174,7 @@ class OrganizationRepositoryImplementation
   }
 
   @override
-  Future<Either<Failure, OrganizationEntity>>
-      updateOrganization(
+  Future<Either<Failure, OrganizationEntity>> updateOrganization(
     OrganizationEntity organization,
   ) async {
     try {
@@ -217,26 +185,22 @@ class OrganizationRepositoryImplementation
       // inside its transaction for the local write,
       // but we need to send the correct version
       // to Supabase as well.
-      final existing = await _localDatasource
-          .getOrganizationById(organization.id);
-      final newSyncVersion =
-          (existing?.syncVersion ?? 0) + 1;
+      final existing = await _localDatasource.getOrganizationById(
+        organization.id,
+      );
+      final newSyncVersion = (existing?.syncVersion ?? 0) + 1;
 
-      final model =
-          OrganizationModel.convertFromEntity(
+      final model = OrganizationModel.convertFromEntity(
         organization,
         syncVersion: newSyncVersion,
       );
 
-      await _localDatasource
-          .updateOrganization(model);
+      await _localDatasource.updateOrganization(model);
 
       // Sync to remote if online
-      if (await _connectivityService
-          .hasInternetConnection()) {
+      if (await _connectivityService.hasInternetConnection()) {
         try {
-          await _remoteDatasource
-              .updateOrganization(model);
+          await _remoteDatasource.updateOrganization(model);
         } on Exception catch (_) {
           // Queued for sync — continue with local
           // success
@@ -247,8 +211,7 @@ class OrganizationRepositoryImplementation
     } on Exception catch (e) {
       return Left(
         LocalCacheWriteFailure(
-          userFriendlyMessage:
-              'Failed to update organization.',
+          userFriendlyMessage: 'Failed to update organization.',
           technicalDetails: e.toString(),
         ),
       );
@@ -256,17 +219,13 @@ class OrganizationRepositoryImplementation
   }
 
   @override
-  Future<Either<Failure, Unit>> deleteOrganization(
-    String id,
-  ) async {
+  Future<Either<Failure, Unit>> deleteOrganization(String id) async {
     try {
       await _localDatasource.deleteOrganization(id);
 
-      if (await _connectivityService
-          .hasInternetConnection()) {
+      if (await _connectivityService.hasInternetConnection()) {
         try {
-          await _remoteDatasource
-              .deleteOrganization(id);
+          await _remoteDatasource.deleteOrganization(id);
         } on Exception catch (_) {
           // Queued for sync
         }
@@ -276,8 +235,7 @@ class OrganizationRepositoryImplementation
     } on Exception catch (e) {
       return Left(
         LocalCacheWriteFailure(
-          userFriendlyMessage:
-              'Failed to delete organization.',
+          userFriendlyMessage: 'Failed to delete organization.',
           technicalDetails: e.toString(),
         ),
       );

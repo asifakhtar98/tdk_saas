@@ -67,7 +67,7 @@ void main() {
     group('validation', () {
       test('returns InputValidationFailure for ringCount < 1', () async {
         final result = await useCase(
-          UpdateTournamentSettingsParams(
+          const UpdateTournamentSettingsParams(
             tournamentId: 'tournament-123',
             ringCount: 0,
           ),
@@ -82,7 +82,7 @@ void main() {
 
       test('returns InputValidationFailure for ringCount > 20', () async {
         final result = await useCase(
-          UpdateTournamentSettingsParams(
+          const UpdateTournamentSettingsParams(
             tournamentId: 'tournament-123',
             ringCount: 21,
           ),
@@ -143,7 +143,7 @@ void main() {
         );
 
         final result = await useCase(
-          UpdateTournamentSettingsParams(
+          const UpdateTournamentSettingsParams(
             tournamentId: 'nonexistent',
             venueName: 'New Venue',
           ),
@@ -166,7 +166,7 @@ void main() {
           );
 
           final result = await useCase(
-            UpdateTournamentSettingsParams(
+            const UpdateTournamentSettingsParams(
               tournamentId: 'nonexistent',
               venueName: 'New Venue',
             ),
@@ -191,7 +191,7 @@ void main() {
           );
 
           final result = await useCase(
-            UpdateTournamentSettingsParams(
+            const UpdateTournamentSettingsParams(
               tournamentId: 'tournament-123',
               venueName: 'New Venue',
             ),
@@ -217,7 +217,7 @@ void main() {
           ).thenAnswer((_) async => Right(viewerUser));
 
           final result = await useCase(
-            UpdateTournamentSettingsParams(
+            const UpdateTournamentSettingsParams(
               tournamentId: 'tournament-123',
               venueName: 'New Venue',
             ),
@@ -244,7 +244,7 @@ void main() {
           ).thenAnswer((_) async => Right(scorerUser));
 
           final result = await useCase(
-            UpdateTournamentSettingsParams(
+            const UpdateTournamentSettingsParams(
               tournamentId: 'tournament-123',
               venueName: 'New Venue',
             ),
@@ -272,7 +272,7 @@ void main() {
         );
 
         final result = await useCase(
-          UpdateTournamentSettingsParams(
+          const UpdateTournamentSettingsParams(
             tournamentId: 'tournament-123',
             venueName: 'New Venue',
           ),
@@ -300,7 +300,7 @@ void main() {
         );
 
         final result = await useCase(
-          UpdateTournamentSettingsParams(
+          const UpdateTournamentSettingsParams(
             tournamentId: 'tournament-123',
             venueName: 'New Venue',
             federationType: FederationType.itf,
@@ -326,7 +326,7 @@ void main() {
         );
 
         final result = await useCase(
-          UpdateTournamentSettingsParams(
+          const UpdateTournamentSettingsParams(
             tournamentId: 'tournament-123',
             venueName: '',
           ),
@@ -355,7 +355,7 @@ void main() {
         );
 
         final result = await useCase(
-          UpdateTournamentSettingsParams(
+          const UpdateTournamentSettingsParams(
             tournamentId: 'tournament-123',
             venueAddress: '',
           ),
@@ -380,7 +380,7 @@ void main() {
         );
 
         final result = await useCase(
-          UpdateTournamentSettingsParams(
+          const UpdateTournamentSettingsParams(
             tournamentId: 'tournament-123',
             ringCount: 5,
           ),
@@ -434,7 +434,7 @@ void main() {
         ).thenAnswer((_) async => Right(testTournament));
 
         final result = await useCase(
-          UpdateTournamentSettingsParams(
+          const UpdateTournamentSettingsParams(
             tournamentId: 'tournament-123',
             venueName: 'New Venue',
           ),
@@ -460,13 +460,13 @@ void main() {
           () => mockUserRepository.getCurrentUser(),
         ).thenAnswer((_) async => Right(testOwner));
         when(() => mockRepository.updateTournament(any())).thenAnswer(
-          (_) async => Left(
+          (_) async => const Left(
             LocalCacheWriteFailure(userFriendlyMessage: 'Failed to save'),
           ),
         );
 
         final result = await useCase(
-          UpdateTournamentSettingsParams(
+          const UpdateTournamentSettingsParams(
             tournamentId: 'tournament-123',
             venueName: 'New Venue',
           ),

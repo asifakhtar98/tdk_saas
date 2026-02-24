@@ -141,13 +141,10 @@ void main() {
 
         // Assert
         expect(result.isRight(), isTrue);
-        result.fold(
-          (_) => fail('Expected Right'),
-          (user) {
-            expect(user.id, equals(testUser.id));
-            expect(user.email, equals(testUser.email));
-          },
-        );
+        result.fold((_) => fail('Expected Right'), (user) {
+          expect(user.id, equals(testUser.id));
+          expect(user.email, equals(testUser.email));
+        });
       });
     });
 
@@ -205,32 +202,33 @@ void main() {
       });
 
       test(
-          'returns OtpVerificationFailure for general verification error',
-          () async {
-        // Arrange
-        when(
-          () => mockAuthRepository.verifyMagicLinkOtp(
-            email: any(named: 'email'),
-            token: any(named: 'token'),
-          ),
-        ).thenAnswer(
-          (_) async => const Left(
-            OtpVerificationFailure(technicalDetails: 'Verification failed'),
-          ),
-        );
+        'returns OtpVerificationFailure for general verification error',
+        () async {
+          // Arrange
+          when(
+            () => mockAuthRepository.verifyMagicLinkOtp(
+              email: any(named: 'email'),
+              token: any(named: 'token'),
+            ),
+          ).thenAnswer(
+            (_) async => const Left(
+              OtpVerificationFailure(technicalDetails: 'Verification failed'),
+            ),
+          );
 
-        // Act
-        final result = await useCase(
-          const VerifyMagicLinkParams(email: validEmail, token: validToken),
-        );
+          // Act
+          final result = await useCase(
+            const VerifyMagicLinkParams(email: validEmail, token: validToken),
+          );
 
-        // Assert
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(failure, isA<OtpVerificationFailure>()),
-          (_) => fail('Expected Left'),
-        );
-      });
+          // Assert
+          expect(result.isLeft(), isTrue);
+          result.fold(
+            (failure) => expect(failure, isA<OtpVerificationFailure>()),
+            (_) => fail('Expected Left'),
+          );
+        },
+      );
     });
   });
 }

@@ -26,10 +26,7 @@ void main() {
   setUp(() {
     mockUserRepository = MockUserRepository();
     mockAuthRepository = MockAuthRepository();
-    useCase = UpdateUserRoleUseCase(
-      mockUserRepository,
-      mockAuthRepository,
-    );
+    useCase = UpdateUserRoleUseCase(mockUserRepository, mockAuthRepository);
   });
 
   // Fixtures
@@ -64,195 +61,133 @@ void main() {
   );
 
   group('UpdateUserRoleUseCase', () {
-    test(
-      'successfully changes user role when requester is Owner',
-      () async {
-        when(
-          () => mockAuthRepository
-              .getCurrentAuthenticatedUser(),
-        ).thenAnswer(
-          (_) async => Right(ownerUser),
-        );
-        when(
-          () => mockUserRepository
-              .getUserById('owner-123'),
-        ).thenAnswer(
-          (_) async => Right(ownerUser),
-        );
-        when(
-          () => mockUserRepository
-              .getUserById('target-456'),
-        ).thenAnswer(
-          (_) async => Right(targetUser),
-        );
-        when(
-          () => mockUserRepository.updateUser(any()),
-        ).thenAnswer((invocation) async {
-          final user = invocation.positionalArguments
-              .first as UserEntity;
-          return Right(user);
-        });
+    test('successfully changes user role when requester is Owner', () async {
+      when(
+        () => mockAuthRepository.getCurrentAuthenticatedUser(),
+      ).thenAnswer((_) async => Right(ownerUser));
+      when(
+        () => mockUserRepository.getUserById('owner-123'),
+      ).thenAnswer((_) async => Right(ownerUser));
+      when(
+        () => mockUserRepository.getUserById('target-456'),
+      ).thenAnswer((_) async => Right(targetUser));
+      when(() => mockUserRepository.updateUser(any())).thenAnswer((
+        invocation,
+      ) async {
+        final user = invocation.positionalArguments.first as UserEntity;
+        return Right(user);
+      });
 
-        final result = await useCase(
-          const UpdateUserRoleParams(
-            targetUserId: 'target-456',
-            newRole: UserRole.scorer,
-            requestingUserId: 'owner-123',
-          ),
-        );
+      final result = await useCase(
+        const UpdateUserRoleParams(
+          targetUserId: 'target-456',
+          newRole: UserRole.scorer,
+          requestingUserId: 'owner-123',
+        ),
+      );
 
-        expect(result.isRight(), isTrue);
-        result.fold(
-          (_) => fail('Expected Right'),
-          (updatedUser) {
-            expect(updatedUser.role, UserRole.scorer);
-            expect(updatedUser.id, 'target-456');
-          },
-        );
-        verify(
-          () => mockUserRepository.updateUser(any()),
-        ).called(1);
-      },
-    );
+      expect(result.isRight(), isTrue);
+      result.fold((_) => fail('Expected Right'), (updatedUser) {
+        expect(updatedUser.role, UserRole.scorer);
+        expect(updatedUser.id, 'target-456');
+      });
+      verify(() => mockUserRepository.updateUser(any())).called(1);
+    });
 
-    test(
-      'returns AuthenticationFailure when auth user does '
-      'not match requestingUserId',
-      () async {
-        when(
-          () => mockAuthRepository
-              .getCurrentAuthenticatedUser(),
-        ).thenAnswer(
-          (_) async => Right(adminUser),
-        );
+    test('returns AuthenticationFailure when auth user does '
+        'not match requestingUserId', () async {
+      when(
+        () => mockAuthRepository.getCurrentAuthenticatedUser(),
+      ).thenAnswer((_) async => Right(adminUser));
 
-        final result = await useCase(
-          const UpdateUserRoleParams(
-            targetUserId: 'target-456',
-            newRole: UserRole.scorer,
-            requestingUserId: 'owner-123',
-          ),
-        );
+      final result = await useCase(
+        const UpdateUserRoleParams(
+          targetUserId: 'target-456',
+          newRole: UserRole.scorer,
+          requestingUserId: 'owner-123',
+        ),
+      );
 
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(
-            failure,
-            isA<AuthenticationFailure>(),
-          ),
-          (_) => fail('Expected Left'),
-        );
-        verifyZeroInteractions(mockUserRepository);
-      },
-    );
+      expect(result.isLeft(), isTrue);
+      result.fold(
+        (failure) => expect(failure, isA<AuthenticationFailure>()),
+        (_) => fail('Expected Left'),
+      );
+      verifyZeroInteractions(mockUserRepository);
+    });
 
-    test(
-      'returns AuthorizationPermissionDeniedFailure when '
-      'requester is not Owner',
-      () async {
-        when(
-          () => mockAuthRepository
-              .getCurrentAuthenticatedUser(),
-        ).thenAnswer(
-          (_) async => Right(adminUser),
-        );
-        when(
-          () => mockUserRepository
-              .getUserById('admin-789'),
-        ).thenAnswer(
-          (_) async => Right(adminUser),
-        );
+    test('returns AuthorizationPermissionDeniedFailure when '
+        'requester is not Owner', () async {
+      when(
+        () => mockAuthRepository.getCurrentAuthenticatedUser(),
+      ).thenAnswer((_) async => Right(adminUser));
+      when(
+        () => mockUserRepository.getUserById('admin-789'),
+      ).thenAnswer((_) async => Right(adminUser));
 
-        final result = await useCase(
-          const UpdateUserRoleParams(
-            targetUserId: 'target-456',
-            newRole: UserRole.scorer,
-            requestingUserId: 'admin-789',
-          ),
-        );
+      final result = await useCase(
+        const UpdateUserRoleParams(
+          targetUserId: 'target-456',
+          newRole: UserRole.scorer,
+          requestingUserId: 'admin-789',
+        ),
+      );
 
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(
-            failure,
-            isA<AuthorizationPermissionDeniedFailure>(),
-          ),
-          (_) => fail('Expected Left'),
-        );
-      },
-    );
+      expect(result.isLeft(), isTrue);
+      result.fold(
+        (failure) =>
+            expect(failure, isA<AuthorizationPermissionDeniedFailure>()),
+        (_) => fail('Expected Left'),
+      );
+    });
 
-    test(
-      'returns InputValidationFailure when trying to '
-      'change own role',
-      () async {
-        when(
-          () => mockAuthRepository
-              .getCurrentAuthenticatedUser(),
-        ).thenAnswer(
-          (_) async => Right(ownerUser),
-        );
-        when(
-          () => mockUserRepository
-              .getUserById('owner-123'),
-        ).thenAnswer(
-          (_) async => Right(ownerUser),
-        );
+    test('returns InputValidationFailure when trying to '
+        'change own role', () async {
+      when(
+        () => mockAuthRepository.getCurrentAuthenticatedUser(),
+      ).thenAnswer((_) async => Right(ownerUser));
+      when(
+        () => mockUserRepository.getUserById('owner-123'),
+      ).thenAnswer((_) async => Right(ownerUser));
 
-        final result = await useCase(
-          const UpdateUserRoleParams(
-            targetUserId: 'owner-123',
-            newRole: UserRole.admin,
-            requestingUserId: 'owner-123',
-          ),
-        );
+      final result = await useCase(
+        const UpdateUserRoleParams(
+          targetUserId: 'owner-123',
+          newRole: UserRole.admin,
+          requestingUserId: 'owner-123',
+        ),
+      );
 
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(
-            failure,
-            isA<InputValidationFailure>(),
-          ),
-          (_) => fail('Expected Left'),
-        );
-      },
-    );
+      expect(result.isLeft(), isTrue);
+      result.fold(
+        (failure) => expect(failure, isA<InputValidationFailure>()),
+        (_) => fail('Expected Left'),
+      );
+    });
 
-    test(
-      'returns InputValidationFailure when trying to '
-      'assign Owner role',
-      () async {
-        when(
-          () => mockAuthRepository
-              .getCurrentAuthenticatedUser(),
-        ).thenAnswer(
-          (_) async => Right(ownerUser),
-        );
-        when(
-          () => mockUserRepository
-              .getUserById('owner-123'),
-        ).thenAnswer(
-          (_) async => Right(ownerUser),
-        );
+    test('returns InputValidationFailure when trying to '
+        'assign Owner role', () async {
+      when(
+        () => mockAuthRepository.getCurrentAuthenticatedUser(),
+      ).thenAnswer((_) async => Right(ownerUser));
+      when(
+        () => mockUserRepository.getUserById('owner-123'),
+      ).thenAnswer((_) async => Right(ownerUser));
 
-        final result = await useCase(
-          const UpdateUserRoleParams(
-            targetUserId: 'target-456',
-            newRole: UserRole.owner,
-            requestingUserId: 'owner-123',
-          ),
-        );
+      final result = await useCase(
+        const UpdateUserRoleParams(
+          targetUserId: 'target-456',
+          newRole: UserRole.owner,
+          requestingUserId: 'owner-123',
+        ),
+      );
 
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(
-            failure,
-            isA<InputValidationFailure>(),
-          ),
-          (_) => fail('Expected Left'),
-        );
-      },
-    );
+      expect(result.isLeft(), isTrue);
+      result.fold(
+        (failure) => expect(failure, isA<InputValidationFailure>()),
+        (_) => fail('Expected Left'),
+      );
+    });
 
     test(
       'returns InputValidationFailure when target user has no organization',
@@ -315,52 +250,33 @@ void main() {
       },
     );
 
-    test(
-      'propagates repository failure when updateUser fails',
-      () async {
-        when(
-          () => mockAuthRepository
-              .getCurrentAuthenticatedUser(),
-        ).thenAnswer(
-          (_) async => Right(ownerUser),
-        );
-        when(
-          () => mockUserRepository
-              .getUserById('owner-123'),
-        ).thenAnswer(
-          (_) async => Right(ownerUser),
-        );
-        when(
-          () => mockUserRepository
-              .getUserById('target-456'),
-        ).thenAnswer(
-          (_) async => Right(targetUser),
-        );
-        when(
-          () => mockUserRepository.updateUser(any()),
-        ).thenAnswer(
-          (_) async => const Left(
-            ServerConnectionFailure(),
-          ),
-        );
+    test('propagates repository failure when updateUser fails', () async {
+      when(
+        () => mockAuthRepository.getCurrentAuthenticatedUser(),
+      ).thenAnswer((_) async => Right(ownerUser));
+      when(
+        () => mockUserRepository.getUserById('owner-123'),
+      ).thenAnswer((_) async => Right(ownerUser));
+      when(
+        () => mockUserRepository.getUserById('target-456'),
+      ).thenAnswer((_) async => Right(targetUser));
+      when(
+        () => mockUserRepository.updateUser(any()),
+      ).thenAnswer((_) async => const Left(ServerConnectionFailure()));
 
-        final result = await useCase(
-          const UpdateUserRoleParams(
-            targetUserId: 'target-456',
-            newRole: UserRole.scorer,
-            requestingUserId: 'owner-123',
-          ),
-        );
+      final result = await useCase(
+        const UpdateUserRoleParams(
+          targetUserId: 'target-456',
+          newRole: UserRole.scorer,
+          requestingUserId: 'owner-123',
+        ),
+      );
 
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(
-            failure,
-            isA<ServerConnectionFailure>(),
-          ),
-          (_) => fail('Expected Left'),
-        );
-      },
-    );
+      expect(result.isLeft(), isTrue);
+      result.fold(
+        (failure) => expect(failure, isA<ServerConnectionFailure>()),
+        (_) => fail('Expected Left'),
+      );
+    });
   });
 }

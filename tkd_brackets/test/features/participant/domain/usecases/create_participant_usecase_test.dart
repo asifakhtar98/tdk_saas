@@ -93,7 +93,7 @@ void main() {
     updatedAtTimestamp: DateTime(2024),
   );
 
-  CreateParticipantParams validParams() => CreateParticipantParams(
+  CreateParticipantParams validParams() => const CreateParticipantParams(
     divisionId: 'division-123',
     firstName: 'John',
     lastName: 'Doe',
@@ -225,7 +225,7 @@ void main() {
       });
 
       test('returns InputValidationFailure for negative weightKg', () async {
-        final result = await useCase(validParams().copyWith(weightKg: -5.0));
+        final result = await useCase(validParams().copyWith(weightKg: -5));
 
         expect(result.isLeft(), isTrue);
         result.fold((failure) {
@@ -236,7 +236,7 @@ void main() {
       });
 
       test('returns InputValidationFailure for weightKg > 150', () async {
-        final result = await useCase(validParams().copyWith(weightKg: 160.0));
+        final result = await useCase(validParams().copyWith(weightKg: 160));
 
         expect(result.isLeft(), isTrue);
         result.fold((failure) {
@@ -480,7 +480,7 @@ void main() {
         });
 
         final result = await useCase(
-          CreateParticipantParams(
+          const CreateParticipantParams(
             divisionId: 'division-123',
             firstName: '  John  ',
             lastName: '  Doe  ',

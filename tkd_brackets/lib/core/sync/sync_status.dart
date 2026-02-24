@@ -41,7 +41,8 @@ class SyncError {
   final int failedOperationCount;
 
   @override
-  String toString() => 'SyncError(message: $message, '
+  String toString() =>
+      'SyncError(message: $message, '
       'technicalDetails: $technicalDetails, '
       'failedOperationCount: $failedOperationCount)';
 

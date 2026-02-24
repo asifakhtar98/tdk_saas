@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 
 class DivisionBuilderWizard extends StatefulWidget {
-  const DivisionBuilderWizard({super.key, required this.tournamentId});
+  const DivisionBuilderWizard({required this.tournamentId, super.key});
 
   final String tournamentId;
 
@@ -174,9 +174,7 @@ class _DivisionBuilderWizardState extends State<DivisionBuilderWizard> {
             ),
             TextButton(
               onPressed: () {
-                setState(() {
-                  _selectedAgeGroups.clear();
-                });
+                setState(_selectedAgeGroups.clear);
               },
               child: const Text('Clear All'),
             ),
@@ -225,9 +223,7 @@ class _DivisionBuilderWizardState extends State<DivisionBuilderWizard> {
             ),
             TextButton(
               onPressed: () {
-                setState(() {
-                  _selectedBeltGroups.clear();
-                });
+                setState(_selectedBeltGroups.clear);
               },
               child: const Text('Clear All'),
             ),

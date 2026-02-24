@@ -68,9 +68,8 @@ void main() {
 
         // Assert
         verify(
-          () => mockAuthRepository.sendSignInMagicLink(
-            email: 'test@example.com',
-          ),
+          () =>
+              mockAuthRepository.sendSignInMagicLink(email: 'test@example.com'),
         ).called(1);
       });
     });
@@ -96,9 +95,7 @@ void main() {
           (value) => expect(value, unit),
         );
         verify(
-          () => mockAuthRepository.sendSignInMagicLink(
-            email: validEmail,
-          ),
+          () => mockAuthRepository.sendSignInMagicLink(email: validEmail),
         ).called(1);
       });
     });

@@ -30,7 +30,7 @@ void main() {
       });
 
       test('returns User when authenticated', () {
-        final mockUser = const User(
+        const mockUser = User(
           id: 'auth-id',
           appMetadata: {},
           userMetadata: {},
@@ -48,7 +48,7 @@ void main() {
 
     group('authStateChanges', () {
       test('returns auth state changes stream', () {
-        final mockStream = Stream<AuthState>.empty();
+        const mockStream = Stream<AuthState>.empty();
         when(() => mockAuth.onAuthStateChange).thenAnswer((_) => mockStream);
 
         final result = datasource.authStateChanges;

@@ -1,8 +1,8 @@
 import 'package:injectable/injectable.dart';
-import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_template.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_template_repository.dart';
+import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 
 @LazySingleton()
 class FederationTemplateRegistry {
@@ -55,7 +55,7 @@ class FederationTemplateRegistry {
       return static;
     }
 
-    final customResult = await _repository!.getCustomTemplates(organizationId);
+    final customResult = await _repository.getCustomTemplates(organizationId);
 
     return customResult.fold(
       (failure) => static,
@@ -86,7 +86,7 @@ class FederationTemplateRegistry {
   ) async {
     if (_repository == null) return [];
 
-    final result = await _repository!.getCustomTemplates(organizationId);
+    final result = await _repository.getCustomTemplates(organizationId);
     return result.fold(
       (failure) => <DivisionTemplate>[],
       (templates) => templates,
@@ -141,14 +141,14 @@ class FederationTemplateRegistry {
     }
 
     // Check custom templates (custom overrides static)
-    final customResult = await _repository!.getCustomTemplateById(templateId);
+    final customResult = await _repository.getCustomTemplateById(templateId);
 
     return customResult.fold((failure) => staticResult, (custom) => custom);
   }
 
   List<DivisionTemplate> _createWtTemplates() {
     final templates = <DivisionTemplate>[];
-    int order = 0;
+    var order = 0;
 
     templates.addAll([
       DivisionTemplate(
@@ -806,7 +806,7 @@ class FederationTemplateRegistry {
 
   List<DivisionTemplate> _createItfTemplates() {
     final templates = <DivisionTemplate>[];
-    int order = 0;
+    var order = 0;
 
     templates.addAll([
       DivisionTemplate(
@@ -1284,7 +1284,7 @@ class FederationTemplateRegistry {
 
   List<DivisionTemplate> _createAtaTemplates() {
     final templates = <DivisionTemplate>[];
-    int order = 0;
+    var order = 0;
 
     templates.addAll([
       DivisionTemplate(

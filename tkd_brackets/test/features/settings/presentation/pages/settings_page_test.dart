@@ -4,11 +4,7 @@ import 'package:tkd_brackets/features/settings/settings.dart';
 
 void main() {
   Widget buildTestWidget() {
-    return const MaterialApp(
-      home: Scaffold(
-        body: SettingsPage(),
-      ),
-    );
+    return const MaterialApp(home: Scaffold(body: SettingsPage()));
   }
 
   group('SettingsPage', () {
@@ -44,8 +40,7 @@ void main() {
       await tester.pumpWidget(buildTestWidget());
       await tester.pump();
 
-      final icon =
-          tester.widget<Icon>(find.byIcon(Icons.settings_outlined));
+      final icon = tester.widget<Icon>(find.byIcon(Icons.settings_outlined));
       expect(icon.semanticLabel, equals('Settings icon'));
     });
   });

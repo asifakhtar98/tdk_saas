@@ -5,9 +5,9 @@
 import 'package:drift/drift.dart' hide JsonKey;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:tkd_brackets/core/database/app_database.dart';
+import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_template.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
-import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 
 part 'division_template_model.freezed.dart';
 part 'division_template_model.g.dart';
@@ -16,11 +16,7 @@ part 'division_template_model.g.dart';
 class DivisionTemplateModel with _$DivisionTemplateModel {
   const factory DivisionTemplateModel({
     required String id,
-    String? organizationId,
-    required String federationType,
-    required String category,
-    required String name,
-    required String gender,
+    required String federationType, required String category, required String name, required String gender, required DateTime createdAtTimestamp, required DateTime updatedAtTimestamp, String? organizationId,
     int? ageMin,
     int? ageMax,
     double? weightMinKg,
@@ -30,8 +26,6 @@ class DivisionTemplateModel with _$DivisionTemplateModel {
     @Default('single_elimination') String defaultBracketFormat,
     @Default(0) int displayOrder,
     @Default(true) bool isActive,
-    required DateTime createdAtTimestamp,
-    required DateTime updatedAtTimestamp,
   }) = _DivisionTemplateModel;
 
   const DivisionTemplateModel._();

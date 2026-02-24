@@ -21,45 +21,35 @@ class OrganizationModel with _$OrganizationModel {
     required String id,
     required String name,
     required String slug,
-    @JsonKey(name: 'subscription_tier')
-    required String subscriptionTier,
-    @JsonKey(name: 'subscription_status')
-    required String subscriptionStatus,
+    @JsonKey(name: 'subscription_tier') required String subscriptionTier,
+    @JsonKey(name: 'subscription_status') required String subscriptionStatus,
     @JsonKey(name: 'max_tournaments_per_month')
     required int maxTournamentsPerMonth,
-    @JsonKey(name: 'max_active_brackets')
-    required int maxActiveBrackets,
+    @JsonKey(name: 'max_active_brackets') required int maxActiveBrackets,
     @JsonKey(name: 'max_participants_per_bracket')
     required int maxParticipantsPerBracket,
     @JsonKey(name: 'max_participants_per_tournament')
     required int maxParticipantsPerTournament,
     @JsonKey(name: 'max_scorers') required int maxScorers,
     @JsonKey(name: 'is_active') required bool isActive,
-    @JsonKey(name: 'created_at_timestamp')
-    required DateTime createdAtTimestamp,
-    @JsonKey(name: 'updated_at_timestamp')
-    required DateTime updatedAtTimestamp,
+    @JsonKey(name: 'created_at_timestamp') required DateTime createdAtTimestamp,
+    @JsonKey(name: 'updated_at_timestamp') required DateTime updatedAtTimestamp,
     @JsonKey(name: 'sync_version') required int syncVersion,
     @JsonKey(name: 'is_deleted') required bool isDeleted,
     @JsonKey(name: 'is_demo_data') required bool isDemoData,
-    @JsonKey(name: 'deleted_at_timestamp')
-    DateTime? deletedAtTimestamp,
+    @JsonKey(name: 'deleted_at_timestamp') DateTime? deletedAtTimestamp,
   }) = _OrganizationModel;
 
   /// Private constructor for freezed mixin.
   const OrganizationModel._();
 
   /// Convert from Supabase JSON to [OrganizationModel].
-  factory OrganizationModel.fromJson(
-    Map<String, dynamic> json,
-  ) =>
+  factory OrganizationModel.fromJson(Map<String, dynamic> json) =>
       _$OrganizationModelFromJson(json);
 
   /// Convert from Drift-generated [OrganizationEntry] to
   /// [OrganizationModel].
-  factory OrganizationModel.fromDriftEntry(
-    OrganizationEntry entry,
-  ) {
+  factory OrganizationModel.fromDriftEntry(OrganizationEntry entry) {
     return OrganizationModel(
       id: entry.id,
       name: entry.name,
@@ -68,10 +58,8 @@ class OrganizationModel with _$OrganizationModel {
       subscriptionStatus: entry.subscriptionStatus,
       maxTournamentsPerMonth: entry.maxTournamentsPerMonth,
       maxActiveBrackets: entry.maxActiveBrackets,
-      maxParticipantsPerBracket:
-          entry.maxParticipantsPerBracket,
-      maxParticipantsPerTournament:
-          entry.maxParticipantsPerTournament,
+      maxParticipantsPerBracket: entry.maxParticipantsPerBracket,
+      maxParticipantsPerTournament: entry.maxParticipantsPerTournament,
       maxScorers: entry.maxScorers,
       isActive: entry.isActive,
       createdAtTimestamp: entry.createdAtTimestamp,
@@ -99,15 +87,11 @@ class OrganizationModel with _$OrganizationModel {
       name: entity.name,
       slug: entity.slug,
       subscriptionTier: entity.subscriptionTier.value,
-      subscriptionStatus:
-          entity.subscriptionStatus.value,
-      maxTournamentsPerMonth:
-          entity.maxTournamentsPerMonth,
+      subscriptionStatus: entity.subscriptionStatus.value,
+      maxTournamentsPerMonth: entity.maxTournamentsPerMonth,
       maxActiveBrackets: entity.maxActiveBrackets,
-      maxParticipantsPerBracket:
-          entity.maxParticipantsPerBracket,
-      maxParticipantsPerTournament:
-          entity.maxParticipantsPerTournament,
+      maxParticipantsPerBracket: entity.maxParticipantsPerBracket,
+      maxParticipantsPerTournament: entity.maxParticipantsPerTournament,
       maxScorers: entity.maxScorers,
       isActive: entity.isActive,
       createdAtTimestamp: entity.createdAt,
@@ -128,13 +112,10 @@ class OrganizationModel with _$OrganizationModel {
       slug: slug,
       subscriptionTier: Value(subscriptionTier),
       subscriptionStatus: Value(subscriptionStatus),
-      maxTournamentsPerMonth:
-          Value(maxTournamentsPerMonth),
+      maxTournamentsPerMonth: Value(maxTournamentsPerMonth),
       maxActiveBrackets: Value(maxActiveBrackets),
-      maxParticipantsPerBracket:
-          Value(maxParticipantsPerBracket),
-      maxParticipantsPerTournament:
-          Value(maxParticipantsPerTournament),
+      maxParticipantsPerBracket: Value(maxParticipantsPerBracket),
+      maxParticipantsPerTournament: Value(maxParticipantsPerTournament),
       maxScorers: Value(maxScorers),
       isActive: Value(isActive),
       syncVersion: Value(syncVersion),
@@ -150,18 +131,12 @@ class OrganizationModel with _$OrganizationModel {
       id: id,
       name: name,
       slug: slug,
-      subscriptionTier:
-          SubscriptionTier.fromString(subscriptionTier),
-      subscriptionStatus:
-          SubscriptionStatus.fromString(
-        subscriptionStatus,
-      ),
+      subscriptionTier: SubscriptionTier.fromString(subscriptionTier),
+      subscriptionStatus: SubscriptionStatus.fromString(subscriptionStatus),
       maxTournamentsPerMonth: maxTournamentsPerMonth,
       maxActiveBrackets: maxActiveBrackets,
-      maxParticipantsPerBracket:
-          maxParticipantsPerBracket,
-      maxParticipantsPerTournament:
-          maxParticipantsPerTournament,
+      maxParticipantsPerBracket: maxParticipantsPerBracket,
+      maxParticipantsPerTournament: maxParticipantsPerTournament,
       maxScorers: maxScorers,
       isActive: isActive,
       createdAt: createdAtTimestamp,

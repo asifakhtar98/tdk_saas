@@ -1,4 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_usecase.dart' show DeleteTournamentUseCase;
+import 'package:tkd_brackets/features/tournament/tournament.dart' show DeleteTournamentUseCase;
 
 part 'delete_tournament_params.freezed.dart';
 

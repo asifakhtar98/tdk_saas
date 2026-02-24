@@ -10,10 +10,7 @@ import 'package:tkd_brackets/features/auth/domain/usecases/remove_organization_m
 @injectable
 class RemoveOrganizationMemberUseCase
     extends UseCase<Unit, RemoveOrganizationMemberParams> {
-  RemoveOrganizationMemberUseCase(
-    this._userRepository,
-    this._authRepository,
-  );
+  RemoveOrganizationMemberUseCase(this._userRepository, this._authRepository);
 
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
@@ -23,8 +20,7 @@ class RemoveOrganizationMemberUseCase
     RemoveOrganizationMemberParams params,
   ) async {
     // 1. Security: Verify authenticated user matches params
-    final authResult =
-        await _authRepository.getCurrentAuthenticatedUser();
+    final authResult = await _authRepository.getCurrentAuthenticatedUser();
 
     return authResult.fold(Left.new, (authUser) async {
       if (authUser.id != params.requestingUserId) {
@@ -47,8 +43,7 @@ class RemoveOrganizationMemberUseCase
             AuthorizationPermissionDeniedFailure(
               userFriendlyMessage:
                   'Only organization owners can remove team members.',
-              technicalDetails:
-                  'Non-owner attempted to remove team member',
+              technicalDetails: 'Non-owner attempted to remove team member',
             ),
           );
         }
@@ -59,9 +54,7 @@ class RemoveOrganizationMemberUseCase
             InputValidationFailure(
               userFriendlyMessage:
                   'You cannot remove yourself from the organization.',
-              fieldErrors: {
-                'targetUserId': 'Cannot target yourself',
-              },
+              fieldErrors: {'targetUserId': 'Cannot target yourself'},
             ),
           );
         }
@@ -77,9 +70,7 @@ class RemoveOrganizationMemberUseCase
               InputValidationFailure(
                 userFriendlyMessage:
                     'This user does not belong to any organization.',
-                fieldErrors: {
-                  'targetUserId': 'User has no organization',
-                },
+                fieldErrors: {'targetUserId': 'User has no organization'},
               ),
             );
           }
@@ -100,13 +91,9 @@ class RemoveOrganizationMemberUseCase
             organizationId: '',
             role: UserRole.viewer,
           );
-          final updateResult =
-              await _userRepository.updateUser(updatedUser);
+          final updateResult = await _userRepository.updateUser(updatedUser);
 
-          return updateResult.fold(
-            Left.new,
-            (_) => const Right(unit),
-          );
+          return updateResult.fold(Left.new, (_) => const Right(unit));
         });
       });
     });

@@ -9,9 +9,8 @@ import 'package:tkd_brackets/features/division/domain/repositories/division_repo
 import 'package:tkd_brackets/features/participant/domain/entities/participant_entity.dart';
 import 'package:tkd_brackets/features/participant/domain/repositories/participant_repository.dart';
 import 'package:tkd_brackets/features/participant/domain/services/auto_assignment_service.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/auto_assignment_match.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/auto_assignment_result.dart';
 import 'package:tkd_brackets/features/participant/domain/usecases/auto_assign_participants_usecase.dart';
+import 'package:tkd_brackets/features/participant/domain/usecases/auto_assignment_match.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 import 'package:tkd_brackets/features/tournament/domain/repositories/tournament_repository.dart';
 
@@ -156,7 +155,7 @@ void main() {
       () async {
         when(
           () => mockUserRepository.getCurrentUser(),
-        ).thenAnswer((_) async => Left(ServerConnectionFailure()));
+        ).thenAnswer((_) async => const Left(ServerConnectionFailure()));
 
         final result = await useCase(
           tournamentId: 'tournament-1',
@@ -199,7 +198,7 @@ void main() {
       ).thenAnswer((_) async => Right(createTestUser()));
       when(
         () => mockTournamentRepository.getTournamentById('tournament-1'),
-      ).thenAnswer((_) async => Left(NotFoundFailure()));
+      ).thenAnswer((_) async => const Left(NotFoundFailure()));
 
       final result = await useCase(
         tournamentId: 'tournament-1',
@@ -368,7 +367,7 @@ void main() {
       ).thenAnswer((_) async => Right(createTestTournament()));
       when(
         () => mockDivisionRepository.getDivisionsForTournament('tournament-1'),
-      ).thenAnswer((_) async => Left(ServerConnectionFailure()));
+      ).thenAnswer((_) async => const Left(ServerConnectionFailure()));
 
       final result = await useCase(
         tournamentId: 'tournament-1',
@@ -452,7 +451,7 @@ void main() {
       setUpHappyPath();
       when(
         () => mockParticipantRepository.getParticipantById('participant-1'),
-      ).thenAnswer((_) async => Left(NotFoundFailure()));
+      ).thenAnswer((_) async => const Left(NotFoundFailure()));
 
       final result = await useCase(
         tournamentId: 'tournament-1',

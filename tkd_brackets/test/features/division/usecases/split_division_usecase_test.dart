@@ -1,12 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/split_division_usecase.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/split_division_params.dart';
-import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
-import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
-import 'package:tkd_brackets/core/database/app_database.dart';
+import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
+import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/split_division_params.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/split_division_usecase.dart';
 import 'package:uuid/uuid.dart';
 
 class MockDivisionRepository extends Mock implements DivisionRepository {}
@@ -30,7 +29,7 @@ void main() {
     useCase = SplitDivisionUseCase(mockRepository, mockUuid);
   });
 
-  DivisionEntity _createTestDivision({
+  DivisionEntity createTestDivision({
     required String id,
     required String tournamentId,
     String name = 'Test Division',
@@ -61,12 +60,12 @@ void main() {
     test('should split division into Pool A and Pool B', () async {
       when(() => mockUuid.v4()).thenReturn('new-uuid-123');
 
-      final params = SplitDivisionParams(
+      const params = SplitDivisionParams(
         divisionId: 'div-a',
         distributionMethod: SplitDistributionMethod.alphabetical,
       );
 
-      final sourceDivision = _createTestDivision(
+      final sourceDivision = createTestDivision(
         id: 'div-a',
         tournamentId: 'tournament-1',
         name: 'Cadets -40kg',
@@ -105,13 +104,13 @@ void main() {
     test('should use custom base name when provided', () async {
       when(() => mockUuid.v4()).thenReturn('new-uuid-123');
 
-      final params = SplitDivisionParams(
+      const params = SplitDivisionParams(
         divisionId: 'div-a',
         distributionMethod: SplitDistributionMethod.random,
         baseName: 'Custom Division',
       );
 
-      final sourceDivision = _createTestDivision(
+      final sourceDivision = createTestDivision(
         id: 'div-a',
         tournamentId: 'tournament-1',
       );
@@ -140,7 +139,7 @@ void main() {
 
   group('SplitDivisionUseCase - Validation Failures', () {
     test('should return ValidationFailure when division not found', () async {
-      final params = SplitDivisionParams(
+      const params = SplitDivisionParams(
         divisionId: 'div-a',
         distributionMethod: SplitDistributionMethod.alphabetical,
       );
@@ -155,12 +154,12 @@ void main() {
     });
 
     test('should return ValidationFailure for deleted division', () async {
-      final params = SplitDivisionParams(
+      const params = SplitDivisionParams(
         divisionId: 'div-a',
         distributionMethod: SplitDistributionMethod.alphabetical,
       );
 
-      final division = _createTestDivision(
+      final division = createTestDivision(
         id: 'div-a',
         tournamentId: 't1',
         isDeleted: true,
@@ -183,12 +182,12 @@ void main() {
     });
 
     test('should return ValidationFailure for combined division', () async {
-      final params = SplitDivisionParams(
+      const params = SplitDivisionParams(
         divisionId: 'div-a',
         distributionMethod: SplitDistributionMethod.alphabetical,
       );
 
-      final division = _createTestDivision(
+      final division = createTestDivision(
         id: 'div-a',
         tournamentId: 't1',
         isCombined: true,
@@ -209,12 +208,12 @@ void main() {
     test(
       'should return ValidationFailure when less than 4 participants',
       () async {
-        final params = SplitDivisionParams(
+        const params = SplitDivisionParams(
           divisionId: 'div-a',
           distributionMethod: SplitDistributionMethod.alphabetical,
         );
 
-        final division = _createTestDivision(id: 'div-a', tournamentId: 't1');
+        final division = createTestDivision(id: 'div-a', tournamentId: 't1');
 
         when(
           () => mockRepository.getDivision('div-a'),

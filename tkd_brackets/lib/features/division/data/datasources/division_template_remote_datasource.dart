@@ -37,7 +37,7 @@ class DivisionTemplateRemoteDatasourceImplementation
 
     return response
         .map<DivisionTemplateModel>(
-          (json) => DivisionTemplateModel.fromJson(json),
+          DivisionTemplateModel.fromJson,
         )
         .toList();
   }
@@ -55,7 +55,7 @@ class DivisionTemplateRemoteDatasourceImplementation
 
     return response
         .map<DivisionTemplateModel>(
-          (json) => DivisionTemplateModel.fromJson(json),
+          DivisionTemplateModel.fromJson,
         )
         .toList();
   }

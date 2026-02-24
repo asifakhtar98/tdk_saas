@@ -22,7 +22,9 @@ class ParticipantEntity with _$ParticipantEntity {
     /// Participant's last name.
     required String lastName,
 
-    /// Date of birth for age verification.
+    /// When the participant was created.
+    required DateTime createdAtTimestamp, /// When the participant was last updated.
+    required DateTime updatedAtTimestamp, /// Date of birth for age verification.
     DateTime? dateOfBirth,
 
     /// Participant gender.
@@ -72,12 +74,6 @@ class ParticipantEntity with _$ParticipantEntity {
 
     /// Whether this is demo mode data.
     @Default(false) bool isDemoData,
-
-    /// When the participant was created.
-    required DateTime createdAtTimestamp,
-
-    /// When the participant was last updated.
-    required DateTime updatedAtTimestamp,
   }) = _ParticipantEntity;
 
   /// Private constructor required for adding getters to freezed class.
@@ -88,7 +84,7 @@ class ParticipantEntity with _$ParticipantEntity {
   int? get age {
     if (dateOfBirth == null) return null;
     final now = DateTime.now();
-    int years = now.year - dateOfBirth!.year;
+    var years = now.year - dateOfBirth!.year;
     if (now.month < dateOfBirth!.month ||
         (now.month == dateOfBirth!.month && now.day < dateOfBirth!.day)) {
       years--;

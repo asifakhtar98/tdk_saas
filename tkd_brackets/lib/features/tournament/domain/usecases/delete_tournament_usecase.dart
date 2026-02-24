@@ -58,7 +58,7 @@ class DeleteTournamentUseCase
     }
 
     if (tournament.status == TournamentStatus.active) {
-      return Left(
+      return const Left(
         TournamentActiveFailure(
           userFriendlyMessage: 'Cannot delete tournament with active matches',
           technicalDetails: 'Tournament has active status',
@@ -79,7 +79,7 @@ class DeleteTournamentUseCase
     }
 
     if (user.role != UserRole.owner) {
-      return Left(
+      return const Left(
         AuthorizationPermissionDeniedFailure(
           userFriendlyMessage: 'Only Owners can delete tournaments',
         ),
@@ -91,7 +91,7 @@ class DeleteTournamentUseCase
         params.tournamentId,
       );
       return hardDeleteResult.fold(
-        (failure) => Left(failure),
+        Left.new,
         (_) => Right(tournament),
       );
     } else {
@@ -108,8 +108,8 @@ class DeleteTournamentUseCase
       );
 
       return updateResult.fold(
-        (failure) => Left(failure),
-        (savedTournament) => Right(savedTournament),
+        Left.new,
+        Right.new,
       );
     }
   }

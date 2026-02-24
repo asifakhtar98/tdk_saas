@@ -7,7 +7,6 @@ part 'create_custom_division_params.g.dart';
 
 @freezed
 class CreateCustomDivisionParams with _$CreateCustomDivisionParams {
-  const CreateCustomDivisionParams._();
 
   const factory CreateCustomDivisionParams({
     required String tournamentId,
@@ -24,6 +23,7 @@ class CreateCustomDivisionParams with _$CreateCustomDivisionParams {
     @Default(3) int judgeCount,
     ScoringMethod? scoringMethod,
   }) = _CreateCustomDivisionParams;
+  const CreateCustomDivisionParams._();
 
   factory CreateCustomDivisionParams.fromJson(Map<String, dynamic> json) =>
       _$CreateCustomDivisionParamsFromJson(json);

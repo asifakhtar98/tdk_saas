@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
-import 'tournament_event.dart';
+import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_event.dart';
 
 part 'tournament_state.freezed.dart';
 

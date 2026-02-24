@@ -24,10 +24,12 @@ void main() {
         StreamController<List<ConnectivityResult>>.broadcast();
     internetStatusController = StreamController<InternetStatus>.broadcast();
 
-    when(() => mockConnectivity.onConnectivityChanged)
-        .thenAnswer((_) => connectivityController.stream);
-    when(() => mockInternetConnection.onStatusChange)
-        .thenAnswer((_) => internetStatusController.stream);
+    when(
+      () => mockConnectivity.onConnectivityChanged,
+    ).thenAnswer((_) => connectivityController.stream);
+    when(
+      () => mockInternetConnection.onStatusChange,
+    ).thenAnswer((_) => internetStatusController.stream);
   });
 
   tearDown(() {
@@ -37,8 +39,9 @@ void main() {
 
   group('ConnectivityServiceImplementation', () {
     test('should start with offline status before initial check', () async {
-      when(() => mockInternetConnection.hasInternetAccess)
-          .thenAnswer((_) async => false);
+      when(
+        () => mockInternetConnection.hasInternetAccess,
+      ).thenAnswer((_) async => false);
 
       final service = ConnectivityServiceImplementation(
         mockConnectivity,
@@ -54,8 +57,9 @@ void main() {
     });
 
     test('should update to online when internet is available', () async {
-      when(() => mockInternetConnection.hasInternetAccess)
-          .thenAnswer((_) async => true);
+      when(
+        () => mockInternetConnection.hasInternetAccess,
+      ).thenAnswer((_) async => true);
 
       final service = ConnectivityServiceImplementation(
         mockConnectivity,
@@ -71,8 +75,9 @@ void main() {
     });
 
     test('should emit status changes on stream', () async {
-      when(() => mockInternetConnection.hasInternetAccess)
-          .thenAnswer((_) async => true);
+      when(
+        () => mockInternetConnection.hasInternetAccess,
+      ).thenAnswer((_) async => true);
 
       final service = ConnectivityServiceImplementation(
         mockConnectivity,
@@ -101,8 +106,9 @@ void main() {
     });
 
     test('should return correct value from hasInternetConnection', () async {
-      when(() => mockInternetConnection.hasInternetAccess)
-          .thenAnswer((_) async => true);
+      when(
+        () => mockInternetConnection.hasInternetAccess,
+      ).thenAnswer((_) async => true);
 
       final service = ConnectivityServiceImplementation(
         mockConnectivity,
@@ -117,8 +123,9 @@ void main() {
     });
 
     test('should handle connectivity result none as offline', () async {
-      when(() => mockInternetConnection.hasInternetAccess)
-          .thenAnswer((_) async => true);
+      when(
+        () => mockInternetConnection.hasInternetAccess,
+      ).thenAnswer((_) async => true);
 
       final service = ConnectivityServiceImplementation(
         mockConnectivity,
@@ -138,8 +145,9 @@ void main() {
     });
 
     test('should update status when connectivity changes to wifi', () async {
-      when(() => mockInternetConnection.hasInternetAccess)
-          .thenAnswer((_) async => false);
+      when(
+        () => mockInternetConnection.hasInternetAccess,
+      ).thenAnswer((_) async => false);
 
       final service = ConnectivityServiceImplementation(
         mockConnectivity,
@@ -151,8 +159,9 @@ void main() {
       expect(service.currentStatus, equals(ConnectivityStatus.offline));
 
       // Now change the mock to return online
-      when(() => mockInternetConnection.hasInternetAccess)
-          .thenAnswer((_) async => true);
+      when(
+        () => mockInternetConnection.hasInternetAccess,
+      ).thenAnswer((_) async => true);
 
       // Simulate wifi connected
       connectivityController.add([ConnectivityResult.wifi]);
@@ -166,8 +175,9 @@ void main() {
 
   group('ConnectivityService interface', () {
     test('implementation should satisfy interface contract', () async {
-      when(() => mockInternetConnection.hasInternetAccess)
-          .thenAnswer((_) async => true);
+      when(
+        () => mockInternetConnection.hasInternetAccess,
+      ).thenAnswer((_) async => true);
 
       final ConnectivityService service = ConnectivityServiceImplementation(
         mockConnectivity,

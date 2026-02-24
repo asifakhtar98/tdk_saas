@@ -17,20 +17,19 @@ class Organizations extends Table with BaseSyncMixin, BaseAuditMixin {
   TextColumn get slug => text().unique()();
 
   /// Subscription tier: 'free', 'pro', 'enterprise'.
-  TextColumn get subscriptionTier => text()
-      .withDefault(const Constant('free'))();
+  TextColumn get subscriptionTier =>
+      text().withDefault(const Constant('free'))();
 
   /// Subscription status: 'active', 'past_due', 'cancelled'.
-  TextColumn get subscriptionStatus => text()
-      .withDefault(const Constant('active'))();
+  TextColumn get subscriptionStatus =>
+      text().withDefault(const Constant('active'))();
 
   /// Free tier: 2 tournaments per month.
   IntColumn get maxTournamentsPerMonth =>
       integer().withDefault(const Constant(2))();
 
   /// Free tier: 3 active brackets.
-  IntColumn get maxActiveBrackets =>
-      integer().withDefault(const Constant(3))();
+  IntColumn get maxActiveBrackets => integer().withDefault(const Constant(3))();
 
   /// Free tier: 32 participants per bracket.
   IntColumn get maxParticipantsPerBracket =>

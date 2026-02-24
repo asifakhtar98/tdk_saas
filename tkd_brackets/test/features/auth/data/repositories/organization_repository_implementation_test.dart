@@ -16,11 +16,9 @@ class MockOrganizationLocalDatasource extends Mock
 class MockOrganizationRemoteDatasource extends Mock
     implements OrganizationRemoteDatasource {}
 
-class MockConnectivityService extends Mock
-    implements ConnectivityService {}
+class MockConnectivityService extends Mock implements ConnectivityService {}
 
-class FakeOrganizationModel extends Fake
-    implements OrganizationModel {}
+class FakeOrganizationModel extends Fake implements OrganizationModel {}
 
 void main() {
   late OrganizationRepositoryImplementation repository;
@@ -64,8 +62,9 @@ void main() {
 
   group('getOrganizationById', () {
     test('returns organization from local when available', () async {
-      when(() => mockLocalDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => testModel);
 
       final result = await repository.getOrganizationById('org-1');
 
@@ -78,14 +77,18 @@ void main() {
     });
 
     test('fetches from remote when local not found and online', () async {
-      when(() => mockLocalDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => null);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => testModel);
-      when(() => mockLocalDatasource.insertOrganization(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.insertOrganization(any()),
+      ).thenAnswer((_) async {});
 
       final result = await repository.getOrganizationById('org-1');
 
@@ -94,10 +97,12 @@ void main() {
     });
 
     test('returns failure when not found locally and offline', () async {
-      when(() => mockLocalDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => null);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final result = await repository.getOrganizationById('org-1');
 
@@ -105,12 +110,15 @@ void main() {
     });
 
     test('returns failure when not found in both data sources', () async {
-      when(() => mockLocalDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => null);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => null);
+      when(
+        () => mockLocalDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => null);
 
       final result = await repository.getOrganizationById('org-1');
 
@@ -118,8 +126,9 @@ void main() {
     });
 
     test('returns failure on exception', () async {
-      when(() => mockLocalDatasource.getOrganizationById('org-1'))
-          .thenThrow(Exception('database error'));
+      when(
+        () => mockLocalDatasource.getOrganizationById('org-1'),
+      ).thenThrow(Exception('database error'));
 
       final result = await repository.getOrganizationById('org-1');
 
@@ -129,10 +138,13 @@ void main() {
 
   group('getOrganizationBySlug', () {
     test('returns organization from local when available', () async {
-      when(() => mockLocalDatasource.getOrganizationBySlug('dragon-martial-arts'))
-          .thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.getOrganizationBySlug('dragon-martial-arts'),
+      ).thenAnswer((_) async => testModel);
 
-      final result = await repository.getOrganizationBySlug('dragon-martial-arts');
+      final result = await repository.getOrganizationBySlug(
+        'dragon-martial-arts',
+      );
 
       expect(result.isRight(), true);
       result.fold(
@@ -142,26 +154,34 @@ void main() {
     });
 
     test('fetches from remote when local not found and online', () async {
-      when(() => mockLocalDatasource.getOrganizationBySlug('dragon-martial-arts'))
-          .thenAnswer((_) async => null);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.getOrganizationBySlug('dragon-martial-arts'))
-          .thenAnswer((_) async => testModel);
-      when(() => mockLocalDatasource.insertOrganization(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDatasource.getOrganizationBySlug('dragon-martial-arts'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.getOrganizationBySlug('dragon-martial-arts'),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.insertOrganization(any()),
+      ).thenAnswer((_) async {});
 
-      final result = await repository.getOrganizationBySlug('dragon-martial-arts');
+      final result = await repository.getOrganizationBySlug(
+        'dragon-martial-arts',
+      );
 
       expect(result.isRight(), true);
       verify(() => mockLocalDatasource.insertOrganization(testModel)).called(1);
     });
 
     test('returns failure when not found and offline', () async {
-      when(() => mockLocalDatasource.getOrganizationBySlug('nonexistent'))
-          .thenAnswer((_) async => null);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.getOrganizationBySlug('nonexistent'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final result = await repository.getOrganizationBySlug('nonexistent');
 
@@ -171,10 +191,12 @@ void main() {
 
   group('getActiveOrganizations', () {
     test('returns local organizations when offline', () async {
-      when(() => mockLocalDatasource.getActiveOrganizations())
-          .thenAnswer((_) async => [testModel]);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.getActiveOrganizations(),
+      ).thenAnswer((_) async => [testModel]);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final result = await repository.getActiveOrganizations();
 
@@ -186,16 +208,21 @@ void main() {
     });
 
     test('syncs from remote when online and inserts new records', () async {
-      when(() => mockLocalDatasource.getActiveOrganizations())
-          .thenAnswer((_) async => []);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.getActiveOrganizations())
-          .thenAnswer((_) async => [testModel]);
-      when(() => mockLocalDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => null);
-      when(() => mockLocalDatasource.insertOrganization(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDatasource.getActiveOrganizations(),
+      ).thenAnswer((_) async => []);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.getActiveOrganizations(),
+      ).thenAnswer((_) async => [testModel]);
+      when(
+        () => mockLocalDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockLocalDatasource.insertOrganization(any()),
+      ).thenAnswer((_) async {});
 
       final result = await repository.getActiveOrganizations();
 
@@ -207,30 +234,40 @@ void main() {
       final olderModel = testModel.copyWith(syncVersion: 1);
       final newerModel = testModel.copyWith(syncVersion: 3);
 
-      when(() => mockLocalDatasource.getActiveOrganizations())
-          .thenAnswer((_) async => [olderModel]);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.getActiveOrganizations())
-          .thenAnswer((_) async => [newerModel]);
-      when(() => mockLocalDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => olderModel);
-      when(() => mockLocalDatasource.updateOrganization(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDatasource.getActiveOrganizations(),
+      ).thenAnswer((_) async => [olderModel]);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.getActiveOrganizations(),
+      ).thenAnswer((_) async => [newerModel]);
+      when(
+        () => mockLocalDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => olderModel);
+      when(
+        () => mockLocalDatasource.updateOrganization(any()),
+      ).thenAnswer((_) async {});
 
       final result = await repository.getActiveOrganizations();
 
       expect(result.isRight(), true);
-      verify(() => mockLocalDatasource.updateOrganization(newerModel)).called(1);
+      verify(
+        () => mockLocalDatasource.updateOrganization(newerModel),
+      ).called(1);
     });
 
     test('uses local data when remote fetch fails', () async {
-      when(() => mockLocalDatasource.getActiveOrganizations())
-          .thenAnswer((_) async => [testModel]);
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.getActiveOrganizations())
-          .thenThrow(Exception('network error'));
+      when(
+        () => mockLocalDatasource.getActiveOrganizations(),
+      ).thenAnswer((_) async => [testModel]);
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.getActiveOrganizations(),
+      ).thenThrow(Exception('network error'));
 
       final result = await repository.getActiveOrganizations();
 
@@ -242,8 +279,9 @@ void main() {
     });
 
     test('returns failure on local exception', () async {
-      when(() => mockLocalDatasource.getActiveOrganizations())
-          .thenThrow(Exception('database error'));
+      when(
+        () => mockLocalDatasource.getActiveOrganizations(),
+      ).thenThrow(Exception('database error'));
 
       final result = await repository.getActiveOrganizations();
 
@@ -253,12 +291,15 @@ void main() {
 
   group('createOrganization', () {
     test('saves locally first then syncs to remote', () async {
-      when(() => mockLocalDatasource.insertOrganization(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.insertOrganization(any()))
-          .thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.insertOrganization(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.insertOrganization(any()),
+      ).thenAnswer((_) async => testModel);
 
       final entity = testModel.convertToEntity();
       final result = await repository.createOrganization(entity);
@@ -269,10 +310,12 @@ void main() {
     });
 
     test('succeeds with local only when offline', () async {
-      when(() => mockLocalDatasource.insertOrganization(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.insertOrganization(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final entity = testModel.convertToEntity();
       final result = await repository.createOrganization(entity);
@@ -283,12 +326,15 @@ void main() {
     });
 
     test('succeeds locally when remote sync fails', () async {
-      when(() => mockLocalDatasource.insertOrganization(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.insertOrganization(any()))
-          .thenThrow(Exception('network error'));
+      when(
+        () => mockLocalDatasource.insertOrganization(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.insertOrganization(any()),
+      ).thenThrow(Exception('network error'));
 
       final entity = testModel.convertToEntity();
       final result = await repository.createOrganization(entity);
@@ -297,8 +343,9 @@ void main() {
     });
 
     test('returns failure when local insert fails', () async {
-      when(() => mockLocalDatasource.insertOrganization(any()))
-          .thenThrow(Exception('database error'));
+      when(
+        () => mockLocalDatasource.insertOrganization(any()),
+      ).thenThrow(Exception('database error'));
 
       final entity = testModel.convertToEntity();
       final result = await repository.createOrganization(entity);
@@ -309,14 +356,18 @@ void main() {
 
   group('updateOrganization', () {
     test('updates locally and syncs to remote when online', () async {
-      when(() => mockLocalDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => testModel);
-      when(() => mockLocalDatasource.updateOrganization(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.updateOrganization(any()))
-          .thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.updateOrganization(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.updateOrganization(any()),
+      ).thenAnswer((_) async => testModel);
 
       final entity = testModel.convertToEntity();
       final result = await repository.updateOrganization(entity);
@@ -329,16 +380,20 @@ void main() {
 
     test('sends correct incremented syncVersion to remote', () async {
       final existingModel = testModel.copyWith(syncVersion: 5);
-      when(() => mockLocalDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => existingModel);
-      when(() => mockLocalDatasource.updateOrganization(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
+      when(
+        () => mockLocalDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => existingModel);
+      when(
+        () => mockLocalDatasource.updateOrganization(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
 
       OrganizationModel? capturedModel;
-      when(() => mockRemoteDatasource.updateOrganization(any()))
-          .thenAnswer((invocation) async {
+      when(() => mockRemoteDatasource.updateOrganization(any())).thenAnswer((
+        invocation,
+      ) async {
         capturedModel = invocation.positionalArguments[0] as OrganizationModel;
         return testModel;
       });
@@ -351,12 +406,15 @@ void main() {
     });
 
     test('succeeds with local only when offline', () async {
-      when(() => mockLocalDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => testModel);
-      when(() => mockLocalDatasource.updateOrganization(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.updateOrganization(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final entity = testModel.convertToEntity();
       final result = await repository.updateOrganization(entity);
@@ -367,14 +425,18 @@ void main() {
     });
 
     test('succeeds locally when remote sync fails', () async {
-      when(() => mockLocalDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => testModel);
-      when(() => mockLocalDatasource.updateOrganization(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.updateOrganization(any()))
-          .thenThrow(Exception('network error'));
+      when(
+        () => mockLocalDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.updateOrganization(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.updateOrganization(any()),
+      ).thenThrow(Exception('network error'));
 
       final entity = testModel.convertToEntity();
       final result = await repository.updateOrganization(entity);
@@ -383,10 +445,12 @@ void main() {
     });
 
     test('returns failure when local update fails', () async {
-      when(() => mockLocalDatasource.getOrganizationById('org-1'))
-          .thenAnswer((_) async => testModel);
-      when(() => mockLocalDatasource.updateOrganization(any()))
-          .thenThrow(Exception('database error'));
+      when(
+        () => mockLocalDatasource.getOrganizationById('org-1'),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.updateOrganization(any()),
+      ).thenThrow(Exception('database error'));
 
       final entity = testModel.convertToEntity();
       final result = await repository.updateOrganization(entity);
@@ -397,12 +461,15 @@ void main() {
 
   group('deleteOrganization', () {
     test('deletes locally and syncs to remote when online', () async {
-      when(() => mockLocalDatasource.deleteOrganization('org-1'))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.deleteOrganization('org-1'))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDatasource.deleteOrganization('org-1'),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.deleteOrganization('org-1'),
+      ).thenAnswer((_) async {});
 
       final result = await repository.deleteOrganization('org-1');
 
@@ -412,10 +479,12 @@ void main() {
     });
 
     test('succeeds with local only when offline', () async {
-      when(() => mockLocalDatasource.deleteOrganization('org-1'))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.deleteOrganization('org-1'),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final result = await repository.deleteOrganization('org-1');
 
@@ -425,12 +494,15 @@ void main() {
     });
 
     test('succeeds locally when remote delete fails', () async {
-      when(() => mockLocalDatasource.deleteOrganization('org-1'))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.deleteOrganization('org-1'))
-          .thenThrow(Exception('network error'));
+      when(
+        () => mockLocalDatasource.deleteOrganization('org-1'),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.deleteOrganization('org-1'),
+      ).thenThrow(Exception('network error'));
 
       final result = await repository.deleteOrganization('org-1');
 
@@ -438,8 +510,9 @@ void main() {
     });
 
     test('returns failure when local delete fails', () async {
-      when(() => mockLocalDatasource.deleteOrganization('org-1'))
-          .thenThrow(Exception('database error'));
+      when(
+        () => mockLocalDatasource.deleteOrganization('org-1'),
+      ).thenThrow(Exception('database error'));
 
       final result = await repository.deleteOrganization('org-1');
 

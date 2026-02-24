@@ -4,9 +4,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/auth_repository.dart';
-import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
+import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 import 'package:tkd_brackets/features/tournament/domain/repositories/tournament_repository.dart';
 import 'package:tkd_brackets/features/tournament/domain/usecases/duplicate_tournament_params.dart';
 import 'package:tkd_brackets/features/tournament/domain/usecases/duplicate_tournament_usecase.dart';
@@ -34,7 +34,7 @@ void main() {
     registerFallbackValue(FakeDivisionEntity());
     registerFallbackValue(FakeUserEntity());
     registerFallbackValue(
-      DuplicateTournamentParams(sourceTournamentId: 'test-id'),
+      const DuplicateTournamentParams(sourceTournamentId: 'test-id'),
     );
   });
 
@@ -130,7 +130,7 @@ void main() {
           );
 
           final result = await useCase(
-            DuplicateTournamentParams(sourceTournamentId: 'nonexistent'),
+            const DuplicateTournamentParams(sourceTournamentId: 'nonexistent'),
           );
 
           expect(result.isLeft(), isTrue);
@@ -152,7 +152,7 @@ void main() {
           );
 
           final result = await useCase(
-            DuplicateTournamentParams(sourceTournamentId: 'null-tournament'),
+            const DuplicateTournamentParams(sourceTournamentId: 'null-tournament'),
           );
 
           expect(result.isLeft(), isTrue);
@@ -171,7 +171,7 @@ void main() {
           ).thenAnswer((_) async => Right(testSoftDeletedTournament));
 
           final result = await useCase(
-            DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+            const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
           );
 
           expect(result.isLeft(), isTrue);
@@ -197,7 +197,7 @@ void main() {
           );
 
           final result = await useCase(
-            DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+            const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
           );
 
           expect(result.isLeft(), isTrue);
@@ -219,7 +219,7 @@ void main() {
           ).thenAnswer((_) async => Right(testViewer));
 
           final result = await useCase(
-            DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+            const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
           );
 
           expect(result.isLeft(), isTrue);
@@ -242,7 +242,7 @@ void main() {
           ).thenAnswer((_) async => Right(testScorer));
 
           final result = await useCase(
-            DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+            const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
           );
 
           expect(result.isLeft(), isTrue);
@@ -275,7 +275,7 @@ void main() {
         });
 
         final result = await useCase(
-          DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+          const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
         );
 
         expect(result.isRight(), isTrue);
@@ -308,7 +308,7 @@ void main() {
         });
 
         final result = await useCase(
-          DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+          const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
         );
 
         expect(result.isRight(), isTrue);
@@ -339,7 +339,7 @@ void main() {
         });
 
         final result = await useCase(
-          DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+          const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
         );
 
         expect(result.isRight(), isTrue);
@@ -378,7 +378,7 @@ void main() {
         });
 
         final result = await useCase(
-          DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+          const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
         );
 
         expect(result.isRight(), isTrue);
@@ -404,7 +404,7 @@ void main() {
         });
 
         final result = await useCase(
-          DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+          const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
         );
 
         expect(result.isRight(), isTrue);
@@ -437,7 +437,7 @@ void main() {
         });
 
         final result = await useCase(
-          DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+          const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
         );
 
         expect(result.isRight(), isTrue);
@@ -469,7 +469,7 @@ void main() {
         });
 
         await useCase(
-          DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+          const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
         );
 
         verifyNever(() => mockDivisionRepository.createDivision(any()));
@@ -494,7 +494,7 @@ void main() {
         });
 
         final result = await useCase(
-          DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
+          const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
         );
 
         final captured =

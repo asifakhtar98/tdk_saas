@@ -56,7 +56,7 @@ void main() {
         schoolOrDojangName: "Kim's TKD",
       );
 
-      final newParticipant = ParticipantCheckData(
+      const newParticipant = ParticipantCheckData(
         firstName: 'JOHN',
         lastName: 'smith',
         schoolOrDojangName: "KIM'S TKD",
@@ -86,7 +86,7 @@ void main() {
         schoolOrDojangName: "Kim's TKD",
       );
 
-      final newParticipant = ParticipantCheckData(
+      const newParticipant = ParticipantCheckData(
         firstName: 'Jhohn',
         lastName: 'Smith',
         schoolOrDojangName: "Kim's TKD",
@@ -114,7 +114,7 @@ void main() {
         schoolOrDojangName: "Kim's TKD",
       );
 
-      final newParticipant = ParticipantCheckData(
+      const newParticipant = ParticipantCheckData(
         firstName: 'Jhon',
         lastName: 'Smith',
         schoolOrDojangName: "Kim's TKD",
@@ -142,7 +142,7 @@ void main() {
         schoolOrDojangName: "Kim's TKD",
       );
 
-      final newParticipant = ParticipantCheckData(
+      const newParticipant = ParticipantCheckData(
         firstName: 'John',
         lastName: 'Smith',
         schoolOrDojangName: 'Different Dojang',
@@ -206,7 +206,7 @@ void main() {
         schoolOrDojangName: "Kim's TKD",
       );
 
-      final newParticipant = ParticipantCheckData(
+      const newParticipant = ParticipantCheckData(
         firstName: 'John',
         lastName: 'Smith',
         schoolOrDojangName: "Kim's TKD",
@@ -225,7 +225,7 @@ void main() {
     });
 
     test('empty existing participants = no matches', () async {
-      final newParticipant = ParticipantCheckData(
+      const newParticipant = ParticipantCheckData(
         firstName: 'John',
         lastName: 'Smith',
         schoolOrDojangName: "Kim's TKD",
@@ -252,7 +252,7 @@ void main() {
         dateOfBirth: null,
       );
 
-      final newParticipant = ParticipantCheckData(
+      const newParticipant = ParticipantCheckData(
         firstName: 'John',
         lastName: 'Smith',
         schoolOrDojangName: "Kim's TKD",
@@ -281,7 +281,7 @@ void main() {
         schoolOrDojangName: "Kim's TKD",
       );
 
-      final exactMatch = ParticipantCheckData(
+      const exactMatch = ParticipantCheckData(
         firstName: 'John',
         lastName: 'Smith',
         schoolOrDojangName: "Kim's TKD",
@@ -309,7 +309,7 @@ void main() {
         schoolOrDojangName: null,
       );
 
-      final newParticipant = ParticipantCheckData(
+      const newParticipant = ParticipantCheckData(
         firstName: 'John',
         lastName: 'Smith',
         schoolOrDojangName: "Kim's TKD",
@@ -336,7 +336,7 @@ void main() {
         schoolOrDojangName: '',
       );
 
-      final newParticipant = ParticipantCheckData(
+      const newParticipant = ParticipantCheckData(
         firstName: 'John',
         lastName: 'Smith',
         schoolOrDojangName: '',
@@ -363,7 +363,7 @@ void main() {
         schoolOrDojangName: '',
       );
 
-      final newParticipant = ParticipantCheckData(
+      const newParticipant = ParticipantCheckData(
         firstName: 'John',
         lastName: 'Smith',
         schoolOrDojangName: '',
@@ -428,15 +428,15 @@ void main() {
       ).thenAnswer((_) async => Right([participantEntry]));
 
       final newParticipants = [
-        ParticipantCheckData(
+        const ParticipantCheckData(
           firstName: 'John',
           lastName: 'Smith',
           schoolOrDojangName: "Kim's TKD",
         ),
-        ParticipantCheckData(
+        const ParticipantCheckData(
           firstName: 'Jane',
           lastName: 'Doe',
-          schoolOrDojangName: "Other TKD",
+          schoolOrDojangName: 'Other TKD',
         ),
       ];
 
@@ -522,20 +522,20 @@ void main() {
         );
 
         final newParticipants = [
-          ParticipantCheckData(
+          const ParticipantCheckData(
             firstName: 'John',
             lastName: 'Smith',
             schoolOrDojangName: "Kim's TKD",
           ),
-          ParticipantCheckData(
+          const ParticipantCheckData(
             firstName: 'Jane',
             lastName: 'Doe',
             schoolOrDojangName: "Kim's TKD",
           ),
-          ParticipantCheckData(
+          const ParticipantCheckData(
             firstName: 'Bob',
             lastName: 'Wilson',
-            schoolOrDojangName: "Elite TKD",
+            schoolOrDojangName: 'Elite TKD',
           ),
         ];
 
@@ -561,10 +561,10 @@ void main() {
         when(
           () =>
               mockDivisionRepository.getDivisionsForTournament('tournament-1'),
-        ).thenAnswer((_) async => Left(ServerConnectionFailure()));
+        ).thenAnswer((_) async => const Left(ServerConnectionFailure()));
 
         final newParticipants = [
-          ParticipantCheckData(
+          const ParticipantCheckData(
             firstName: 'John',
             lastName: 'Smith',
             schoolOrDojangName: "Kim's TKD",
@@ -614,10 +614,10 @@ void main() {
           () => mockDivisionRepository.getParticipantsForDivisions([
             'division-1',
           ]),
-        ).thenAnswer((_) async => Left(ServerConnectionFailure()));
+        ).thenAnswer((_) async => const Left(ServerConnectionFailure()));
 
         final newParticipants = [
-          ParticipantCheckData(
+          const ParticipantCheckData(
             firstName: 'John',
             lastName: 'Smith',
             schoolOrDojangName: "Kim's TKD",
@@ -646,7 +646,7 @@ void main() {
         schoolOrDojangName: "Kim's TKD",
       );
 
-      final newParticipant = ParticipantCheckData(
+      const newParticipant = ParticipantCheckData(
         firstName: 'Johm',
         lastName: 'Smith',
         schoolOrDojangName: "Kim's TKD",
@@ -674,7 +674,7 @@ void main() {
         schoolOrDojangName: "Kim's TKD",
       );
 
-      final newParticipant = ParticipantCheckData(
+      const newParticipant = ParticipantCheckData(
         firstName: 'Jonathan',
         lastName: 'Smith',
         schoolOrDojangName: "Kim's TKD",

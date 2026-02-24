@@ -118,7 +118,7 @@ void main() {
         final originalOrgId = originalOrgs.first.id;
 
         // Perform migration
-        final newOrgId = 'production-org-id-123';
+        const newOrgId = 'production-org-id-123';
         final migratedCount = await migrationService.migrateDemoData(newOrgId);
 
         // Should have migrated: 1 org, 1 tournament, 1 division, 8 participants, 1 user
@@ -149,7 +149,7 @@ void main() {
         final originalTournament = originalTournaments.first;
 
         // Perform migration
-        final newOrgId = 'production-org-id-123';
+        const newOrgId = 'production-org-id-123';
         await migrationService.migrateDemoData(newOrgId);
 
         // Verify tournament now references the new organization
@@ -165,7 +165,7 @@ void main() {
         ).thenAnswer((_) async => true);
         await _seedDemoData(db);
 
-        final newOrgId = 'production-org-id-123';
+        const newOrgId = 'production-org-id-123';
         await migrationService.migrateDemoData(newOrgId);
 
         // Verify all entities have updated organization ID
@@ -332,7 +332,7 @@ Future<void> _seedDemoData(AppDatabase db) async {
   // Insert demo organization
   await db.insertOrganization(
     OrganizationsCompanion(
-      id: Value(DemoDataConstants.demoOrganizationId),
+      id: const Value(DemoDataConstants.demoOrganizationId),
       name: const Value('Demo Dojang'),
       slug: const Value('demo-dojang'),
       isDemoData: const Value(true),
@@ -352,8 +352,8 @@ Future<void> _seedDemoData(AppDatabase db) async {
   // Insert demo user
   await db.insertUser(
     UsersCompanion(
-      id: Value(DemoDataConstants.demoUserId),
-      organizationId: Value(DemoDataConstants.demoOrganizationId),
+      id: const Value(DemoDataConstants.demoUserId),
+      organizationId: const Value(DemoDataConstants.demoOrganizationId),
       email: const Value('demo@example.com'),
       displayName: const Value('Demo User'),
       role: const Value('owner'),
@@ -367,9 +367,9 @@ Future<void> _seedDemoData(AppDatabase db) async {
   // Insert demo tournament
   await db.insertTournament(
     TournamentsCompanion(
-      id: Value(DemoDataConstants.demoTournamentId),
-      organizationId: Value(DemoDataConstants.demoOrganizationId),
-      createdByUserId: Value(DemoDataConstants.demoUserId),
+      id: const Value(DemoDataConstants.demoTournamentId),
+      organizationId: const Value(DemoDataConstants.demoOrganizationId),
+      createdByUserId: const Value(DemoDataConstants.demoUserId),
       name: const Value('Demo Tournament'),
       description: const Value('A demo tournament'),
       venueName: const Value('Demo Venue'),
@@ -385,11 +385,11 @@ Future<void> _seedDemoData(AppDatabase db) async {
   );
 
   // Insert demo division
-  final divisionId = 'demo-division-id';
+  const divisionId = 'demo-division-id';
   await db.insertDivision(
     DivisionsCompanion(
-      id: Value(divisionId),
-      tournamentId: Value(DemoDataConstants.demoTournamentId),
+      id: const Value(divisionId),
+      tournamentId: const Value(DemoDataConstants.demoTournamentId),
       name: const Value('Demo Division'),
       category: const Value('forms'),
       gender: const Value('mixed'),
@@ -407,8 +407,8 @@ Future<void> _seedDemoData(AppDatabase db) async {
     await db.insertParticipant(
       ParticipantsCompanion(
         id: Value('demo-participant-$i'),
-        divisionId: Value(divisionId),
-        firstName: Value('Participant'),
+        divisionId: const Value(divisionId),
+        firstName: const Value('Participant'),
         lastName: Value('$i'),
         gender: const Value('male'),
         beltRank: const Value('white'),

@@ -143,8 +143,10 @@ class AutosaveServiceImplementation
   @override
   void start() {
     _autosaveTimer?.cancel();
-    _autosaveTimer =
-        Timer.periodic(_autosaveInterval, (_) => _performAutosave());
+    _autosaveTimer = Timer.periodic(
+      _autosaveInterval,
+      (_) => _performAutosave(),
+    );
   }
 
   @override
@@ -170,7 +172,8 @@ class AutosaveServiceImplementation
         // Queue for sync (implementation in future Story 1.10)
         // For now, just log that we would sync
         _errorReportingService.addBreadcrumb(
-          message: 'Autosave: $dirtyEntityCount entities saved locally, '
+          message:
+              'Autosave: $dirtyEntityCount entities saved locally, '
               'ready for cloud sync',
           category: 'autosave',
         );

@@ -21,8 +21,7 @@ class Users extends Table with BaseSyncMixin, BaseAuditMixin {
   TextColumn get displayName => text().withLength(min: 1, max: 255)();
 
   /// Role: 'owner', 'admin', 'scorer', 'viewer'.
-  TextColumn get role => text()
-      .withDefault(const Constant('viewer'))();
+  TextColumn get role => text().withDefault(const Constant('viewer'))();
 
   /// Optional avatar URL (Supabase Storage or external).
   TextColumn get avatarUrl => text().nullable()();

@@ -236,58 +236,56 @@ void main() {
       const testToken = '123456';
 
       test(
-          'returns UserEntity for existing user with updated lastSignInAt',
-          () async {
-        // Arrange
-        final mockUser = MockUser();
-        final mockAuthResponse = MockAuthResponse();
-        when(() => mockUser.id).thenReturn('user-123');
-        when(() => mockUser.email).thenReturn(testEmail);
-        when(() => mockUser.userMetadata).thenReturn(null);
-        when(() => mockAuthResponse.user).thenReturn(mockUser);
+        'returns UserEntity for existing user with updated lastSignInAt',
+        () async {
+          // Arrange
+          final mockUser = MockUser();
+          final mockAuthResponse = MockAuthResponse();
+          when(() => mockUser.id).thenReturn('user-123');
+          when(() => mockUser.email).thenReturn(testEmail);
+          when(() => mockUser.userMetadata).thenReturn(null);
+          when(() => mockAuthResponse.user).thenReturn(mockUser);
 
-        when(
-          () => mockAuthDatasource.verifyOtp(
-            email: any(named: 'email'),
-            token: any(named: 'token'),
-            type: any(named: 'type'),
-          ),
-        ).thenAnswer((_) async => mockAuthResponse);
+          when(
+            () => mockAuthDatasource.verifyOtp(
+              email: any(named: 'email'),
+              token: any(named: 'token'),
+              type: any(named: 'type'),
+            ),
+          ).thenAnswer((_) async => mockAuthResponse);
 
-        when(
-          () => mockUserRemoteDatasource.getUserById(any()),
-        ).thenAnswer((_) async => testUserModel);
+          when(
+            () => mockUserRemoteDatasource.getUserById(any()),
+          ).thenAnswer((_) async => testUserModel);
 
-        when(
-          () => mockUserRemoteDatasource.updateUser(any()),
-        ).thenAnswer((_) async => testUserModel);
+          when(
+            () => mockUserRemoteDatasource.updateUser(any()),
+          ).thenAnswer((_) async => testUserModel);
 
-        when(
-          () => mockUserLocalDatasource.getUserById(any()),
-        ).thenAnswer((_) async => testUserModel);
+          when(
+            () => mockUserLocalDatasource.getUserById(any()),
+          ).thenAnswer((_) async => testUserModel);
 
-        when(
-          () => mockUserLocalDatasource.updateUser(any()),
-        ).thenAnswer((_) async {});
+          when(
+            () => mockUserLocalDatasource.updateUser(any()),
+          ).thenAnswer((_) async {});
 
-        // Act
-        final result = await repository.verifyMagicLinkOtp(
-          email: testEmail,
-          token: testToken,
-        );
+          // Act
+          final result = await repository.verifyMagicLinkOtp(
+            email: testEmail,
+            token: testToken,
+          );
 
-        // Assert
-        expect(result.isRight(), isTrue);
-        result.fold(
-          (_) => fail('Expected Right'),
-          (user) {
+          // Assert
+          expect(result.isRight(), isTrue);
+          result.fold((_) => fail('Expected Right'), (user) {
             expect(user.id, equals('user-123'));
             expect(user.email, equals(testEmail));
-          },
-        );
-        verify(() => mockUserRemoteDatasource.updateUser(any())).called(1);
-        verify(() => mockUserLocalDatasource.updateUser(any())).called(1);
-      });
+          });
+          verify(() => mockUserRemoteDatasource.updateUser(any())).called(1);
+          verify(() => mockUserLocalDatasource.updateUser(any())).called(1);
+        },
+      );
 
       test('creates new user profile for first-time sign-in', () async {
         // Arrange
@@ -295,8 +293,9 @@ void main() {
         final mockAuthResponse = MockAuthResponse();
         when(() => mockUser.id).thenReturn('new-user-123');
         when(() => mockUser.email).thenReturn(testEmail);
-        when(() => mockUser.userMetadata)
-            .thenReturn({'display_name': 'New User'});
+        when(
+          () => mockUser.userMetadata,
+        ).thenReturn({'display_name': 'New User'});
         when(() => mockAuthResponse.user).thenReturn(mockUser);
 
         when(
@@ -339,33 +338,35 @@ void main() {
         verifyNever(() => mockUserRemoteDatasource.updateUser(any()));
       });
 
-      test('returns OtpVerificationFailure when AuthResponse.user is null',
-          () async {
-        // Arrange
-        final mockAuthResponse = MockAuthResponse();
-        when(() => mockAuthResponse.user).thenReturn(null);
+      test(
+        'returns OtpVerificationFailure when AuthResponse.user is null',
+        () async {
+          // Arrange
+          final mockAuthResponse = MockAuthResponse();
+          when(() => mockAuthResponse.user).thenReturn(null);
 
-        when(
-          () => mockAuthDatasource.verifyOtp(
-            email: any(named: 'email'),
-            token: any(named: 'token'),
-            type: any(named: 'type'),
-          ),
-        ).thenAnswer((_) async => mockAuthResponse);
+          when(
+            () => mockAuthDatasource.verifyOtp(
+              email: any(named: 'email'),
+              token: any(named: 'token'),
+              type: any(named: 'type'),
+            ),
+          ).thenAnswer((_) async => mockAuthResponse);
 
-        // Act
-        final result = await repository.verifyMagicLinkOtp(
-          email: testEmail,
-          token: testToken,
-        );
+          // Act
+          final result = await repository.verifyMagicLinkOtp(
+            email: testEmail,
+            token: testToken,
+          );
 
-        // Assert
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(failure, isA<OtpVerificationFailure>()),
-          (_) => fail('Expected Left'),
-        );
-      });
+          // Assert
+          expect(result.isLeft(), isTrue);
+          result.fold(
+            (failure) => expect(failure, isA<OtpVerificationFailure>()),
+            (_) => fail('Expected Left'),
+          );
+        },
+      );
 
       test('returns ExpiredTokenFailure for expired token error', () async {
         // Arrange
@@ -569,66 +570,67 @@ void main() {
         verify(() => mockUserLocalDatasource.insertUser(any())).called(1);
       });
 
-      test('returns UserNotFoundFailure when no authenticated session',
-          () async {
-        // Arrange
-        when(() => mockAuthDatasource.currentUser).thenReturn(null);
+      test(
+        'returns UserNotFoundFailure when no authenticated session',
+        () async {
+          // Arrange
+          when(() => mockAuthDatasource.currentUser).thenReturn(null);
 
-        // Act
-        final result = await repository.getCurrentAuthenticatedUser();
+          // Act
+          final result = await repository.getCurrentAuthenticatedUser();
 
-        // Assert
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(failure, isA<UserNotFoundFailure>()),
-          (_) => fail('Expected Left'),
-        );
-      });
+          // Assert
+          expect(result.isLeft(), isTrue);
+          result.fold(
+            (failure) => expect(failure, isA<UserNotFoundFailure>()),
+            (_) => fail('Expected Left'),
+          );
+        },
+      );
 
       test(
-          'returns UserNotFoundFailure when user profile not in database',
-          () async {
-        // Arrange
-        final mockUser = MockUser();
-        when(() => mockUser.id).thenReturn('user-123');
-        when(() => mockAuthDatasource.currentUser).thenReturn(mockUser);
-        when(
-          () => mockUserLocalDatasource.getUserById(any()),
-        ).thenAnswer((_) async => null);
-        when(
-          () => mockUserRemoteDatasource.getUserById(any()),
-        ).thenAnswer((_) async => null);
+        'returns UserNotFoundFailure when user profile not in database',
+        () async {
+          // Arrange
+          final mockUser = MockUser();
+          when(() => mockUser.id).thenReturn('user-123');
+          when(() => mockAuthDatasource.currentUser).thenReturn(mockUser);
+          when(
+            () => mockUserLocalDatasource.getUserById(any()),
+          ).thenAnswer((_) async => null);
+          when(
+            () => mockUserRemoteDatasource.getUserById(any()),
+          ).thenAnswer((_) async => null);
 
-        // Act
-        final result = await repository.getCurrentAuthenticatedUser();
+          // Act
+          final result = await repository.getCurrentAuthenticatedUser();
 
-        // Assert
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(failure, isA<UserNotFoundFailure>()),
-          (_) => fail('Expected Left'),
-        );
-      });
+          // Assert
+          expect(result.isLeft(), isTrue);
+          result.fold(
+            (failure) => expect(failure, isA<UserNotFoundFailure>()),
+            (_) => fail('Expected Left'),
+          );
+        },
+      );
     });
 
     group('authStateChanges', () {
       test('emits null when user signs out', () async {
         // Arrange
         final controller = StreamController<AuthState>();
-        when(() => mockAuthDatasource.onAuthStateChange)
-            .thenAnswer((_) => controller.stream);
+        when(
+          () => mockAuthDatasource.onAuthStateChange,
+        ).thenAnswer((_) => controller.stream);
 
         // Act
         final stream = repository.authStateChanges;
 
         // Add a signed-out state (no session)
-        controller.add(AuthState(AuthChangeEvent.signedOut, null));
+        controller.add(const AuthState(AuthChangeEvent.signedOut, null));
 
         // Assert
-        expect(
-          stream,
-          emits(isA<Right<Failure, void>>()),
-        );
+        expect(stream, emits(isA<Right<Failure, void>>()));
 
         // Cleanup
         await controller.close();

@@ -96,10 +96,7 @@ void main() {
 
     test('addBreadcrumb should be no-op when disabled', () {
       // Should not throw
-      SentryService.addBreadcrumb(
-        message: 'test breadcrumb',
-        category: 'test',
-      );
+      SentryService.addBreadcrumb(message: 'test breadcrumb', category: 'test');
     });
 
     test('setUserContext should be no-op when disabled', () {

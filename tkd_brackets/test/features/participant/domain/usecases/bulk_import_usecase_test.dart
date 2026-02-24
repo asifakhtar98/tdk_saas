@@ -11,9 +11,7 @@ import 'package:tkd_brackets/features/participant/domain/services/csv_row_error.
 import 'package:tkd_brackets/features/participant/domain/services/duplicate_detection_service.dart';
 import 'package:tkd_brackets/features/participant/domain/services/duplicate_match.dart';
 import 'package:tkd_brackets/features/participant/domain/services/duplicate_match_type.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/bulk_import_preview.dart';
 import 'package:tkd_brackets/features/participant/domain/usecases/bulk_import_preview_row.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/bulk_import_result.dart';
 import 'package:tkd_brackets/features/participant/domain/usecases/bulk_import_row_status.dart';
 import 'package:tkd_brackets/features/participant/domain/usecases/bulk_import_usecase.dart';
 
@@ -150,16 +148,16 @@ John,,Kim's TKD,blue
       test(
         'returns preview with error rows when CSV has parsing errors',
         () async {
-          final csvResult = CSVImportResult(
+          const csvResult = CSVImportResult(
             validRows: [],
             errors: [
-              const CSVRowError(
+              CSVRowError(
                 rowNumber: 1,
                 fieldName: 'lastName',
                 errorMessage: 'Last name is required',
                 rawValue: null,
               ),
-              const CSVRowError(
+              CSVRowError(
                 rowNumber: 2,
                 fieldName: 'firstName',
                 errorMessage: 'First name is required',
@@ -174,7 +172,7 @@ John,,Kim's TKD,blue
               csvContent: any(named: 'csvContent'),
               divisionId: any(named: 'divisionId'),
             ),
-          ).thenAnswer((_) async => Right(csvResult));
+          ).thenAnswer((_) async => const Right(csvResult));
 
           final result = await useCase.generatePreview(
             csvContent: csvWithErrors,
@@ -235,7 +233,7 @@ John,,Kim's TKD,blue
               DuplicateMatch(
                 existingParticipant: existingParticipant,
                 matchType: DuplicateMatchType.exact,
-                confidenceScore: 1.0,
+                confidenceScore: 1,
                 matchedFields: {'firstName': 'John', 'lastName': 'Doe'},
               ),
             ],
@@ -309,7 +307,7 @@ John,,Kim's TKD,blue
                 DuplicateMatch(
                   existingParticipant: existingParticipant,
                   matchType: DuplicateMatchType.exact,
-                  confidenceScore: 1.0,
+                  confidenceScore: 1,
                   matchedFields: {'firstName': 'John', 'lastName': 'Doe'},
                 ),
               ],
@@ -370,7 +368,7 @@ John,,Kim's TKD,blue
               DuplicateMatch(
                 existingParticipant: createParticipant(id: 'e1'),
                 matchType: DuplicateMatchType.exact,
-                confidenceScore: 1.0,
+                confidenceScore: 1,
                 matchedFields: {},
               ),
             ],
@@ -462,7 +460,7 @@ John,,Kim's TKD,blue
           ),
         ).thenAnswer(
           (_) async =>
-              Left(LocalCacheAccessFailure(technicalDetails: 'DB error')),
+              const Left(LocalCacheAccessFailure(technicalDetails: 'DB error')),
         );
 
         final result = await useCase.generatePreview(
@@ -507,22 +505,22 @@ John,,Kim's TKD,blue
       test(
         'aggregates multiple validation errors for same row into validationErrors map',
         () async {
-          final csvResult = CSVImportResult(
+          const csvResult = CSVImportResult(
             validRows: [],
             errors: [
-              const CSVRowError(
+              CSVRowError(
                 rowNumber: 1,
                 fieldName: 'firstName',
                 errorMessage: 'First name is required',
                 rawValue: null,
               ),
-              const CSVRowError(
+              CSVRowError(
                 rowNumber: 1,
                 fieldName: 'lastName',
                 errorMessage: 'Last name is required',
                 rawValue: null,
               ),
-              const CSVRowError(
+              CSVRowError(
                 rowNumber: 1,
                 fieldName: 'beltRank',
                 errorMessage: 'Belt rank is required',
@@ -537,7 +535,7 @@ John,,Kim's TKD,blue
               csvContent: any(named: 'csvContent'),
               divisionId: any(named: 'divisionId'),
             ),
-          ).thenAnswer((_) async => Right(csvResult));
+          ).thenAnswer((_) async => const Right(csvResult));
 
           final result = await useCase.generatePreview(
             csvContent: csvWithErrors,
@@ -696,7 +694,7 @@ John,,Kim's TKD,blue
               DuplicateMatch(
                 existingParticipant: existingParticipant,
                 matchType: DuplicateMatchType.exact,
-                confidenceScore: 1.0,
+                confidenceScore: 1,
                 matchedFields: {},
               ),
             ],

@@ -3,8 +3,7 @@ import 'package:tkd_brackets/features/division/domain/entities/conflict_warning.
 
 class ConflictWarningBanner extends StatelessWidget {
   const ConflictWarningBanner({
-    super.key,
-    required this.conflicts,
+    required this.conflicts, super.key,
     this.onDismiss,
   });
 
@@ -79,12 +78,12 @@ class ConflictWarningBanner extends StatelessWidget {
                     text: conflict.participantName,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  TextSpan(text: ' is in both '),
+                  const TextSpan(text: ' is in both '),
                   TextSpan(
                     text: conflict.divisionName1,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  TextSpan(text: ' and '),
+                  const TextSpan(text: ' and '),
                   TextSpan(
                     text: conflict.divisionName2,
                     style: const TextStyle(fontWeight: FontWeight.bold),

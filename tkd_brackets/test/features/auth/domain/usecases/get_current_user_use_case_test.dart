@@ -7,8 +7,7 @@ import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/get_current_user_use_case.dart';
 
-class MockAuthRepository extends Mock
-    implements AuthRepository {}
+class MockAuthRepository extends Mock implements AuthRepository {}
 
 void main() {
   late MockAuthRepository mockAuthRepository;
@@ -30,58 +29,36 @@ void main() {
   );
 
   group('GetCurrentUserUseCase', () {
-    test(
-      'returns Right(UserEntity) when user is '
-      'authenticated',
-      () async {
-        when(
-          () => mockAuthRepository
-              .getCurrentAuthenticatedUser(),
-        ).thenAnswer((_) async => Right(testUser));
+    test('returns Right(UserEntity) when user is '
+        'authenticated', () async {
+      when(
+        () => mockAuthRepository.getCurrentAuthenticatedUser(),
+      ).thenAnswer((_) async => Right(testUser));
 
-        final result =
-            await useCase(const NoParams());
+      final result = await useCase(const NoParams());
 
-        expect(result.isRight(), isTrue);
-        result.fold(
-          (_) => fail('Expected Right'),
-          (user) =>
-              expect(user.id, equals('user-123')),
-        );
-        verify(
-          () => mockAuthRepository
-              .getCurrentAuthenticatedUser(),
-        ).called(1);
-      },
-    );
+      expect(result.isRight(), isTrue);
+      result.fold(
+        (_) => fail('Expected Right'),
+        (user) => expect(user.id, equals('user-123')),
+      );
+      verify(() => mockAuthRepository.getCurrentAuthenticatedUser()).called(1);
+    });
 
-    test(
-      'returns Left(Failure) when no user '
-      'authenticated',
-      () async {
-        when(
-          () => mockAuthRepository
-              .getCurrentAuthenticatedUser(),
-        ).thenAnswer(
-          (_) async => const Left(
-            UserNotFoundFailure(
-              technicalDetails: 'No session',
-            ),
-          ),
-        );
+    test('returns Left(Failure) when no user '
+        'authenticated', () async {
+      when(() => mockAuthRepository.getCurrentAuthenticatedUser()).thenAnswer(
+        (_) async =>
+            const Left(UserNotFoundFailure(technicalDetails: 'No session')),
+      );
 
-        final result =
-            await useCase(const NoParams());
+      final result = await useCase(const NoParams());
 
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) => expect(
-            failure,
-            isA<UserNotFoundFailure>(),
-          ),
-          (_) => fail('Expected Left'),
-        );
-      },
-    );
+      expect(result.isLeft(), isTrue);
+      result.fold(
+        (failure) => expect(failure, isA<UserNotFoundFailure>()),
+        (_) => fail('Expected Left'),
+      );
+    });
   });
 }

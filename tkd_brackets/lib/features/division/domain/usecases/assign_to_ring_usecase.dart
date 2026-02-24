@@ -53,7 +53,7 @@ class AssignToRingUseCase extends UseCase<DivisionEntity, AssignToRingParams> {
                 'Ring number must be between 1 and ${tournament.numberOfRings}',
             technicalDetails:
                 'Tournament "${tournament.name}" has ${tournament.numberOfRings} rings configured',
-            fieldErrors: {
+            fieldErrors: const {
               'ringNumber': 'Invalid ring number for this tournament',
             },
           ),
@@ -61,7 +61,7 @@ class AssignToRingUseCase extends UseCase<DivisionEntity, AssignToRingParams> {
       }
     }
 
-    int displayOrder =
+    final displayOrder =
         params.displayOrder ??
         await _getNextDisplayOrder(division.tournamentId, params.ringNumber);
 

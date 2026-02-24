@@ -68,7 +68,7 @@ class AutoAssignParticipantsUseCase {
 
     if (divisionsResult.isLeft()) {
       return divisionsResult.fold(
-        (failure) => Left(failure),
+        Left.new,
         (_) => const Left(
           ServerConnectionFailure(
             userFriendlyMessage: 'Failed to load divisions',

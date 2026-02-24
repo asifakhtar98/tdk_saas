@@ -100,9 +100,12 @@ class UserRemoteDatasourceImplementation implements UserRemoteDatasource {
   @override
   Future<void> deleteUser(String id) async {
     // Soft delete by setting is_deleted = true
-    await _supabase.from(_tableName).update({
-      'is_deleted': true,
-      'deleted_at_timestamp': DateTime.now().toIso8601String(),
-    }).eq('id', id);
+    await _supabase
+        .from(_tableName)
+        .update({
+          'is_deleted': true,
+          'deleted_at_timestamp': DateTime.now().toIso8601String(),
+        })
+        .eq('id', id);
   }
 }

@@ -17,26 +17,17 @@ void main() {
   group('Dependency Injection Configuration', () {
     test('should initialize GetIt container without errors', () {
       // Act & Assert
-      expect(
-        () => configureDependencies(dev.name),
-        returnsNormally,
-      );
+      expect(() => configureDependencies(dev.name), returnsNormally);
     });
 
     test('should initialize with staging environment without errors', () {
       // Act & Assert
-      expect(
-        () => configureDependencies(staging.name),
-        returnsNormally,
-      );
+      expect(() => configureDependencies(staging.name), returnsNormally);
     });
 
     test('should initialize with production environment without errors', () {
       // Act & Assert
-      expect(
-        () => configureDependencies(prod.name),
-        returnsNormally,
-      );
+      expect(() => configureDependencies(prod.name), returnsNormally);
     });
 
     test('should resolve LoggerService after initialization', () {
@@ -68,10 +59,7 @@ void main() {
       final logger = getIt<LoggerService>();
 
       // Act & Assert
-      expect(
-        () => logger.info('Test info message'),
-        returnsNormally,
-      );
+      expect(() => logger.info('Test info message'), returnsNormally);
     });
 
     test('LoggerService warning method should not throw', () {
@@ -80,10 +68,7 @@ void main() {
       final logger = getIt<LoggerService>();
 
       // Act & Assert
-      expect(
-        () => logger.warning('Test warning message'),
-        returnsNormally,
-      );
+      expect(() => logger.warning('Test warning message'), returnsNormally);
     });
 
     test('LoggerService error method should not throw', () {

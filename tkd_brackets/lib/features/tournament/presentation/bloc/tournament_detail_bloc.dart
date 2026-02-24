@@ -1,18 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/entities/conflict_warning.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/get_tournament_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/update_tournament_settings_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/update_tournament_settings_params.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_params.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_params.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/get_divisions_usecase.dart';
+import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/services/conflict_detection_service.dart';
-import 'tournament_detail_event.dart';
-import 'tournament_detail_state.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/get_divisions_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_params.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_params.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/get_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/update_tournament_settings_params.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/update_tournament_settings_usecase.dart';
+import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_detail_event.dart';
+import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_detail_state.dart';
 
 @injectable
 class TournamentDetailBloc

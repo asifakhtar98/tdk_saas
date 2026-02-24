@@ -83,9 +83,8 @@ void main() {
 
         // Assert
         verify(
-          () => mockAuthRepository.sendSignUpMagicLink(
-            email: 'test@example.com',
-          ),
+          () =>
+              mockAuthRepository.sendSignUpMagicLink(email: 'test@example.com'),
         ).called(1);
       });
     });
@@ -111,9 +110,7 @@ void main() {
           (value) => expect(value, unit),
         );
         verify(
-          () => mockAuthRepository.sendSignUpMagicLink(
-            email: validEmail,
-          ),
+          () => mockAuthRepository.sendSignUpMagicLink(email: validEmail),
         ).called(1);
       });
     });
@@ -125,9 +122,7 @@ void main() {
           () => mockAuthRepository.sendSignUpMagicLink(
             email: any(named: 'email'),
           ),
-        ).thenAnswer(
-          (_) async => const Left(RateLimitExceededFailure()),
-        );
+        ).thenAnswer((_) async => const Left(RateLimitExceededFailure()));
 
         // Act
         final result = await useCase(
@@ -148,9 +143,7 @@ void main() {
           () => mockAuthRepository.sendSignUpMagicLink(
             email: any(named: 'email'),
           ),
-        ).thenAnswer(
-          (_) async => const Left(MagicLinkSendFailure()),
-        );
+        ).thenAnswer((_) async => const Left(MagicLinkSendFailure()));
 
         // Act
         final result = await useCase(
@@ -171,9 +164,7 @@ void main() {
           () => mockAuthRepository.sendSignUpMagicLink(
             email: any(named: 'email'),
           ),
-        ).thenAnswer(
-          (_) async => const Left(ServerConnectionFailure()),
-        );
+        ).thenAnswer((_) async => const Left(ServerConnectionFailure()));
 
         // Act
         final result = await useCase(

@@ -1,29 +1,23 @@
 import 'dart:async';
 
-import 'package:bloc/bloc.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_bloc.dart';
-import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_event.dart';
 import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_state.dart';
 
 /// Mock for AuthenticationBloc using mocktail.
 ///
 /// Shared mock for use across all tests requiring
 /// AuthenticationBloc (router tests, widget tests, etc.).
-class MockAuthenticationBloc extends Mock
-    implements AuthenticationBloc {
-  final _stateController =
-      StreamController<AuthenticationState>.broadcast();
+class MockAuthenticationBloc extends Mock implements AuthenticationBloc {
+  final _stateController = StreamController<AuthenticationState>.broadcast();
 
-  AuthenticationState _state =
-      const AuthenticationState.initial();
+  AuthenticationState _state = const AuthenticationState.initial();
 
   @override
   AuthenticationState get state => _state;
 
   @override
-  Stream<AuthenticationState> get stream =>
-      _stateController.stream;
+  Stream<AuthenticationState> get stream => _stateController.stream;
 
   @override
   Future<void> close() async {
@@ -55,8 +49,7 @@ class MockAuthenticationBloc extends Mock
 /// });
 /// ```
 MockAuthenticationBloc createMockAuthenticationBloc({
-  AuthenticationState initialState =
-      const AuthenticationState.initial(),
+  AuthenticationState initialState = const AuthenticationState.initial(),
 }) {
   final mock = MockAuthenticationBloc();
   mock._state = initialState;

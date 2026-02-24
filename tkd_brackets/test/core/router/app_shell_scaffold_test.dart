@@ -24,8 +24,9 @@ void main() {
     GetIt.instance.registerSingleton<SyncService>(mockSyncService);
 
     // Default mock setup
-    when(() => mockSyncService.statusStream)
-        .thenAnswer((_) => statusController.stream);
+    when(
+      () => mockSyncService.statusStream,
+    ).thenAnswer((_) => statusController.stream);
     when(() => mockSyncService.currentStatus).thenReturn(SyncStatus.synced);
     when(() => mockSyncService.currentError).thenReturn(null);
   });
@@ -72,21 +73,19 @@ void main() {
         expect(find.byType(NavigationBar), findsNothing);
       });
 
-      testWidgets(
-        'shows NavigationRail on tablet (768-1279px)',
-        (tester) async {
-          tester.view.physicalSize = const Size(1024, 768);
-          tester.view.devicePixelRatio = 1.0;
-          addTearDown(tester.view.resetPhysicalSize);
+      testWidgets('shows NavigationRail on tablet (768-1279px)', (
+        tester,
+      ) async {
+        tester.view.physicalSize = const Size(1024, 768);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
 
-          await tester
-              .pumpWidget(buildTestShell(currentLocation: '/dashboard'));
-          await tester.pump();
+        await tester.pumpWidget(buildTestShell(currentLocation: '/dashboard'));
+        await tester.pump();
 
-          expect(find.byType(NavigationRail), findsOneWidget);
-          expect(find.byType(NavigationBar), findsNothing);
-        },
-      );
+        expect(find.byType(NavigationRail), findsOneWidget);
+        expect(find.byType(NavigationBar), findsNothing);
+      });
 
       testWidgets('shows NavigationBar on mobile (<768px)', (tester) async {
         tester.view.physicalSize = const Size(375, 812);
@@ -102,8 +101,9 @@ void main() {
     });
 
     group('navigation state', () {
-      testWidgets('highlights dashboard when location is /dashboard',
-          (tester) async {
+      testWidgets('highlights dashboard when location is /dashboard', (
+        tester,
+      ) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
@@ -111,27 +111,29 @@ void main() {
         await tester.pumpWidget(buildTestShell(currentLocation: '/dashboard'));
         await tester.pump();
 
-        final rail =
-            tester.widget<NavigationRail>(find.byType(NavigationRail));
+        final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
         expect(rail.selectedIndex, equals(0)); // Dashboard is index 0
       });
 
-      testWidgets('highlights tournaments when location is /tournaments',
-          (tester) async {
+      testWidgets('highlights tournaments when location is /tournaments', (
+        tester,
+      ) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
 
-        await tester.pumpWidget(buildTestShell(currentLocation: '/tournaments'));
+        await tester.pumpWidget(
+          buildTestShell(currentLocation: '/tournaments'),
+        );
         await tester.pump();
 
-        final rail =
-            tester.widget<NavigationRail>(find.byType(NavigationRail));
+        final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
         expect(rail.selectedIndex, equals(1)); // Tournaments is index 1
       });
 
-      testWidgets('highlights settings when location is /settings',
-          (tester) async {
+      testWidgets('highlights settings when location is /settings', (
+        tester,
+      ) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
@@ -139,8 +141,7 @@ void main() {
         await tester.pumpWidget(buildTestShell(currentLocation: '/settings'));
         await tester.pump();
 
-        final rail =
-            tester.widget<NavigationRail>(find.byType(NavigationRail));
+        final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
         expect(rail.selectedIndex, equals(2)); // Settings is index 2
       });
 
@@ -152,8 +153,7 @@ void main() {
         await tester.pumpWidget(buildTestShell(currentLocation: '/unknown'));
         await tester.pump();
 
-        final rail =
-            tester.widget<NavigationRail>(find.byType(NavigationRail));
+        final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
         expect(rail.selectedIndex, equals(0)); // Defaults to dashboard
       });
     });
@@ -172,8 +172,9 @@ void main() {
         expect(find.text('Dashboard'), findsAtLeastNWidgets(1));
       });
 
-      testWidgets('displays SyncStatusIndicatorWidget in app bar',
-          (tester) async {
+      testWidgets('displays SyncStatusIndicatorWidget in app bar', (
+        tester,
+      ) async {
         tester.view.physicalSize = const Size(1440, 900);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
@@ -263,8 +264,7 @@ void main() {
         await tester.pump();
 
         // Rail should be extended again
-        final rail =
-            tester.widget<NavigationRail>(find.byType(NavigationRail));
+        final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
         expect(rail.extended, isTrue);
       });
     });

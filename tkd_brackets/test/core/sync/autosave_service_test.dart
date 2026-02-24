@@ -35,8 +35,9 @@ void main() {
     mockErrorReporting = MockErrorReportingService();
 
     // Default stubs
-    when(() => mockConnectivity.currentStatus)
-        .thenReturn(ConnectivityStatus.online);
+    when(
+      () => mockConnectivity.currentStatus,
+    ).thenReturn(ConnectivityStatus.online);
     when(() => mockDatabase.schemaVersion).thenReturn(1);
   });
 
@@ -178,8 +179,9 @@ void main() {
       });
 
       test('should add cloud sync breadcrumb when online', () async {
-        when(() => mockConnectivity.currentStatus)
-            .thenReturn(ConnectivityStatus.online);
+        when(
+          () => mockConnectivity.currentStatus,
+        ).thenReturn(ConnectivityStatus.online);
 
         final service = createService();
 
@@ -200,8 +202,9 @@ void main() {
       });
 
       test('should not add cloud sync breadcrumb when offline', () async {
-        when(() => mockConnectivity.currentStatus)
-            .thenReturn(ConnectivityStatus.offline);
+        when(
+          () => mockConnectivity.currentStatus,
+        ).thenReturn(ConnectivityStatus.offline);
 
         final service = createService();
 
@@ -402,37 +405,40 @@ void main() {
     });
 
     group('error handling', () {
-      test('should report exception and set error status on save failure',
-          () async {
-        // First, let the service initialize normally
-        final service = createService();
+      test(
+        'should report exception and set error status on save failure',
+        () async {
+          // First, let the service initialize normally
+          final service = createService();
 
-        // Then reconfigure the mock to throw on subsequent calls
-        when(() => mockDatabase.schemaVersion)
-            .thenThrow(Exception('DB error'));
+          // Then reconfigure the mock to throw on subsequent calls
+          when(
+            () => mockDatabase.schemaVersion,
+          ).thenThrow(Exception('DB error'));
 
-        final statuses = <AutosaveStatus>[];
-        final subscription = service.statusStream.listen(statuses.add);
+          final statuses = <AutosaveStatus>[];
+          final subscription = service.statusStream.listen(statuses.add);
 
-        service.markDirty('tournament', 'id-1');
+          service.markDirty('tournament', 'id-1');
 
-        // Wait for autosave cycle
-        await Future<void>.delayed(const Duration(seconds: 6));
+          // Wait for autosave cycle
+          await Future<void>.delayed(const Duration(seconds: 6));
 
-        // Should have transitioned to error status
-        expect(statuses, contains(AutosaveStatus.error));
+          // Should have transitioned to error status
+          expect(statuses, contains(AutosaveStatus.error));
 
-        verify(
-          () => mockErrorReporting.reportException(
-            any(),
-            any(),
-            context: 'Autosave',
-          ),
-        ).called(greaterThanOrEqualTo(1));
+          verify(
+            () => mockErrorReporting.reportException(
+              any(),
+              any(),
+              context: 'Autosave',
+            ),
+          ).called(greaterThanOrEqualTo(1));
 
-        await subscription.cancel();
-        service.dispose();
-      });
+          await subscription.cancel();
+          service.dispose();
+        },
+      );
     });
 
     group('statusStream', () {
@@ -463,10 +469,12 @@ void main() {
         await Future<void>.delayed(const Duration(seconds: 6));
 
         // Count occurrences of each status
-        final savingCount =
-            statuses.where((s) => s == AutosaveStatus.saving).length;
-        final savedCount =
-            statuses.where((s) => s == AutosaveStatus.saved).length;
+        final savingCount = statuses
+            .where((s) => s == AutosaveStatus.saving)
+            .length;
+        final savedCount = statuses
+            .where((s) => s == AutosaveStatus.saved)
+            .length;
 
         // Should have exactly one transition per status
         expect(savingCount, equals(1));
@@ -499,10 +507,7 @@ void main() {
         // For broadcast streams, the subscription gets closed
         // but listening after close returns a done subscription
         final isDone = Completer<void>();
-        service.statusStream.listen(
-          (_) {},
-          onDone: isDone.complete,
-        );
+        service.statusStream.listen((_) {}, onDone: isDone.complete);
 
         // The new subscription should complete immediately since stream is closed
         await isDone.future;

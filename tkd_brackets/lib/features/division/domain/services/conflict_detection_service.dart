@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
-import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/database/app_database.dart';
+import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/features/division/domain/entities/conflict_warning.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
@@ -24,88 +24,83 @@ class ConflictDetectionService {
       tournamentId,
     );
 
-    return divisionsResult.fold(
-      (failure) => Left(failure),
-      (allDivs) async {
-        final divisions = allDivs
-            .where(
-                (d) => d.isDeleted == false && d.assignedRingNumber != null)
+    return divisionsResult.fold(Left.new, (allDivs) async {
+      final divisions = allDivs
+          .where((d) => d.isDeleted == false && d.assignedRingNumber != null)
+          .toList();
+
+      if (divisions.isEmpty) {
+        return const Right([]);
+      }
+
+      // Step 2: Fetch participants — propagate failure
+      final allParticipantsResult = await _getAllParticipantsForDivisions(
+        divisions.map((d) => d.id).toList(),
+      );
+
+      return allParticipantsResult.fold(Left.new, (
+        allParticipantsRaw,
+      ) {
+        final allParticipants = allParticipantsRaw
+            .where((p) => p.isDeleted == false)
             .toList();
 
-        if (divisions.isEmpty) {
-          return const Right([]);
-        }
-
-        // Step 2: Fetch participants — propagate failure
-        final allParticipantsResult = await _getAllParticipantsForDivisions(
-          divisions.map((d) => d.id).toList(),
+        final participantDivisions = _buildParticipantDivisionsMap(
+          allParticipants,
+          divisions,
         );
 
-        return allParticipantsResult.fold(
-          (failure) => Left(failure),
-          (allParticipantsRaw) {
-            final allParticipants = allParticipantsRaw
-                .where((p) => p.isDeleted == false)
-                .toList();
+        final conflicts = <ConflictWarning>[];
+        var conflictId = 1;
 
-            final participantDivisions = _buildParticipantDivisionsMap(
-              allParticipants,
-              divisions,
-            );
+        for (final entry in participantDivisions.entries) {
+          final participantKey = entry.key;
+          final participantDivs = entry.value;
 
-            final List<ConflictWarning> conflicts = [];
-            int conflictId = 1;
+          final firstParticipant = allParticipants.firstWhere(
+            (p) => _getParticipantKey(p) == participantKey,
+          );
+          final participantName =
+              '${firstParticipant.firstName} ${firstParticipant.lastName}';
 
-            for (final entry in participantDivisions.entries) {
-              final participantKey = entry.key;
-              final participantDivs = entry.value;
+          final ringGroups = <int?, List<DivisionEntity>>{};
 
-              final firstParticipant = allParticipants.firstWhere(
-                (p) => _getParticipantKey(p) == participantKey,
-              );
-              final participantName =
-                  '${firstParticipant.firstName} ${firstParticipant.lastName}';
+          for (final div in participantDivs) {
+            final ring = div.assignedRingNumber;
+            ringGroups.putIfAbsent(ring, () => []).add(div);
+          }
 
-              final ringGroups = <int?, List<DivisionEntity>>{};
+          for (final ringEntry in ringGroups.entries) {
+            if (ringEntry.value.length >= 2) {
+              final divs = ringEntry.value;
 
-              for (final div in participantDivs) {
-                final ring = div.assignedRingNumber;
-                ringGroups.putIfAbsent(ring, () => []).add(div);
-              }
-
-              for (final ringEntry in ringGroups.entries) {
-                if (ringEntry.value.length >= 2) {
-                  final divs = ringEntry.value;
-
-                  for (int i = 0; i < divs.length; i++) {
-                    for (int j = i + 1; j < divs.length; j++) {
-                      conflicts.add(
-                        ConflictWarning(
-                          id: 'conflict-$conflictId',
-                          participantId: firstParticipant.id,
-                          participantName: participantName,
-                          dojangName: firstParticipant.schoolOrDojangName,
-                          divisionId1: divs[i].id,
-                          divisionName1: divs[i].name,
-                          ringNumber1: divs[i].assignedRingNumber,
-                          divisionId2: divs[j].id,
-                          divisionName2: divs[j].name,
-                          ringNumber2: divs[j].assignedRingNumber,
-                          conflictType: ConflictType.sameRing,
-                        ),
-                      );
-                      conflictId++;
-                    }
-                  }
+              for (var i = 0; i < divs.length; i++) {
+                for (var j = i + 1; j < divs.length; j++) {
+                  conflicts.add(
+                    ConflictWarning(
+                      id: 'conflict-$conflictId',
+                      participantId: firstParticipant.id,
+                      participantName: participantName,
+                      dojangName: firstParticipant.schoolOrDojangName,
+                      divisionId1: divs[i].id,
+                      divisionName1: divs[i].name,
+                      ringNumber1: divs[i].assignedRingNumber,
+                      divisionId2: divs[j].id,
+                      divisionName2: divs[j].name,
+                      ringNumber2: divs[j].assignedRingNumber,
+                      conflictType: ConflictType.sameRing,
+                    ),
+                  );
+                  conflictId++;
                 }
               }
             }
+          }
+        }
 
-            return Right(conflicts);
-          },
-        );
-      },
-    );
+        return Right(conflicts);
+      });
+    });
   }
 
   Future<Either<Failure, List<ParticipantEntry>>>
@@ -128,7 +123,7 @@ class ConflictDetectionService {
     List<ParticipantEntry> participants,
     List<DivisionEntity> divisions,
   ) {
-    final Map<String, List<DivisionEntity>> participantDivisions = {};
+    final participantDivisions = <String, List<DivisionEntity>>{};
 
     for (final participant in participants) {
       final key = _getParticipantKey(participant);
@@ -149,7 +144,7 @@ class ConflictDetectionService {
     final result = await detectConflicts(tournamentId);
 
     return result.fold(
-      (failure) => Left(failure),
+      Left.new,
       (conflicts) => Right(conflicts.isNotEmpty),
     );
   }
@@ -158,7 +153,7 @@ class ConflictDetectionService {
     final result = await detectConflicts(tournamentId);
 
     return result.fold(
-      (failure) => Left(failure),
+      Left.new,
       (conflicts) => Right(conflicts.length),
     );
   }
@@ -172,86 +167,82 @@ class ConflictDetectionService {
       tournamentId,
     );
 
-    return divisionsResult.fold(
-      (failure) => Left(failure),
-      (allDivs) async {
-        final divisionsList = allDivs
-            .where(
-                (d) => d.isDeleted == false && d.assignedRingNumber != null)
+    return divisionsResult.fold(Left.new, (allDivs) async {
+      final divisionsList = allDivs
+          .where((d) => d.isDeleted == false && d.assignedRingNumber != null)
+          .toList();
+
+      if (divisionsList.isEmpty) {
+        return const Right([]);
+      }
+
+      // Step 2: Fetch participants — propagate failure
+      final participantsResult = await _getAllParticipantsForDivisions(
+        divisionsList.map((d) => d.id).toList(),
+      );
+
+      return participantsResult.fold(Left.new, (
+        allParticipants,
+      ) {
+        // Filter to entries for this specific participant
+        final participantEntries = allParticipants
+            .where((p) => p.id == participantId && p.isDeleted == false)
             .toList();
 
-        if (divisionsList.isEmpty) {
+        if (participantEntries.isEmpty) {
           return const Right([]);
         }
 
-        // Step 2: Fetch participants — propagate failure
-        final participantsResult = await _getAllParticipantsForDivisions(
-          divisionsList.map((d) => d.id).toList(),
-        );
+        // Collect ALL division IDs for this participant (not just the first)
+        final participantDivisionIds = participantEntries
+            .map((p) => p.divisionId)
+            .toSet();
+        final participantDivs = divisionsList
+            .where((d) => participantDivisionIds.contains(d.id))
+            .toList();
 
-        return participantsResult.fold(
-          (failure) => Left(failure),
-          (allParticipants) {
-            // Filter to entries for this specific participant
-            final participantEntries = allParticipants
-                .where((p) => p.id == participantId && p.isDeleted == false)
-                .toList();
+        final ringGroups = <int?, List<DivisionEntity>>{};
 
-            if (participantEntries.isEmpty) {
-              return const Right([]);
-            }
+        for (final div in participantDivs) {
+          final ring = div.assignedRingNumber;
+          ringGroups.putIfAbsent(ring, () => []).add(div);
+        }
 
-            // Collect ALL division IDs for this participant (not just the first)
-            final participantDivisionIds =
-                participantEntries.map((p) => p.divisionId).toSet();
-            final participantDivs = divisionsList
-                .where((d) => participantDivisionIds.contains(d.id))
-                .toList();
+        final conflicts = <ConflictWarning>[];
+        var conflictId = 1;
+        final firstEntry = participantEntries.first;
+        final participantName =
+            '${firstEntry.firstName} ${firstEntry.lastName}';
 
-            final ringGroups = <int?, List<DivisionEntity>>{};
+        for (final ringEntry in ringGroups.entries) {
+          if (ringEntry.value.length >= 2) {
+            final divs = ringEntry.value;
 
-            for (final div in participantDivs) {
-              final ring = div.assignedRingNumber;
-              ringGroups.putIfAbsent(ring, () => []).add(div);
-            }
-
-            final List<ConflictWarning> conflicts = [];
-            int conflictId = 1;
-            final firstEntry = participantEntries.first;
-            final participantName =
-                '${firstEntry.firstName} ${firstEntry.lastName}';
-
-            for (final ringEntry in ringGroups.entries) {
-              if (ringEntry.value.length >= 2) {
-                final divs = ringEntry.value;
-
-                for (int i = 0; i < divs.length; i++) {
-                  for (int j = i + 1; j < divs.length; j++) {
-                    conflicts.add(
-                      ConflictWarning(
-                        id: 'conflict-$conflictId',
-                        participantId: participantId,
-                        participantName: participantName,
-                        dojangName: firstEntry.schoolOrDojangName,
-                        divisionId1: divs[i].id,
-                        divisionName1: divs[i].name,
-                        ringNumber1: divs[i].assignedRingNumber,
-                        divisionId2: divs[j].id,
-                        divisionName2: divs[j].name,
-                        ringNumber2: divs[j].assignedRingNumber,
-                        conflictType: ConflictType.sameRing,
-                      ),
-                    );
-                    conflictId++;
-                  }
-                }
+            for (var i = 0; i < divs.length; i++) {
+              for (var j = i + 1; j < divs.length; j++) {
+                conflicts.add(
+                  ConflictWarning(
+                    id: 'conflict-$conflictId',
+                    participantId: participantId,
+                    participantName: participantName,
+                    dojangName: firstEntry.schoolOrDojangName,
+                    divisionId1: divs[i].id,
+                    divisionName1: divs[i].name,
+                    ringNumber1: divs[i].assignedRingNumber,
+                    divisionId2: divs[j].id,
+                    divisionName2: divs[j].name,
+                    ringNumber2: divs[j].assignedRingNumber,
+                    conflictType: ConflictType.sameRing,
+                  ),
+                );
+                conflictId++;
               }
             }
+          }
+        }
 
-            return Right(conflicts);
-          },
-        );
-      },
-    );
+        return Right(conflicts);
+      });
+    });
   }
 }

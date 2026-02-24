@@ -18,9 +18,7 @@ abstract class AuthRepository {
   /// Returns:
   /// - [Right(Unit)] on success - email sent
   /// - [Left(Failure)] on error (invalid email, rate limit, network)
-  Future<Either<Failure, Unit>> sendSignUpMagicLink({
-    required String email,
-  });
+  Future<Either<Failure, Unit>> sendSignUpMagicLink({required String email});
 
   /// Send magic link (OTP) to email for sign-in.
   ///
@@ -29,9 +27,7 @@ abstract class AuthRepository {
   /// Returns:
   /// - [Right(Unit)] on success - email sent
   /// - [Left(Failure)] on error (user not found, rate limit, network)
-  Future<Either<Failure, Unit>> sendSignInMagicLink({
-    required String email,
-  });
+  Future<Either<Failure, Unit>> sendSignInMagicLink({required String email});
 
   /// Verify OTP token from magic link.
   ///

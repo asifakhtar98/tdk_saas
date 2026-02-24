@@ -4,11 +4,7 @@ import 'package:tkd_brackets/features/dashboard/dashboard.dart';
 
 void main() {
   Widget buildTestWidget() {
-    return const MaterialApp(
-      home: Scaffold(
-        body: DashboardPage(),
-      ),
-    );
+    return const MaterialApp(home: Scaffold(body: DashboardPage()));
   }
 
   group('DashboardPage', () {
@@ -44,8 +40,7 @@ void main() {
       await tester.pumpWidget(buildTestWidget());
       await tester.pump();
 
-      final icon =
-          tester.widget<Icon>(find.byIcon(Icons.dashboard_outlined));
+      final icon = tester.widget<Icon>(find.byIcon(Icons.dashboard_outlined));
       expect(icon.semanticLabel, equals('Dashboard icon'));
     });
   });

@@ -63,27 +63,20 @@ void main() {
 
   setUp(() {
     mockSupabase = MockSupabaseClient();
-    datasource =
-        OrganizationRemoteDatasourceImplementation(mockSupabase);
+    datasource = OrganizationRemoteDatasourceImplementation(mockSupabase);
   });
 
   group('OrganizationRemoteDatasource', () {
     group('interface compliance', () {
       test('implements OrganizationRemoteDatasource', () {
-        expect(
-          datasource,
-          isA<OrganizationRemoteDatasource>(),
-        );
+        expect(datasource, isA<OrganizationRemoteDatasource>());
       });
 
       test('uses correct table name', () {
         // Verify the datasource targets the organizations table.
         // The table name is a static const, so we verify through
         // the class instantiation and type check.
-        expect(
-          datasource,
-          isA<OrganizationRemoteDatasourceImplementation>(),
-        );
+        expect(datasource, isA<OrganizationRemoteDatasourceImplementation>());
       });
     });
 
@@ -127,9 +120,10 @@ void main() {
 
     group('JSON contract - getActiveOrganizations', () {
       test('list response maps correctly', () {
-        final models = [testJson, testJson]
-            .map<OrganizationModel>(OrganizationModel.fromJson)
-            .toList();
+        final models = [
+          testJson,
+          testJson,
+        ].map<OrganizationModel>(OrganizationModel.fromJson).toList();
 
         expect(models.length, 2);
         expect(models.every((m) => m.id == 'org-1'), true);
@@ -183,7 +177,10 @@ void main() {
         expect(json['slug'], testModel.slug);
         expect(json['subscription_tier'], testModel.subscriptionTier);
         expect(json['subscription_status'], testModel.subscriptionStatus);
-        expect(json['max_tournaments_per_month'], testModel.maxTournamentsPerMonth);
+        expect(
+          json['max_tournaments_per_month'],
+          testModel.maxTournamentsPerMonth,
+        );
         expect(json['max_active_brackets'], testModel.maxActiveBrackets);
         expect(json['is_active'], testModel.isActive);
         expect(json['sync_version'], testModel.syncVersion);
@@ -199,11 +196,26 @@ void main() {
         expect(roundtripJson['name'], json['name']);
         expect(roundtripJson['slug'], json['slug']);
         expect(roundtripJson['subscription_tier'], json['subscription_tier']);
-        expect(roundtripJson['subscription_status'], json['subscription_status']);
-        expect(roundtripJson['max_tournaments_per_month'], json['max_tournaments_per_month']);
-        expect(roundtripJson['max_active_brackets'], json['max_active_brackets']);
-        expect(roundtripJson['max_participants_per_bracket'], json['max_participants_per_bracket']);
-        expect(roundtripJson['max_participants_per_tournament'], json['max_participants_per_tournament']);
+        expect(
+          roundtripJson['subscription_status'],
+          json['subscription_status'],
+        );
+        expect(
+          roundtripJson['max_tournaments_per_month'],
+          json['max_tournaments_per_month'],
+        );
+        expect(
+          roundtripJson['max_active_brackets'],
+          json['max_active_brackets'],
+        );
+        expect(
+          roundtripJson['max_participants_per_bracket'],
+          json['max_participants_per_bracket'],
+        );
+        expect(
+          roundtripJson['max_participants_per_tournament'],
+          json['max_participants_per_tournament'],
+        );
         expect(roundtripJson['max_scorers'], json['max_scorers']);
         expect(roundtripJson['is_active'], json['is_active']);
         expect(roundtripJson['sync_version'], json['sync_version']);

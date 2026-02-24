@@ -3,18 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
-import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/entities/conflict_warning.dart';
-import 'package:tkd_brackets/features/division/domain/usecases/get_divisions_usecase.dart';
+import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/services/conflict_detection_service.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/get_divisions_usecase.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/get_tournament_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/update_tournament_settings_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/update_tournament_settings_params.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_params.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart';
 import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_params.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_params.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/get_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/update_tournament_settings_params.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/update_tournament_settings_usecase.dart';
 import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_detail_bloc.dart';
 import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_detail_event.dart';
 import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_detail_state.dart';
@@ -78,7 +78,7 @@ void main() {
     updatedAtTimestamp: DateTime(2026),
   );
 
-  final testConflict = ConflictWarning(
+  const testConflict = ConflictWarning(
     id: 'conflict-123',
     participantId: 'participant-123',
     participantName: 'John Doe',
@@ -97,15 +97,15 @@ void main() {
     registerFallbackValue(FakeTournamentEntity());
     registerFallbackValue(FakeDivisionEntity());
     registerFallbackValue(
-      UpdateTournamentSettingsParams(
+      const UpdateTournamentSettingsParams(
         tournamentId: 'test',
         venueName: 'test',
         venueAddress: 'test',
         ringCount: 1,
       ),
     );
-    registerFallbackValue(DeleteTournamentParams(tournamentId: ''));
-    registerFallbackValue(ArchiveTournamentParams(tournamentId: ''));
+    registerFallbackValue(const DeleteTournamentParams(tournamentId: ''));
+    registerFallbackValue(const ArchiveTournamentParams(tournamentId: ''));
   });
 
   setUp(() {
@@ -172,7 +172,7 @@ void main() {
           ).thenAnswer((_) async => Right([testDivision]));
           when(
             () => mockConflictDetectionService.detectConflicts(any()),
-          ).thenAnswer((_) async => Right([testConflict]));
+          ).thenAnswer((_) async => const Right([testConflict]));
           return buildBloc();
         },
         act: (bloc) =>
@@ -258,7 +258,7 @@ void main() {
           return buildBloc();
         },
         act: (bloc) => bloc.add(
-          TournamentDetailUpdateRequested(
+          const TournamentDetailUpdateRequested(
             'tournament-123',
             'New Venue',
             'New Address',
@@ -289,7 +289,7 @@ void main() {
           return buildBloc();
         },
         act: (bloc) => bloc.add(
-          TournamentDetailUpdateRequested('tournament-123', '', null, null),
+          const TournamentDetailUpdateRequested('tournament-123', '', null, null),
         ),
         expect: () => [
           const TournamentDetailUpdateInProgress(),
@@ -391,7 +391,7 @@ void main() {
     group('ConflictDismissed', () {
       blocTest<TournamentDetailBloc, TournamentDetailState>(
         'adds conflict ID to dismissed list',
-        build: () => buildBloc(),
+        build: buildBloc,
         seed: () => TournamentDetailLoadSuccess(
           tournament: testTournament,
           divisions: [testDivision],
@@ -410,7 +410,7 @@ void main() {
 
       blocTest<TournamentDetailBloc, TournamentDetailState>(
         'does nothing when not in loadSuccess state',
-        build: () => buildBloc(),
+        build: buildBloc,
         seed: () => const TournamentDetailInitial(),
         act: (bloc) => bloc.add(const ConflictDismissed('conflict-123')),
         expect: () => [],

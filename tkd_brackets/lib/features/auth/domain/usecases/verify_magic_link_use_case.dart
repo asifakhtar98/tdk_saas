@@ -38,9 +38,7 @@ class VerifyMagicLinkUseCase
     final email = params.email.trim().toLowerCase();
     if (email.isEmpty || !_emailRegex.hasMatch(email)) {
       return const Left(
-        InvalidEmailFailure(
-          technicalDetails: 'Email failed regex validation',
-        ),
+        InvalidEmailFailure(technicalDetails: 'Email failed regex validation'),
       );
     }
 
@@ -48,16 +46,11 @@ class VerifyMagicLinkUseCase
     final token = params.token.trim();
     if (token.isEmpty) {
       return const Left(
-        InvalidTokenFailure(
-          technicalDetails: 'Token is empty',
-        ),
+        InvalidTokenFailure(technicalDetails: 'Token is empty'),
       );
     }
 
     // Delegate to repository
-    return _authRepository.verifyMagicLinkOtp(
-      email: email,
-      token: token,
-    );
+    return _authRepository.verifyMagicLinkOtp(email: email, token: token);
   }
 }

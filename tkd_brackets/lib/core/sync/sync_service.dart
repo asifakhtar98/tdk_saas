@@ -318,7 +318,10 @@ class SyncServiceImplementation implements SyncService {
           final remoteSyncVersion = remote['sync_version'] as int;
 
           if (await _shouldApplyRemoteChange(
-              tableName, recordId, remoteSyncVersion)) {
+            tableName,
+            recordId,
+            remoteSyncVersion,
+          )) {
             await _applyRemoteRecord(tableName, remote);
             totalApplied++;
           }
@@ -380,14 +383,14 @@ class SyncServiceImplementation implements SyncService {
 
     switch (tableName) {
       case 'organizations':
-        final orgs = await (_appDatabase.select(_appDatabase.organizations)
-              ..where((o) => o.id.isIn(recordIds)))
-            .get();
+        final orgs = await (_appDatabase.select(
+          _appDatabase.organizations,
+        )..where((o) => o.id.isIn(recordIds))).get();
         return orgs.map(_organizationToMap).toList();
       case 'users':
-        final users = await (_appDatabase.select(_appDatabase.users)
-              ..where((u) => u.id.isIn(recordIds)))
-            .get();
+        final users = await (_appDatabase.select(
+          _appDatabase.users,
+        )..where((u) => u.id.isIn(recordIds))).get();
         return users.map(_userToMap).toList();
       default:
         return [];
@@ -482,9 +485,9 @@ class SyncServiceImplementation implements SyncService {
       await _appDatabase.insertUser(_mapToUsersCompanion(remote));
     } else {
       // Update existing
-      await (_appDatabase.update(_appDatabase.users)
-            ..where((u) => u.id.equals(id)))
-          .write(_mapToUsersCompanion(remote));
+      await (_appDatabase.update(
+        _appDatabase.users,
+      )..where((u) => u.id.equals(id))).write(_mapToUsersCompanion(remote));
     }
   }
 
@@ -521,8 +524,8 @@ class SyncServiceImplementation implements SyncService {
       'role': user.role,
       'avatar_url': user.avatarUrl,
       'is_active': user.isActive,
-      'last_sign_in_at_timestamp':
-          user.lastSignInAtTimestamp?.toIso8601String(),
+      'last_sign_in_at_timestamp': user.lastSignInAtTimestamp
+          ?.toIso8601String(),
       'sync_version': user.syncVersion,
       'is_deleted': user.isDeleted,
       'deleted_at_timestamp': user.deletedAtTimestamp?.toIso8601String(),
@@ -534,21 +537,26 @@ class SyncServiceImplementation implements SyncService {
 
   /// Converts a remote map to OrganizationsCompanion for insertion/update.
   OrganizationsCompanion _mapToOrganizationsCompanion(
-      Map<String, dynamic> map) {
+    Map<String, dynamic> map,
+  ) {
     return OrganizationsCompanion(
       id: Value(map['id'] as String),
       name: Value(map['name'] as String),
       slug: Value(map['slug'] as String),
       subscriptionTier: Value(map['subscription_tier'] as String? ?? 'free'),
-      subscriptionStatus:
-          Value(map['subscription_status'] as String? ?? 'active'),
-      maxTournamentsPerMonth:
-          Value(map['max_tournaments_per_month'] as int? ?? 2),
+      subscriptionStatus: Value(
+        map['subscription_status'] as String? ?? 'active',
+      ),
+      maxTournamentsPerMonth: Value(
+        map['max_tournaments_per_month'] as int? ?? 2,
+      ),
       maxActiveBrackets: Value(map['max_active_brackets'] as int? ?? 3),
-      maxParticipantsPerBracket:
-          Value(map['max_participants_per_bracket'] as int? ?? 32),
-      maxParticipantsPerTournament:
-          Value(map['max_participants_per_tournament'] as int? ?? 100),
+      maxParticipantsPerBracket: Value(
+        map['max_participants_per_bracket'] as int? ?? 32,
+      ),
+      maxParticipantsPerTournament: Value(
+        map['max_participants_per_tournament'] as int? ?? 100,
+      ),
       maxScorers: Value(map['max_scorers'] as int? ?? 2),
       isActive: Value(map['is_active'] as bool? ?? true),
       syncVersion: Value(map['sync_version'] as int? ?? 1),
@@ -556,9 +564,11 @@ class SyncServiceImplementation implements SyncService {
       deletedAtTimestamp: Value(_parseDateTime(map['deleted_at_timestamp'])),
       isDemoData: Value(map['is_demo_data'] as bool? ?? false),
       createdAtTimestamp: Value(
-          _parseDateTime(map['created_at_timestamp']) ?? DateTime.now()),
+        _parseDateTime(map['created_at_timestamp']) ?? DateTime.now(),
+      ),
       updatedAtTimestamp: Value(
-          _parseDateTime(map['updated_at_timestamp']) ?? DateTime.now()),
+        _parseDateTime(map['updated_at_timestamp']) ?? DateTime.now(),
+      ),
     );
   }
 
@@ -572,16 +582,19 @@ class SyncServiceImplementation implements SyncService {
       role: Value(map['role'] as String? ?? 'viewer'),
       avatarUrl: Value(map['avatar_url'] as String?),
       isActive: Value(map['is_active'] as bool? ?? true),
-      lastSignInAtTimestamp:
-          Value(_parseDateTime(map['last_sign_in_at_timestamp'])),
+      lastSignInAtTimestamp: Value(
+        _parseDateTime(map['last_sign_in_at_timestamp']),
+      ),
       syncVersion: Value(map['sync_version'] as int? ?? 1),
       isDeleted: Value(map['is_deleted'] as bool? ?? false),
       deletedAtTimestamp: Value(_parseDateTime(map['deleted_at_timestamp'])),
       isDemoData: Value(map['is_demo_data'] as bool? ?? false),
       createdAtTimestamp: Value(
-          _parseDateTime(map['created_at_timestamp']) ?? DateTime.now()),
+        _parseDateTime(map['created_at_timestamp']) ?? DateTime.now(),
+      ),
       updatedAtTimestamp: Value(
-          _parseDateTime(map['updated_at_timestamp']) ?? DateTime.now()),
+        _parseDateTime(map['updated_at_timestamp']) ?? DateTime.now(),
+      ),
     );
   }
 

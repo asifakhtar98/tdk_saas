@@ -52,21 +52,21 @@ class SyncStatusIndicatorWidget extends StatelessWidget {
     return switch (status) {
       SyncStatus.synced => const Icon(Icons.cloud_done),
       SyncStatus.syncing => const SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ),
       SyncStatus.pendingChanges => const Icon(Icons.cloud_upload),
       SyncStatus.error => Icon(Icons.cloud_off, color: colorScheme.error),
     };
   }
 
   String _getLabel(SyncStatus status) => switch (status) {
-        SyncStatus.synced => 'Synced',
-        SyncStatus.syncing => 'Syncing...',
-        SyncStatus.pendingChanges => 'Pending',
-        SyncStatus.error => 'Error',
-      };
+    SyncStatus.synced => 'Synced',
+    SyncStatus.syncing => 'Syncing...',
+    SyncStatus.pendingChanges => 'Pending',
+    SyncStatus.error => 'Error',
+  };
 
   String _getSemanticLabel(SyncStatus status) =>
       'Sync status: ${_getLabel(status)}';

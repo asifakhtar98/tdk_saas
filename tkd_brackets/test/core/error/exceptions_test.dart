@@ -42,7 +42,9 @@ void main() {
       );
 
       expect(
-          exception.toString(), 'AppException: Server error (code: ERR_500)');
+        exception.toString(),
+        'AppException: Server error (code: ERR_500)',
+      );
     });
 
     test('toString should handle null code', () {

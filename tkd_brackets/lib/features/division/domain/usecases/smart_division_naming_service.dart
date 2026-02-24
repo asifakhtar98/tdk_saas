@@ -51,8 +51,9 @@ class DivisionNamingService {
       final parts = <String>[];
       if (ageGroup != null) parts.add(ageGroup.name);
       parts.add(category.name[0].toUpperCase() + category.name.substring(1));
-      if (beltGroupName(beltGroup) != null)
+      if (beltGroupName(beltGroup) != null) {
         parts.add(beltGroupName(beltGroup)!);
+      }
       parts.add(genderStr);
       return parts.join(' ');
     }

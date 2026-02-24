@@ -1,15 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/get_tournaments_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart';
 import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_params.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_usecase.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_params.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/create_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart';
 import 'package:tkd_brackets/features/tournament/domain/usecases/create_tournament_params.dart';
-import 'tournament_event.dart';
-import 'tournament_state.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/create_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_params.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/delete_tournament_usecase.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/get_tournaments_usecase.dart';
+import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_event.dart';
+import 'package:tkd_brackets/features/tournament/presentation/bloc/tournament_state.dart';
 
 @injectable
 class TournamentBloc extends Bloc<TournamentEvent, TournamentState> {

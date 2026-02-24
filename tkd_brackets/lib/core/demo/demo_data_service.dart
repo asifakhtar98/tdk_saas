@@ -43,64 +43,74 @@ class DemoDataServiceImpl implements DemoDataService {
       final now = DateTime.now();
 
       // 1. Create demo organization first (FK target for users and tournaments)
-      await _db.insertOrganization(OrganizationsCompanion(
-        id: const Value(DemoDataConstants.demoOrganizationId),
-        name: const Value(DemoDataConstants.demoOrganizationName),
-        slug: const Value(DemoDataConstants.demoOrganizationSlug),
-        subscriptionTier: const Value(DemoDataConstants.demoOrganizationTier),
-        isDemoData: const Value(true),
-        createdAtTimestamp: Value(now),
-        updatedAtTimestamp: Value(now),
-      ));
+      await _db.insertOrganization(
+        OrganizationsCompanion(
+          id: const Value(DemoDataConstants.demoOrganizationId),
+          name: const Value(DemoDataConstants.demoOrganizationName),
+          slug: const Value(DemoDataConstants.demoOrganizationSlug),
+          subscriptionTier: const Value(DemoDataConstants.demoOrganizationTier),
+          isDemoData: const Value(true),
+          createdAtTimestamp: Value(now),
+          updatedAtTimestamp: Value(now),
+        ),
+      );
 
       // 2. Create demo user (owner)
-      await _db.insertUser(UsersCompanion(
-        id: const Value(DemoDataConstants.demoUserId),
-        organizationId: const Value(DemoDataConstants.demoOrganizationId),
-        email: const Value(DemoDataConstants.demoUserEmail),
-        displayName: const Value(DemoDataConstants.demoUserDisplayName),
-        role: const Value(DemoDataConstants.demoUserRole),
-        isDemoData: const Value(true),
-        createdAtTimestamp: Value(now),
-        updatedAtTimestamp: Value(now),
-      ));
+      await _db.insertUser(
+        UsersCompanion(
+          id: const Value(DemoDataConstants.demoUserId),
+          organizationId: const Value(DemoDataConstants.demoOrganizationId),
+          email: const Value(DemoDataConstants.demoUserEmail),
+          displayName: const Value(DemoDataConstants.demoUserDisplayName),
+          role: const Value(DemoDataConstants.demoUserRole),
+          isDemoData: const Value(true),
+          createdAtTimestamp: Value(now),
+          updatedAtTimestamp: Value(now),
+        ),
+      );
 
       // 3. Create demo tournament
       final tournamentDate = now.add(
         const Duration(days: DemoDataConstants.demoTournamentDaysFromNow),
       );
-      await _db.insertTournament(TournamentsCompanion(
-        id: const Value(DemoDataConstants.demoTournamentId),
-        organizationId: const Value(DemoDataConstants.demoOrganizationId),
-        createdByUserId: const Value(DemoDataConstants.demoUserId),
-        name: const Value(DemoDataConstants.demoTournamentName),
-        federationType:
-            const Value(DemoDataConstants.demoTournamentFederation),
-        status: const Value(DemoDataConstants.demoTournamentStatus),
-        scheduledDate: Value(tournamentDate),
-        isDemoData: const Value(true),
-        createdAtTimestamp: Value(now),
-        updatedAtTimestamp: Value(now),
-      ));
+      await _db.insertTournament(
+        TournamentsCompanion(
+          id: const Value(DemoDataConstants.demoTournamentId),
+          organizationId: const Value(DemoDataConstants.demoOrganizationId),
+          createdByUserId: const Value(DemoDataConstants.demoUserId),
+          name: const Value(DemoDataConstants.demoTournamentName),
+          federationType: const Value(
+            DemoDataConstants.demoTournamentFederation,
+          ),
+          status: const Value(DemoDataConstants.demoTournamentStatus),
+          scheduledDate: Value(tournamentDate),
+          isDemoData: const Value(true),
+          createdAtTimestamp: Value(now),
+          updatedAtTimestamp: Value(now),
+        ),
+      );
 
       // 4. Create demo division
-      await _db.insertDivision(DivisionsCompanion(
-        id: const Value(DemoDataConstants.demoDivisionId),
-        tournamentId: const Value(DemoDataConstants.demoTournamentId),
-        name: const Value(DemoDataConstants.demoDivisionName),
-        category: const Value(DemoDataConstants.demoDivisionCategory),
-        gender: const Value(DemoDataConstants.demoDivisionGender),
-        ageMin: const Value(DemoDataConstants.demoDivisionAgeMin),
-        ageMax: const Value(DemoDataConstants.demoDivisionAgeMax),
-        weightMinKg: const Value(DemoDataConstants.demoDivisionWeightMin),
-        weightMaxKg: const Value(DemoDataConstants.demoDivisionWeightMax),
-        bracketFormat:
-            const Value(DemoDataConstants.demoDivisionBracketFormat),
-        status: const Value(DemoDataConstants.demoDivisionStatus),
-        isDemoData: const Value(true),
-        createdAtTimestamp: Value(now),
-        updatedAtTimestamp: Value(now),
-      ));
+      await _db.insertDivision(
+        DivisionsCompanion(
+          id: const Value(DemoDataConstants.demoDivisionId),
+          tournamentId: const Value(DemoDataConstants.demoTournamentId),
+          name: const Value(DemoDataConstants.demoDivisionName),
+          category: const Value(DemoDataConstants.demoDivisionCategory),
+          gender: const Value(DemoDataConstants.demoDivisionGender),
+          ageMin: const Value(DemoDataConstants.demoDivisionAgeMin),
+          ageMax: const Value(DemoDataConstants.demoDivisionAgeMax),
+          weightMinKg: const Value(DemoDataConstants.demoDivisionWeightMin),
+          weightMaxKg: const Value(DemoDataConstants.demoDivisionWeightMax),
+          bracketFormat: const Value(
+            DemoDataConstants.demoDivisionBracketFormat,
+          ),
+          status: const Value(DemoDataConstants.demoDivisionStatus),
+          isDemoData: const Value(true),
+          createdAtTimestamp: Value(now),
+          updatedAtTimestamp: Value(now),
+        ),
+      );
 
       // 5. Create 8 demo participants (2 from each of 4 dojangs)
       await _seedDemoParticipants(now);
@@ -136,21 +146,24 @@ class DemoDataServiceImpl implements DemoDataService {
         now.day,
       );
 
-      await _db.insertParticipant(ParticipantsCompanion(
-        id: Value(DemoDataConstants.demoParticipantIds[i]),
-        divisionId: const Value(DemoDataConstants.demoDivisionId),
-        firstName: Value(firstName),
-        lastName: Value(lastName),
-        dateOfBirth: Value(dateOfBirth),
-        gender: const Value(DemoDataConstants.demoParticipantGender),
-        weightKg: Value(weight),
-        schoolOrDojangName:
-            Value(DemoDataConstants.sampleDojangs[dojangIndex]),
-        checkInStatus: const Value('pending'),
-        isDemoData: const Value(true),
-        createdAtTimestamp: Value(now),
-        updatedAtTimestamp: Value(now),
-      ));
+      await _db.insertParticipant(
+        ParticipantsCompanion(
+          id: Value(DemoDataConstants.demoParticipantIds[i]),
+          divisionId: const Value(DemoDataConstants.demoDivisionId),
+          firstName: Value(firstName),
+          lastName: Value(lastName),
+          dateOfBirth: Value(dateOfBirth),
+          gender: const Value(DemoDataConstants.demoParticipantGender),
+          weightKg: Value(weight),
+          schoolOrDojangName: Value(
+            DemoDataConstants.sampleDojangs[dojangIndex],
+          ),
+          checkInStatus: const Value('pending'),
+          isDemoData: const Value(true),
+          createdAtTimestamp: Value(now),
+          updatedAtTimestamp: Value(now),
+        ),
+      );
     }
   }
 }

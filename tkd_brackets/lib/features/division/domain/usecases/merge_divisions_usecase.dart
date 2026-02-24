@@ -1,6 +1,5 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
-import 'package:uuid/uuid.dart';
 import 'package:tkd_brackets/core/database/app_database.dart'
     show ParticipantEntry;
 import 'package:tkd_brackets/core/error/failures.dart';
@@ -8,6 +7,7 @@ import 'package:tkd_brackets/core/usecases/use_case.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
 import 'package:tkd_brackets/features/division/domain/usecases/merge_divisions_params.dart';
+import 'package:uuid/uuid.dart';
 
 @injectable
 class MergeDivisionsUseCase
@@ -68,7 +68,7 @@ class MergeDivisionsUseCase
 
     final isNameUnique = nameCheck.fold((l) => false, (r) => r);
     if (!isNameUnique) {
-      return Left(
+      return const Left(
         ValidationFailure(
           userFriendlyMessage:
               'Division name already exists in this tournament',
@@ -278,8 +278,9 @@ class MergeDivisionsUseCase
 
   DivisionGender _resolveGender(DivisionGender a, DivisionGender b) {
     if (a == b) return a;
-    if (a == DivisionGender.mixed || b == DivisionGender.mixed)
+    if (a == DivisionGender.mixed || b == DivisionGender.mixed) {
       return DivisionGender.mixed;
+    }
     return DivisionGender.mixed;
   }
 

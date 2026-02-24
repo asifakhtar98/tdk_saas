@@ -9,8 +9,7 @@ part 'remove_organization_member_params.freezed.dart';
 /// [requestingUserId] — The authenticated user performing
 /// the removal (must be Owner).
 @freezed
-class RemoveOrganizationMemberParams
-    with _$RemoveOrganizationMemberParams {
+class RemoveOrganizationMemberParams with _$RemoveOrganizationMemberParams {
   const factory RemoveOrganizationMemberParams({
     /// The ID of the user being removed from the organization.
     required String targetUserId,

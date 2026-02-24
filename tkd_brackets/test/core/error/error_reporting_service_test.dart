@@ -54,9 +54,7 @@ void main() {
 
       errorReportingService.reportFailure(failure);
 
-      verify(
-        () => mockLoggerService.warning(any()),
-      ).called(1);
+      verify(() => mockLoggerService.warning(any())).called(1);
       verify(
         () => mockLoggerService.error('Technical details: Timeout after 30s'),
       ).called(1);
@@ -135,10 +133,7 @@ void main() {
     test('should log error with optional error object', () {
       final error = Exception('Error details');
 
-      errorReportingService.reportError(
-        'Something went wrong',
-        error: error,
-      );
+      errorReportingService.reportError('Something went wrong', error: error);
 
       verify(
         () => mockLoggerService.error('Something went wrong', error, null),
@@ -169,11 +164,8 @@ void main() {
       );
 
       verify(
-        () => mockLoggerService.error(
-          'Something went wrong',
-          error,
-          stackTrace,
-        ),
+        () =>
+            mockLoggerService.error('Something went wrong', error, stackTrace),
       ).called(1);
     });
   });
@@ -215,9 +207,7 @@ void main() {
     });
 
     test('should handle null organizationId', () {
-      errorReportingService.setUserContext(
-        userId: 'user-123',
-      );
+      errorReportingService.setUserContext(userId: 'user-123');
 
       verify(
         () => mockLoggerService.info(
@@ -231,9 +221,7 @@ void main() {
     test('should log context cleared', () {
       errorReportingService.clearUserContext();
 
-      verify(
-        () => mockLoggerService.info('User context cleared'),
-      ).called(1);
+      verify(() => mockLoggerService.info('User context cleared')).called(1);
     });
   });
 }

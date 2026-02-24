@@ -29,13 +29,15 @@ void main() {
 
       test('returns false when organizations exist', () async {
         // Insert a non-demo organization
-        await db.insertOrganization(OrganizationsCompanion(
-          id: const Value('test-org-id'),
-          name: const Value('Test Org'),
-          slug: const Value('test-org'),
-          createdAtTimestamp: Value(DateTime.now()),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ));
+        await db.insertOrganization(
+          OrganizationsCompanion(
+            id: const Value('test-org-id'),
+            name: const Value('Test Org'),
+            slug: const Value('test-org'),
+            createdAtTimestamp: Value(DateTime.now()),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        );
 
         final shouldSeed = await demoService.shouldSeedDemoData();
 
@@ -68,14 +70,16 @@ void main() {
 
       test('returns false when only non-demo data exists', () async {
         // Insert non-demo organization
-        await db.insertOrganization(OrganizationsCompanion(
-          id: const Value('real-org-id'),
-          name: const Value('Real Org'),
-          slug: const Value('real-org'),
-          isDemoData: const Value(false),
-          createdAtTimestamp: Value(DateTime.now()),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ));
+        await db.insertOrganization(
+          OrganizationsCompanion(
+            id: const Value('real-org-id'),
+            name: const Value('Real Org'),
+            slug: const Value('real-org'),
+            isDemoData: const Value(false),
+            createdAtTimestamp: Value(DateTime.now()),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        );
 
         final hasDemoData = await demoService.hasDemoData();
 
@@ -186,8 +190,7 @@ void main() {
         await demoService.seedDemoData();
 
         final participants = await db.getActiveParticipants();
-        final dojangs =
-            participants.map((p) => p.schoolOrDojangName).toSet();
+        final dojangs = participants.map((p) => p.schoolOrDojangName).toSet();
 
         expect(dojangs, hasLength(4));
         for (final dojang in DemoDataConstants.sampleDojangs) {
@@ -201,8 +204,9 @@ void main() {
         final participants = await db.getActiveParticipants();
 
         for (final dojang in DemoDataConstants.sampleDojangs) {
-          final count =
-              participants.where((p) => p.schoolOrDojangName == dojang).length;
+          final count = participants
+              .where((p) => p.schoolOrDojangName == dojang)
+              .length;
           expect(count, equals(2), reason: 'Dojang $dojang should have 2');
         }
       });
@@ -283,14 +287,16 @@ void main() {
         await demoService.seedDemoData();
 
         // Add non-demo organization
-        await db.insertOrganization(OrganizationsCompanion(
-          id: const Value('real-org-id'),
-          name: const Value('Real Org'),
-          slug: const Value('real-org'),
-          isDemoData: const Value(false),
-          createdAtTimestamp: Value(DateTime.now()),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ));
+        await db.insertOrganization(
+          OrganizationsCompanion(
+            id: const Value('real-org-id'),
+            name: const Value('Real Org'),
+            slug: const Value('real-org'),
+            isDemoData: const Value(false),
+            createdAtTimestamp: Value(DateTime.now()),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        );
 
         // Clear demo data
         await db.clearDemoData();

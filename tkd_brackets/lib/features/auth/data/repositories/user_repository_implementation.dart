@@ -102,8 +102,9 @@ class UserRepositoryImplementation implements UserRepository {
   ) async {
     try {
       // Try local first
-      var users =
-          await _localDatasource.getUsersForOrganization(organizationId);
+      var users = await _localDatasource.getUsersForOrganization(
+        organizationId,
+      );
 
       // If online, fetch from remote and update local cache
       if (await _connectivityService.hasInternetConnection()) {
@@ -235,11 +236,7 @@ class UserRepositoryImplementation implements UserRepository {
       // Fetch user profile from our users table
       return getUserById(authUser.id);
     } on Exception catch (e) {
-      return Left(
-        ServerConnectionFailure(
-          technicalDetails: e.toString(),
-        ),
-      );
+      return Left(ServerConnectionFailure(technicalDetails: e.toString()));
     }
   }
 

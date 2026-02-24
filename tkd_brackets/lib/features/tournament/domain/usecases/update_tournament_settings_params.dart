@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
+import 'package:tkd_brackets/features/tournament/domain/usecases/update_tournament_settings_usecase.dart' show UpdateTournamentSettingsUseCase;
+import 'package:tkd_brackets/features/tournament/tournament.dart' show UpdateTournamentSettingsUseCase;
 
 part 'update_tournament_settings_params.freezed.dart';
 

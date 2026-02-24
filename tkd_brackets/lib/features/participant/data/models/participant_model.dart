@@ -22,7 +22,7 @@ class ParticipantModel with _$ParticipantModel {
     @JsonKey(name: 'division_id') required String divisionId,
     @JsonKey(name: 'first_name') required String firstName,
     @JsonKey(name: 'last_name') required String lastName,
-    @JsonKey(name: 'date_of_birth') DateTime? dateOfBirth,
+    @JsonKey(name: 'check_in_status') required String checkInStatus, @JsonKey(name: 'sync_version') required int syncVersion, @JsonKey(name: 'created_at_timestamp') required DateTime createdAtTimestamp, @JsonKey(name: 'updated_at_timestamp') required DateTime updatedAtTimestamp, @JsonKey(name: 'date_of_birth') DateTime? dateOfBirth,
     String? gender,
     @JsonKey(name: 'weight_kg') double? weightKg,
     @JsonKey(name: 'school_or_dojang_name') String? schoolOrDojangName,
@@ -30,17 +30,13 @@ class ParticipantModel with _$ParticipantModel {
     @JsonKey(name: 'seed_number') int? seedNumber,
     @JsonKey(name: 'registration_number') String? registrationNumber,
     @JsonKey(name: 'is_bye') @Default(false) bool isBye,
-    @JsonKey(name: 'check_in_status') required String checkInStatus,
     @JsonKey(name: 'check_in_at_timestamp') DateTime? checkInAtTimestamp,
     @JsonKey(name: 'dq_reason') String? dqReason,
     @JsonKey(name: 'photo_url') String? photoUrl,
     String? notes,
-    @JsonKey(name: 'sync_version') required int syncVersion,
     @JsonKey(name: 'is_deleted') @Default(false) bool isDeleted,
     @JsonKey(name: 'deleted_at_timestamp') DateTime? deletedAtTimestamp,
     @JsonKey(name: 'is_demo_data') @Default(false) bool isDemoData,
-    @JsonKey(name: 'created_at_timestamp') required DateTime createdAtTimestamp,
-    @JsonKey(name: 'updated_at_timestamp') required DateTime updatedAtTimestamp,
   }) = _ParticipantModel;
 
   /// Private constructor for freezed mixin.

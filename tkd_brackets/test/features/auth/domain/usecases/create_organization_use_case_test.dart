@@ -242,7 +242,7 @@ void main() {
         () async {
           final result = await useCase(
             const CreateOrganizationParams(
-              name: '!!!@#\$%',
+              name: r'!!!@#$%',
               userId: 'user-123',
             ),
           );
@@ -306,13 +306,13 @@ void main() {
 
       test('handles mixed whitespace', () {
         expect(
-          CreateOrganizationUseCase.generateSlug("Dragon\tDojang\nAcademy"),
+          CreateOrganizationUseCase.generateSlug('Dragon\tDojang\nAcademy'),
           'dragon-dojang-academy',
         );
       });
 
       test('returns empty string for all-special-characters', () {
-        expect(CreateOrganizationUseCase.generateSlug('!!!@#\$%'), '');
+        expect(CreateOrganizationUseCase.generateSlug(r'!!!@#$%'), '');
       });
     });
 
@@ -404,8 +404,8 @@ void main() {
           capturedOrg.id,
           matches(
             RegExp(
-              r'^[0-9a-f]{8}-[0-9a-f]{4}-'
-              r'4[0-9a-f]{3}-[89ab][0-9a-f]{3}-'
+              '^[0-9a-f]{8}-[0-9a-f]{4}-'
+              '4[0-9a-f]{3}-[89ab][0-9a-f]{3}-'
               r'[0-9a-f]{12}$',
             ),
           ),

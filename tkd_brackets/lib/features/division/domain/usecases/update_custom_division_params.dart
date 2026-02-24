@@ -7,7 +7,6 @@ part 'update_custom_division_params.g.dart';
 
 @freezed
 class UpdateCustomDivisionParams with _$UpdateCustomDivisionParams {
-  const UpdateCustomDivisionParams._();
 
   const factory UpdateCustomDivisionParams({
     required String divisionId,
@@ -24,6 +23,7 @@ class UpdateCustomDivisionParams with _$UpdateCustomDivisionParams {
     int? judgeCount,
     ScoringMethod? scoringMethod,
   }) = _UpdateCustomDivisionParams;
+  const UpdateCustomDivisionParams._();
 
   factory UpdateCustomDivisionParams.fromJson(Map<String, dynamic> json) =>
       _$UpdateCustomDivisionParamsFromJson(json);
