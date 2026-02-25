@@ -132,7 +132,7 @@ development_status:
   # ═══════════════════════════════════════════════════════════════════════════
   epic-5: in-progress
   5-1-bracket-feature-structure: done
-  5-2-bracket-entity-and-repository: backlog
+  5-2-bracket-entity-and-repository: done
   5-3-match-entity-and-repository: backlog
   5-4-single-elimination-bracket-generator: backlog
   5-5-double-elimination-bracket-generator: backlog

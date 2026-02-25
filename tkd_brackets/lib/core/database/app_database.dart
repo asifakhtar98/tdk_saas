@@ -25,6 +25,7 @@ part 'app_database.g.dart';
     Tournaments,
     Divisions,
     Participants,
+    Brackets,
     Invitations,
     DivisionTemplates,
   ],
@@ -40,7 +41,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration {
@@ -66,6 +67,10 @@ class AppDatabase extends _$AppDatabase {
         // Version 5: Add division_templates table for federation templates
         if (from < 5) {
           await m.createTable(divisionTemplates);
+        }
+        // Version 6: Add brackets table for bracket generation
+        if (from < 6) {
+          await m.createTable(brackets);
         }
       },
       beforeOpen: (details) async {
@@ -398,6 +403,58 @@ class AppDatabase extends _$AppDatabase {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
+  // Brackets CRUD
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Get all active brackets for a division.
+  Future<List<BracketEntry>> getBracketsForDivision(String divisionId) {
+    return (select(brackets)
+          ..where((b) => b.divisionId.equals(divisionId))
+          ..where((b) => b.isDeleted.equals(false)))
+        .get();
+  }
+
+  /// Get bracket by ID.
+  Future<BracketEntry?> getBracketById(String id) {
+    return (select(brackets)..where((b) => b.id.equals(id))).getSingleOrNull();
+  }
+
+  /// Insert a new bracket.
+  Future<int> insertBracket(BracketsCompanion bracket) {
+    return into(brackets).insert(bracket);
+  }
+
+  /// Update a bracket and increment sync_version.
+  Future<bool> updateBracket(String id, BracketsCompanion bracket) async {
+    return transaction(() async {
+      final current = await getBracketById(id);
+      if (current == null) return false;
+      final rows = await (update(brackets)..where((b) => b.id.equals(id)))
+          .write(bracket.copyWith(
+            syncVersion: Value(current.syncVersion + 1),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ));
+      return rows > 0;
+    });
+  }
+
+  /// Soft delete a bracket.
+  Future<bool> softDeleteBracket(String id) {
+    return (update(brackets)..where((b) => b.id.equals(id)))
+        .write(BracketsCompanion(
+          isDeleted: const Value(true),
+          deletedAtTimestamp: Value(DateTime.now()),
+          updatedAtTimestamp: Value(DateTime.now()),
+        ))
+        .then((rows) => rows > 0);
+  }
+
+  /// Get all active brackets (for testing).
+  Future<List<BracketEntry>> getActiveBrackets() {
+    return (select(brackets)..where((b) => b.isDeleted.equals(false))).get();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
   // Invitations CRUD
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -551,6 +608,7 @@ class AppDatabase extends _$AppDatabase {
   /// Delete all demo data (for migration to production).
   /// Deletes in reverse FK order to respect constraints.
   Future<void> clearDemoData() async {
+    await (delete(brackets)..where((b) => b.isDemoData.equals(true))).go();
     await (delete(participants)..where((p) => p.isDemoData.equals(true))).go();
     await (delete(divisions)..where((d) => d.isDemoData.equals(true))).go();
     await (delete(tournaments)..where((t) => t.isDemoData.equals(true))).go();
