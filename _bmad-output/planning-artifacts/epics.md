@@ -673,7 +673,7 @@ lib/
 │   ├── constants/
 │   ├── error/
 │   ├── extensions/
-│   ├── routing/
+│   ├── router/
 │   └── utils/
 ├── features/
 │   └── (empty, ready for feature folders)
@@ -716,8 +716,8 @@ lib/
 
 **Given** dependency injection is configured from Story 1.2
 **When** I configure go_router with go_router_builder
-**Then** `lib/core/routing/app_router.dart` defines the router configuration
-**And** `lib/core/routing/routes.dart` contains type-safe route definitions
+**Then** `lib/core/router/app_router.dart` defines the router configuration
+**And** `lib/core/router/routes.dart` contains type-safe route definitions
 **And** `.g.dart` files are generated for route builders
 **And** the router supports redirect guards for auth protection
 **And** shell routes are configured for the main app scaffold
@@ -735,12 +735,12 @@ lib/
 
 **Given** the project scaffold exists
 **When** I implement the error handling infrastructure
-**Then** `lib/core/error/failure.dart` contains the Failure base class hierarchy:
-  - `ServerFailure` for API errors
-  - `CacheFailure` for local DB errors
-  - `NetworkFailure` for connectivity issues
-  - `ValidationFailure` for input validation errors
-  - `AuthFailure` for authentication errors
+**Then** `lib/core/error/failures.dart` contains the Failure base class hierarchy:
+  - `ServerConnectionFailure`, `ServerResponseFailure` for API errors
+  - `LocalCacheAccessFailure`, `LocalCacheWriteFailure` for local DB errors
+  - `DataSynchronizationFailure` for sync/connectivity issues
+  - `ValidationFailure`, `InputValidationFailure`, `NotFoundFailure` for validation errors
+  - `AuthenticationSessionExpiredFailure`, `AuthorizationPermissionDeniedFailure`, `AuthenticationFailure` for auth errors
 **And** each Failure has `userFriendlyMessage` and `technicalDetails` properties
 **And** `lib/core/error/exceptions.dart` contains corresponding exception types
 **And** `lib/core/error/error_reporting_service.dart` provides centralized error reporting
@@ -779,7 +779,7 @@ lib/
 
 **Given** the project has Drift and DI configured
 **When** I configure Supabase client
-**Then** `lib/core/supabase/supabase_config.dart` contains initialization logic
+**Then** `lib/core/config/supabase_config.dart` contains initialization logic
 **And** environment-specific configuration is loaded from build-time variables
 **And** `main_development.dart`, `main_staging.dart`, `main_production.dart` entry points exist
 **And** Supabase client is registered as a singleton in the DI container

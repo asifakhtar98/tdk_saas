@@ -309,16 +309,32 @@ targets:
 
 ```dart
 // core/error/failures.dart
-abstract class Failure {
-  final String message;
-  const Failure(this.message);
+abstract class Failure extends Equatable {
+  final String userFriendlyMessage;
+  final String technicalDetails;
+  const Failure({required this.userFriendlyMessage, this.technicalDetails = ''});
 }
 
-class ServerFailure extends Failure { const ServerFailure(super.message); }
-class CacheFailure extends Failure { const CacheFailure(super.message); }
-class SyncFailure extends Failure { const SyncFailure(super.message); }
-class NetworkFailure extends Failure { const NetworkFailure(super.message); }
-class ValidationFailure extends Failure { const ValidationFailure(super.message); }
+// Network Failures
+class ServerConnectionFailure extends Failure { ... }
+class ServerResponseFailure extends Failure { ... }
+
+// Local Storage Failures
+class LocalCacheAccessFailure extends Failure { ... }
+class LocalCacheWriteFailure extends Failure { ... }
+
+// Sync Failures
+class DataSynchronizationFailure extends Failure { ... }
+
+// Validation Failures
+class ValidationFailure extends Failure { ... }
+class InputValidationFailure extends Failure { ... }
+class NotFoundFailure extends Failure { ... }
+
+// Authentication Failures
+class AuthenticationSessionExpiredFailure extends Failure { ... }
+class AuthorizationPermissionDeniedFailure extends Failure { ... }
+class AuthenticationFailure extends Failure { ... }
 
 // domain/usecases/get_tournament.dart
 class GetTournament {
@@ -359,7 +375,7 @@ class SyncService {
         await localOperation(); // Update local cache
         return Right(remote);
       } catch (e) {
-        return Left(ServerFailure(e.toString()));
+        return Left(ServerConnectionFailure(e.toString()));
       }
     } else {
       try {
@@ -367,7 +383,7 @@ class SyncService {
         notifications.queueForSync();
         return Right(local);
       } catch (e) {
-        return Left(CacheFailure(e.toString()));
+        return Left(LocalCacheWriteFailure(e.toString()));
       }
     }
   }
@@ -475,7 +491,7 @@ CREATE POLICY "org_members_tournaments" ON tournaments
 | ------------------ | ------------------------------- | --------------------- |
 | **Realtime Usage** | Minimal — scoring/brackets only | Reduces complexity    |
 | **Data Access**    | Direct Supabase Client SDK      | Simple, RLS-protected |
-| **Error Mapping**  | Generic wrapper (ServerFailure) | Consistency           |
+| **Error Mapping**  | Granular Failure hierarchy      | Consistency           |
 
 **Realtime Subscriptions:**
 - `matches` table changes during active tournament
@@ -4610,7 +4626,7 @@ class GenerateShareLinkUseCase {
 **Public Route (No Auth):**
 
 ```dart
-// core/routing/app_router.dart
+// core/router/app_router.dart
 GoRoute(
   path: '/b/:shareToken',
   builder: (context, state) => PublicBracketViewPage(
