@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tkd_brackets/core/database/app_database.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
@@ -13,6 +14,8 @@ class MockDivisionRepository extends Mock implements DivisionRepository {}
 class MockUuid extends Mock implements Uuid {}
 
 class FakeDivisionEntity extends Fake implements DivisionEntity {}
+
+class MockParticipantEntry extends Mock implements ParticipantEntry {}
 
 void main() {
   setUpAll(() {
@@ -71,12 +74,22 @@ void main() {
         name: 'Cadets -40kg',
       );
 
+      final fakeParticipants = List<ParticipantEntry>.generate(
+        4,
+        (i) {
+          final mock = MockParticipantEntry();
+          when(() => mock.lastName).thenReturn('User $i');
+          when(() => mock.firstName).thenReturn('Test');
+          return mock;
+        },
+      );
+
       when(
         () => mockRepository.getDivision('div-a'),
       ).thenAnswer((_) async => Right(sourceDivision));
       when(
         () => mockRepository.getParticipantsForDivision('div-a'),
-      ).thenAnswer((_) async => const Right([]));
+      ).thenAnswer((_) async => Right(fakeParticipants));
       when(
         () => mockRepository.splitDivision(
           poolADivision: any(named: 'poolADivision'),
@@ -115,12 +128,22 @@ void main() {
         tournamentId: 'tournament-1',
       );
 
+      final fakeParticipants = List<ParticipantEntry>.generate(
+        4,
+        (i) {
+          final mock = MockParticipantEntry();
+          when(() => mock.lastName).thenReturn('User $i');
+          when(() => mock.firstName).thenReturn('Test');
+          return mock;
+        },
+      );
+
       when(
         () => mockRepository.getDivision('div-a'),
       ).thenAnswer((_) async => Right(sourceDivision));
       when(
         () => mockRepository.getParticipantsForDivision('div-a'),
-      ).thenAnswer((_) async => const Right([]));
+      ).thenAnswer((_) async => Right(fakeParticipants));
       when(
         () => mockRepository.splitDivision(
           poolADivision: any(named: 'poolADivision'),

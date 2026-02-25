@@ -357,7 +357,7 @@ void main() {
 
     group('TournamentCreateRequested', () {
       blocTest<TournamentBloc, TournamentState>(
-        'emits [createInProgress, createSuccess, loadInProgress] on success',
+        'emits [createInProgress, createSuccess, loadInProgress, loadSuccess] on success',
         build: () {
           when(
             () => mockCreateTournamentUseCase(any()),
@@ -367,14 +367,23 @@ void main() {
           ).thenAnswer((_) async => Right([testTournament]));
           return buildBloc();
         },
-        act: (bloc) => bloc.add(
-          TournamentCreateRequested(
-            name: 'New Tournament',
-            scheduledDate: DateTime.now().add(const Duration(days: 7)),
-            description: 'Test description',
-          ),
-        ),
+        act: (bloc) async {
+          // First load to set _currentOrganizationId
+          bloc.add(const TournamentLoadRequested(organizationId: 'org-456'));
+          await bloc.stream.firstWhere(
+            (s) => s is TournamentLoadSuccess || s is TournamentLoadFailure,
+          );
+          bloc.add(
+            TournamentCreateRequested(
+              name: 'New Tournament',
+              scheduledDate: DateTime.now().add(const Duration(days: 7)),
+              description: 'Test description',
+            ),
+          );
+        },
         expect: () => [
+          const TournamentLoadInProgress(),
+          isA<TournamentLoadSuccess>(),
           const TournamentCreateInProgress(),
           const TournamentCreateSuccess(),
           const TournamentLoadInProgress(),

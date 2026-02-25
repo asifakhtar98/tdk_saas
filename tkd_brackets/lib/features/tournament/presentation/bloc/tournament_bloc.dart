@@ -75,13 +75,15 @@ class TournamentBloc extends Bloc<TournamentEvent, TournamentState> {
       return;
     }
 
-    emit(const TournamentLoadInProgress());
-
-    final result = await _getTournamentsUseCase(orgId);
-
+    // Capture current filter BEFORE emitting LoadInProgress
+    // (emitting overwrites state, losing the seeded TournamentLoadSuccess)
     final currentFilter = state is TournamentLoadSuccess
         ? (state as TournamentLoadSuccess).currentFilter
         : TournamentFilter.all;
+
+    emit(const TournamentLoadInProgress());
+
+    final result = await _getTournamentsUseCase(orgId);
 
     result.fold(
       (failure) => emit(
