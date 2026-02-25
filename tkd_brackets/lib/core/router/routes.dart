@@ -7,6 +7,8 @@ import 'package:tkd_brackets/features/settings/settings.dart';
 import 'package:tkd_brackets/features/tournament/presentation/pages/division_builder_wizard.dart';
 import 'package:tkd_brackets/features/tournament/presentation/pages/tournament_detail_page.dart';
 import 'package:tkd_brackets/features/tournament/presentation/pages/tournament_list_page.dart';
+import 'package:tkd_brackets/features/participant/presentation/pages/participant_list_page.dart';
+import 'package:tkd_brackets/features/participant/presentation/pages/csv_import_page.dart';
 
 part 'routes.g.dart';
 
@@ -90,4 +92,44 @@ class TournamentDivisionsRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       DivisionBuilderWizard(tournamentId: tournamentId);
+}
+
+/// Participant list route.
+@TypedGoRoute<ParticipantListRoute>(
+  path: '/tournaments/:tournamentId/divisions/:divisionId/participants',
+)
+class ParticipantListRoute extends GoRouteData {
+  const ParticipantListRoute({
+    required this.tournamentId,
+    required this.divisionId,
+  });
+
+  final String tournamentId;
+  final String divisionId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => ParticipantListPage(
+        tournamentId: tournamentId,
+        divisionId: divisionId,
+      );
+}
+
+/// CSV Import route.
+@TypedGoRoute<CsvImportRoute>(
+  path: '/tournaments/:tournamentId/divisions/:divisionId/participants/import',
+)
+class CsvImportRoute extends GoRouteData {
+  const CsvImportRoute({
+    required this.tournamentId,
+    required this.divisionId,
+  });
+
+  final String tournamentId;
+  final String divisionId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => CSVImportPage(
+        tournamentId: tournamentId,
+        divisionId: divisionId,
+      );
 }

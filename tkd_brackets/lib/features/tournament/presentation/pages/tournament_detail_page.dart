@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tkd_brackets/core/di/injection.dart';
+import 'package:tkd_brackets/core/router/routes.dart';
 import 'package:tkd_brackets/core/widgets/sync_status_indicator_widget.dart';
 import 'package:tkd_brackets/features/division/domain/services/conflict_detection_service.dart';
 import 'package:tkd_brackets/features/division/domain/usecases/get_divisions_usecase.dart';
@@ -351,6 +352,12 @@ class _TournamentDetailViewState extends State<_TournamentDetailView>
               '${division.category.value} • ${division.gender.value} • Ring ${division.assignedRingNumber ?? "Unassigned"}',
             ),
             trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              ParticipantListRoute(
+                tournamentId: state.tournament.id,
+                divisionId: division.id,
+              ).go(context);
+            },
           ),
         );
       },
