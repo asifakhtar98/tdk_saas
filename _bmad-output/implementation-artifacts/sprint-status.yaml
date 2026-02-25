@@ -109,10 +109,10 @@ development_status:
   # FRs: FR13-FR19
   # Dependencies: Epic 3 (Tournament & Division Management)
   # ═══════════════════════════════════════════════════════════════════════════
-  epic-4: in-progress
+  epic-4: done
   4-1-participant-feature-structure: done
   4-2-participant-entity-and-repository: done
-  4-3-manual-participant-entry: review
+  4-3-manual-participant-entry: done
   4-4-csv-import-parser: done
   4-5-duplicate-detection-algorithm: done
   4-6-bulk-import-with-validation: done
@@ -130,8 +130,8 @@ development_status:
   # FRs: FR20-FR31
   # Dependencies: Epic 4 (Participant Management)
   # ═══════════════════════════════════════════════════════════════════════════
-  epic-5: backlog
-  5-1-bracket-feature-structure: backlog
+  epic-5: in-progress
+  5-1-bracket-feature-structure: done
   5-2-bracket-entity-and-repository: backlog
   5-3-match-entity-and-repository: backlog
   5-4-single-elimination-bracket-generator: backlog
