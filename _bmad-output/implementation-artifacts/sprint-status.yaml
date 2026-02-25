@@ -86,7 +86,7 @@ development_status:
   # FRs: FR1-FR12
   # Dependencies: Epic 2 (Auth & Organization)
   # ═══════════════════════════════════════════════════════════════════════════
-  epic-3: in-progress
+  epic-3: done
   3-1-tournament-feature-structure: done
   3-2-tournament-entity-and-repository: done
   3-3-create-tournament-use-case: done
@@ -101,7 +101,7 @@ development_status:
   3-6-archive-and-delete-tournament: done
   3-5-duplicate-tournament-as-template: done
   3-14-tournament-management-ui: done
-  epic-3-retrospective: backlog
+  epic-3-retrospective: done
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Epic 4: Participant Management
@@ -109,7 +109,7 @@ development_status:
   # FRs: FR13-FR19
   # Dependencies: Epic 3 (Tournament & Division Management)
   # ═══════════════════════════════════════════════════════════════════════════
-  epic-4: in-progress
+  epic-4: done
   4-1-participant-feature-structure: done
   4-2-participant-entity-and-repository: done
   4-3-manual-participant-entry: review
@@ -122,7 +122,7 @@ development_status:
   4-10-division-participant-view: done
   4-11-participant-edit-and-transfer: done
   4-12-participant-management-ui: done
-  epic-4-retrospective: backlog
+  epic-4-retrospective: done
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Epic 5: Bracket Generation & Seeding

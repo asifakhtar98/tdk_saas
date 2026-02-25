@@ -120,7 +120,12 @@ class DemoMigrationServiceImpl implements DemoMigrationService {
       }
       for (final user in demoUsers) {
         final newId = uuidMapping[user.id]!;
-        await _insertMigratedUser(user, newId, newOrganizationId);
+        await _insertMigratedUser(
+          user,
+          newId,
+          newOrganizationId,
+          isActive: false,
+        );
         migratedCount++;
       }
       for (final tournament in demoTournaments) {
@@ -153,89 +158,8 @@ class DemoMigrationServiceImpl implements DemoMigrationService {
         await _insertMigratedInvitation(invitation, newId, newOrganizationId);
         migratedCount++;
       }
-      for (final tournament in demoTournaments) {
-        final newId = uuidMapping[tournament.id]!;
-        final newCreatedById = tournament.createdByUserId != null
-            ? uuidMapping[tournament.createdByUserId]
-            : null;
-        await _insertMigratedTournament(
-          tournament,
-          newId,
-          newOrganizationId,
-          newCreatedById,
-        );
-        migratedCount++;
-      }
-      for (final division in demoDivisions) {
-        final newId = uuidMapping[division.id]!;
-        final newTournamentId = uuidMapping[division.tournamentId]!;
-        await _insertMigratedDivision(division, newId, newTournamentId);
-        migratedCount++;
-      }
-      for (final participant in demoParticipants) {
-        final newId = uuidMapping[participant.id]!;
-        final newDivisionId = uuidMapping[participant.divisionId]!;
-        await _insertMigratedParticipant(participant, newId, newDivisionId);
-        migratedCount++;
-      }
-      for (final invitation in demoInvitations) {
-        final newId = uuidMapping[invitation.id]!;
-        await _insertMigratedInvitation(invitation, newId, newOrganizationId);
-        migratedCount++;
-      }
-      for (final user in demoUsers) {
-        final newId = uuidMapping[user.id]!;
-        await _insertMigratedUser(user, newId, newOrganizationId);
-        migratedCount++;
-      }
 
-      // 4. Migrate tournaments (insert new with new org ID, delete old)
-      for (final tournament in demoTournaments) {
-        final newId = uuidMapping[tournament.id]!;
-        final newCreatedById = tournament.createdByUserId != null
-            ? uuidMapping[tournament.createdByUserId]
-            : null;
-        await _insertMigratedTournament(
-          tournament,
-          newId,
-          newOrganizationId,
-          newCreatedById,
-        );
-        migratedCount++;
-      }
-
-      // 5. Migrate divisions (insert new with new tournament ID, delete old)
-      for (final division in demoDivisions) {
-        final newId = uuidMapping[division.id]!;
-        final newTournamentId = uuidMapping[division.tournamentId]!;
-        await _insertMigratedDivision(division, newId, newTournamentId);
-        migratedCount++;
-      }
-
-      // 6. Migrate participants (insert new with new division ID, delete old)
-      for (final participant in demoParticipants) {
-        final newId = uuidMapping[participant.id]!;
-        final newDivisionId = uuidMapping[participant.divisionId]!;
-        await _insertMigratedParticipant(participant, newId, newDivisionId);
-        migratedCount++;
-      }
-
-      // 7. Migrate invitations (update FK to new org ID)
-      for (final invitation in demoInvitations) {
-        final newId = uuidMapping[invitation.id]!;
-        await _insertMigratedInvitation(invitation, newId, newOrganizationId);
-        migratedCount++;
-      }
-
-      // 8. Migrate users (insert new with new org ID and inactive, delete old)
-      for (final user in demoUsers) {
-        final newId = uuidMapping[user.id]!;
-        // Mark demo users as inactive during migration (AC10 requirement)
-        await _insertMigratedUser(user, newId, newOrganizationId);
-        migratedCount++;
-      }
-
-      // 9. Queue all migrated entities for sync
+      // 5. Queue all migrated entities for sync
       await _queueMigratedEntitiesForSync(
         organizations: demoOrgs.map((o) => uuidMapping[o.id]!).toList(),
         tournaments: demoTournaments.map((t) => uuidMapping[t.id]!).toList(),
@@ -415,11 +339,6 @@ class DemoMigrationServiceImpl implements DemoMigrationService {
         updatedAtTimestamp: Value(DateTime.now()),
       ),
     );
-
-    // Delete old tournament
-    await (_db.delete(
-      _db.tournaments,
-    )..where((t) => t.id.equals(tournament.id))).go();
   }
 
   /// Inserts migrated division with new IDs and flags.
@@ -455,11 +374,6 @@ class DemoMigrationServiceImpl implements DemoMigrationService {
         updatedAtTimestamp: Value(DateTime.now()),
       ),
     );
-
-    // Delete old division
-    await (_db.delete(
-      _db.divisions,
-    )..where((d) => d.id.equals(division.id))).go();
   }
 
   /// Inserts migrated participant with new IDs and flags.
@@ -468,9 +382,7 @@ class DemoMigrationServiceImpl implements DemoMigrationService {
     String newId,
     String newDivisionId,
   ) async {
-    await (_db.update(
-      _db.participants,
-    )..where((p) => p.id.equals(participant.id))).write(
+    await _db.into(_db.participants).insert(
       ParticipantsCompanion(
         id: Value(newId),
         divisionId: Value(newDivisionId),
@@ -504,9 +416,7 @@ class DemoMigrationServiceImpl implements DemoMigrationService {
     String newId,
     String newOrganizationId,
   ) async {
-    await (_db.update(
-      _db.invitations,
-    )..where((i) => i.id.equals(invitation.id))).write(
+    await _db.into(_db.invitations).insert(
       InvitationsCompanion(
         id: Value(newId),
         organizationId: Value(newOrganizationId),
