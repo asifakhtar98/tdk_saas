@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:tkd_brackets/app/app.dart';
 import 'package:tkd_brackets/core/config/supabase_config.dart';
 import 'package:tkd_brackets/core/demo/demo_data_service.dart';
@@ -15,6 +16,7 @@ Future<void> bootstrap({
   required String supabaseAnonKey,
   required String sentryDsn,
 }) async {
+  usePathUrlStrategy();
   final binding = WidgetsFlutterBinding.ensureInitialized();
 
   // On web, always enable the semantics tree so that screen readers

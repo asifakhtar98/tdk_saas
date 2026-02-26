@@ -164,7 +164,7 @@
       document.body.classList.add('flutter-loaded');
     });
     
-    if (window.location.hash === '#app' || window.location.search.includes('launch=true')) {
+    if (window.location.hash === '#app' || window.location.pathname !== '/' || window.location.search.includes('launch=true')) {
       launchApp();
     }
   </script>

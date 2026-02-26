@@ -191,13 +191,10 @@ export async function expectRoute(
 ): Promise<void> {
     await page.waitForTimeout(1_000);
     const url = page.url();
-    const hashMatch =
-        url.includes(`#${expectedPath}`) ||
-        url.includes(`#${expectedPath}/`);
     const pathMatch = new URL(url).pathname === expectedPath;
 
     expect(
-        hashMatch || pathMatch,
+        pathMatch,
         `Expected route "${expectedPath}" but got URL: ${url}`,
     ).toBeTruthy();
 }
@@ -209,7 +206,6 @@ export async function navigateToRoute(
     page: Page,
     route: string,
 ): Promise<void> {
-    const baseUrl = page.url().split('#')[0];
-    await page.goto(`${baseUrl}#${route}`);
+    await page.goto(route);
     await page.waitForTimeout(ROUTE_SETTLE_TIME + SEMANTICS_SETTLE_TIME);
 }
