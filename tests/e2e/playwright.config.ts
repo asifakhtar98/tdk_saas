@@ -32,6 +32,9 @@ export default defineConfig({
         // Flutter Web specific: give it more time to load WASM/JS
         actionTimeout: 15_000,
         navigationTimeout: 30_000,
+        launchOptions: {
+            slowMo: 3000, // Slows down Playwright operations 
+        },
     },
     projects: [
         {

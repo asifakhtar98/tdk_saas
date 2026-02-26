@@ -1,0 +1,77 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Playwright: Run E2E Tests (Headed / Visual)",
+      "type": "npm",
+      "script": "test:headed",
+      "path": "tests/e2e",
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "detail": "Runs Playwright tests visually so you can watch execution",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Playwright: Run E2E Tests (Headless / Fast)",
+      "type": "npm",
+      "script": "test",
+      "path": "tests/e2e",
+      "problemMatcher": [],
+      "group": "test",
+      "detail": "Runs Playwright tests silently in the background",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Playwright: Debug E2E Tests",
+      "type": "npm",
+      "script": "test:debug",
+      "path": "tests/e2e",
+      "problemMatcher": [],
+      "group": "test",
+      "detail": "Runs tests step-by-step using the Playwright Inspector",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Flutter: Build Web (Development)",
+      "type": "shell",
+      "command": "flutter build web -t lib/main_development.dart",
+      "options": {
+        "cwd": "${workspaceFolder}/tkd_brackets"
+      },
+      "problemMatcher": [],
+      "group": "build",
+      "detail": "Builds the Flutter web application using the development entrypoint",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Firebase: Deploy",
+      "type": "shell",
+      "command": "npx firebase deploy",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "group": "deploy",
+      "detail": "Deploys the application (Hosting, Functions, etc) to Firebase",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

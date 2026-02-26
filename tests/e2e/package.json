@@ -5,11 +5,7 @@
   "private": true,
   "scripts": {
     "test": "npx playwright test",
-    "test:landing": "npx playwright test specs/01-landing-page.spec.ts",
-    "test:demo": "npx playwright test specs/02-demo-mode.spec.ts",
-    "test:auth": "npx playwright test specs/03-authorization.spec.ts",
-    "test:home": "npx playwright test specs/04-home-page.spec.ts",
-    "test:status": "npx playwright test specs/05-project-completion-status.spec.ts",
+    "test:journey": "npx playwright test specs/new-user-journey.spec.ts",
     "test:headed": "npx playwright test --headed",
     "test:debug": "npx playwright test --debug",
     "report": "npx playwright show-report"
