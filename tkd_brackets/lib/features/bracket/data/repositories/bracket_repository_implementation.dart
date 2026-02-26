@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
-import 'package:tkd_brackets/core/database/app_database.dart';
+
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/network/connectivity_service.dart';
 import 'package:tkd_brackets/features/bracket/data/datasources/bracket_local_datasource.dart';
@@ -15,13 +15,11 @@ class BracketRepositoryImplementation implements BracketRepository {
     this._localDatasource,
     this._remoteDatasource,
     this._connectivityService,
-    this._database,
   );
 
   final BracketLocalDatasource _localDatasource;
   final BracketRemoteDatasource _remoteDatasource;
   final ConnectivityService _connectivityService;
-  final AppDatabase _database;
 
   @override
   Future<Either<Failure, List<BracketEntity>>> getBracketsForDivision(

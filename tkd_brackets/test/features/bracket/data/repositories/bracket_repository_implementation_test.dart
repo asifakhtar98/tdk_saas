@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:tkd_brackets/core/database/app_database.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/network/connectivity_service.dart';
 import 'package:tkd_brackets/features/bracket/data/datasources/bracket_local_datasource.dart';
@@ -17,14 +16,14 @@ class MockBracketRemoteDatasource extends Mock
 
 class MockConnectivityService extends Mock implements ConnectivityService {}
 
-class MockAppDatabase extends Mock implements AppDatabase {}
+
 
 void main() {
   late BracketRepositoryImplementation repository;
   late MockBracketLocalDatasource mockLocalDatasource;
   late MockBracketRemoteDatasource mockRemoteDatasource;
   late MockConnectivityService mockConnectivityService;
-  late MockAppDatabase mockAppDatabase;
+
 
   final testDateTime = DateTime(2026, 1, 15, 10, 30);
 
@@ -57,12 +56,10 @@ void main() {
     mockLocalDatasource = MockBracketLocalDatasource();
     mockRemoteDatasource = MockBracketRemoteDatasource();
     mockConnectivityService = MockConnectivityService();
-    mockAppDatabase = MockAppDatabase();
     repository = BracketRepositoryImplementation(
       mockLocalDatasource,
       mockRemoteDatasource,
       mockConnectivityService,
-      mockAppDatabase,
     );
   });
 

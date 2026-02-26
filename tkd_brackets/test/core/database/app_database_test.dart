@@ -18,7 +18,7 @@ void main() {
   group('AppDatabase', () {
     test('should create database successfully', () {
       expect(database, isNotNull);
-      expect(database.schemaVersion, 6);
+      expect(database.schemaVersion, 7);
     });
 
     test('should have organizations table', () {
@@ -27,6 +27,9 @@ void main() {
 
     test('should have users table', () {
       expect(database.users, isNotNull);
+    });
+    test('should have matches table', () {
+      expect(database.matches, isNotNull);
     });
   });
 
@@ -518,6 +521,100 @@ void main() {
       final user = await database.getUserById('retrieve-del-user');
       expect(user, isNotNull);
       expect(user!.isDeleted, true);
+    });
+  });
+
+  group('Matches CRUD', () {
+    late String testBracketId;
+
+    setUp(() async {
+      testBracketId = 'test-bracket-id';
+      // Create supporting data
+      await database.insertOrganization(
+        const OrganizationsCompanion(
+          id: Value('org-1'),
+          name: Value('Org 1'),
+          slug: Value('org-1'),
+        ),
+      );
+      await database.insertTournament(
+        const TournamentsCompanion(
+          id: Value('tourn-1'),
+          organizationId: Value('org-1'),
+          name: Value('Tourn 1'),
+        ),
+      );
+      await database.insertDivision(
+        const DivisionsCompanion(
+          id: Value('div-1'),
+          tournamentId: Value('tourn-1'),
+          name: Value('Div 1'),
+          gender: Value('male'),
+        ),
+      );
+      await database.insertBracket(
+        BracketsCompanion.insert(
+          id: testBracketId,
+          divisionId: 'div-1',
+          bracketType: 'single_elimination',
+          totalRounds: 3,
+        ),
+      );
+    });
+
+    test('should insert and retrieve match', () async {
+      final matchId = 'match-1';
+      await database.insertMatch(
+        MatchesCompanion.insert(
+          id: matchId,
+          bracketId: testBracketId,
+          roundNumber: 1,
+          matchNumberInRound: 1,
+        ),
+      );
+
+      final result = await database.getMatchById(matchId);
+      expect(result, isNotNull);
+      expect(result!.bracketId, testBracketId);
+      expect(result.roundNumber, 1);
+      expect(result.matchNumberInRound, 1);
+    });
+
+    test('should get matches for bracket', () async {
+      await database.insertMatch(
+        MatchesCompanion.insert(
+          id: 'm1',
+          bracketId: testBracketId,
+          roundNumber: 1,
+          matchNumberInRound: 1,
+        ),
+      );
+      await database.insertMatch(
+        MatchesCompanion.insert(
+          id: 'm2',
+          bracketId: testBracketId,
+          roundNumber: 1,
+          matchNumberInRound: 2,
+        ),
+      );
+
+      final matches = await database.getMatchesForBracket(testBracketId);
+      expect(matches.length, 2);
+    });
+
+    test('should soft delete match', () async {
+      await database.insertMatch(
+        MatchesCompanion.insert(
+          id: 'm-del',
+          bracketId: testBracketId,
+          roundNumber: 1,
+          matchNumberInRound: 1,
+        ),
+      );
+
+      await database.softDeleteMatch('m-del');
+      final result = await database.getMatchById('m-del');
+      expect(result!.isDeleted, true);
     });
   });
 }

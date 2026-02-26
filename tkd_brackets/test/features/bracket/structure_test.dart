@@ -54,10 +54,7 @@ void main() {
       );
     });
 
-    // TODO(Story-5.2): Remove or update this test when exports are added
-    // to the barrel file. This assertion is only valid during the
-    // scaffolding stage (Story 5.1).
-    test('barrel file should have six export statements', () {
+    test('barrel file should have twelve export statements', () {
       final barrelFile = File('$basePath/bracket.dart');
       final content = barrelFile.readAsStringSync();
 
@@ -66,8 +63,8 @@ void main() {
 
       expect(
         matches.length,
-        6,
-        reason: 'Barrel file should have six exports for bracket entity & repo',
+        12,
+        reason: 'Barrel file should have twelve exports for bracket & match entity & repo',
       );
     });
 

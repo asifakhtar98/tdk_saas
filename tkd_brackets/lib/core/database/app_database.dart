@@ -26,6 +26,7 @@ part 'app_database.g.dart';
     Divisions,
     Participants,
     Brackets,
+    Matches,
     Invitations,
     DivisionTemplates,
   ],
@@ -41,7 +42,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration {
@@ -71,6 +72,10 @@ class AppDatabase extends _$AppDatabase {
         // Version 6: Add brackets table for bracket generation
         if (from < 6) {
           await m.createTable(brackets);
+        }
+        // Version 7: Add matches table for match tracking within brackets
+        if (from < 7) {
+          await m.createTable(matches);
         }
       },
       beforeOpen: (details) async {
@@ -455,6 +460,72 @@ class AppDatabase extends _$AppDatabase {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
+  // Matches CRUD
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Get all active matches for a bracket, ordered by round and position.
+  Future<List<MatchEntry>> getMatchesForBracket(String bracketId) {
+    return (select(matches)
+          ..where((m) => m.bracketId.equals(bracketId))
+          ..where((m) => m.isDeleted.equals(false))
+          ..orderBy([
+            (m) => OrderingTerm.asc(m.roundNumber),
+            (m) => OrderingTerm.asc(m.matchNumberInRound),
+          ]))
+        .get();
+  }
+
+  /// Get matches for a specific round within a bracket.
+  Future<List<MatchEntry>> getMatchesByRound(String bracketId, int roundNumber) {
+    return (select(matches)
+          ..where((m) => m.bracketId.equals(bracketId))
+          ..where((m) => m.roundNumber.equals(roundNumber))
+          ..where((m) => m.isDeleted.equals(false))
+          ..orderBy([(m) => OrderingTerm.asc(m.matchNumberInRound)]))
+        .get();
+  }
+
+  /// Get match by ID.
+  Future<MatchEntry?> getMatchById(String id) {
+    return (select(matches)..where((m) => m.id.equals(id))).getSingleOrNull();
+  }
+
+  /// Insert a new match.
+  Future<int> insertMatch(MatchesCompanion match) {
+    return into(matches).insert(match);
+  }
+
+  /// Update a match and increment sync_version.
+  Future<bool> updateMatch(String id, MatchesCompanion match) async {
+    return transaction(() async {
+      final current = await getMatchById(id);
+      if (current == null) return false;
+      final rows = await (update(matches)..where((m) => m.id.equals(id)))
+          .write(match.copyWith(
+            syncVersion: Value(current.syncVersion + 1),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ));
+      return rows > 0;
+    });
+  }
+
+  /// Soft delete a match.
+  Future<bool> softDeleteMatch(String id) {
+    return (update(matches)..where((m) => m.id.equals(id)))
+        .write(MatchesCompanion(
+          isDeleted: const Value(true),
+          deletedAtTimestamp: Value(DateTime.now()),
+          updatedAtTimestamp: Value(DateTime.now()),
+        ))
+        .then((rows) => rows > 0);
+  }
+
+  /// Get all active matches (for testing).
+  Future<List<MatchEntry>> getActiveMatches() {
+    return (select(matches)..where((m) => m.isDeleted.equals(false))).get();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
   // Invitations CRUD
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -608,6 +679,7 @@ class AppDatabase extends _$AppDatabase {
   /// Delete all demo data (for migration to production).
   /// Deletes in reverse FK order to respect constraints.
   Future<void> clearDemoData() async {
+    await (delete(matches)..where((m) => m.isDemoData.equals(true))).go();
     await (delete(brackets)..where((b) => b.isDemoData.equals(true))).go();
     await (delete(participants)..where((p) => p.isDemoData.equals(true))).go();
     await (delete(divisions)..where((d) => d.isDemoData.equals(true))).go();
