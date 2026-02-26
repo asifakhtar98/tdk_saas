@@ -99,9 +99,21 @@ class AppRouter {
 
     final authState = getIt<AuthenticationBloc>().state;
 
-    // Public routes that don't require auth
+    // Routes that are always accessible (no auth required).
+    // These include the landing pages and demo-accessible routes
+    // so users can explore tournaments without creating an account.
     const publicRoutes = ['/', '/demo'];
+
+    // Demo-accessible route prefixes — these allow unauthenticated
+    // users in demo mode to browse tournaments, divisions, and
+    // participants. Matches: /tournaments, /tournaments/:id,
+    // /tournaments/:id/divisions, /tournaments/:id/divisions/:id/participants, etc.
+    const demoAccessiblePrefixes = ['/tournaments'];
+
     final isPublicRoute = publicRoutes.contains(location);
+    final isDemoAccessible = demoAccessiblePrefixes.any(
+      (prefix) => location == prefix || location.startsWith('$prefix/'),
+    );
 
     final isAuthenticated = authState is AuthenticationAuthenticated;
 
@@ -113,8 +125,10 @@ class AppRouter {
 
     // If not authenticated and on protected route,
     // go home. Don't redirect during initial check.
+    // Allow demo-accessible routes without auth.
     if (!isAuthenticated &&
         !isPublicRoute &&
+        !isDemoAccessible &&
         authState is! AuthenticationCheckInProgress &&
         authState is! AuthenticationInitial) {
       return '/';

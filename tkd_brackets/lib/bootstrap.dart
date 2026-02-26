@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:tkd_brackets/app/app.dart';
 import 'package:tkd_brackets/core/config/supabase_config.dart';
 import 'package:tkd_brackets/core/demo/demo_data_service.dart';
@@ -13,7 +15,15 @@ Future<void> bootstrap({
   required String supabaseAnonKey,
   required String sentryDsn,
 }) async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final binding = WidgetsFlutterBinding.ensureInitialized();
+
+  // On web, always enable the semantics tree so that screen readers
+  // and E2E testing tools (Playwright, Selenium) can interact with
+  // Flutter-rendered content. Without this, CanvasKit renders into
+  // an opaque <canvas> with no accessible DOM elements.
+  if (kIsWeb) {
+    binding.ensureSemantics();
+  }
 
   // Initialize Supabase FIRST (before DI so client is available for injection)
   // Debug mode enabled only in development for network request logging.

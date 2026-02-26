@@ -1,0 +1,20 @@
+{
+  "name": "tkd-brackets-e2e",
+  "version": "1.0.0",
+  "description": "E2E tests for TKD Brackets (Flutter Web) using Playwright",
+  "private": true,
+  "scripts": {
+    "test": "npx playwright test",
+    "test:landing": "npx playwright test specs/01-landing-page.spec.ts",
+    "test:demo": "npx playwright test specs/02-demo-mode.spec.ts",
+    "test:auth": "npx playwright test specs/03-authorization.spec.ts",
+    "test:home": "npx playwright test specs/04-home-page.spec.ts",
+    "test:status": "npx playwright test specs/05-project-completion-status.spec.ts",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0"
+  }
+}
