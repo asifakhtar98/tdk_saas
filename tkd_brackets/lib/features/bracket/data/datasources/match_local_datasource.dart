@@ -11,6 +11,7 @@ abstract class MatchLocalDatasource {
   );
   Future<MatchModel?> getMatchById(String id);
   Future<void> insertMatch(MatchModel match);
+  Future<void> insertMatches(List<MatchModel> matches);
   Future<void> updateMatch(MatchModel match);
   Future<void> deleteMatch(String id);
 }
@@ -44,6 +45,13 @@ class MatchLocalDatasourceImplementation implements MatchLocalDatasource {
   @override
   Future<void> insertMatch(MatchModel match) async {
     await _database.insertMatch(match.toDriftCompanion());
+  }
+
+  @override
+  Future<void> insertMatches(List<MatchModel> matches) async {
+    await _database.insertMatches(
+      matches.map((m) => m.toDriftCompanion()).toList(),
+    );
   }
 
   @override

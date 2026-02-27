@@ -112,6 +112,23 @@ class MatchRepositoryImplementation implements MatchRepository {
   }
 
   @override
+  Future<Either<Failure, List<MatchEntity>>> createMatches(
+    List<MatchEntity> matchEntities,
+  ) async {
+    try {
+      final models = matchEntities
+          .map(MatchModel.convertFromEntity)
+          .toList();
+      await _localDatasource.insertMatches(models);
+      return Right(matchEntities);
+    } on Exception catch (e) {
+      return Left(LocalCacheWriteFailure(
+        technicalDetails: 'Failed to create matches in batch: $e',
+      ));
+    }
+  }
+
+  @override
   Future<Either<Failure, MatchEntity>> updateMatch(
     MatchEntity match,
   ) async {

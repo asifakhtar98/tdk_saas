@@ -208,3 +208,15 @@ class DemoMigrationFailure extends Failure {
   @override
   List<Object?> get props => [userFriendlyMessage, technicalDetails, reason];
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Bracket Failures
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// Failure during bracket generation process.
+class BracketGenerationFailure extends Failure {
+  const BracketGenerationFailure({
+    required super.userFriendlyMessage,
+    super.technicalDetails,
+  });
+}

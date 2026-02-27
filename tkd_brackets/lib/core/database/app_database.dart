@@ -495,6 +495,13 @@ class AppDatabase extends _$AppDatabase {
     return into(matches).insert(match);
   }
 
+  /// Insert multiple matches in a single transaction (batch).
+  Future<void> insertMatches(List<MatchesCompanion> matchEntries) async {
+    await batch((b) {
+      b.insertAll(matches, matchEntries);
+    });
+  }
+
   /// Update a match and increment sync_version.
   Future<bool> updateMatch(String id, MatchesCompanion match) async {
     return transaction(() async {

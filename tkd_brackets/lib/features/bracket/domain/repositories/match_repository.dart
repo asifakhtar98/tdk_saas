@@ -13,6 +13,9 @@ abstract class MatchRepository {
   );
   Future<Either<Failure, MatchEntity>> getMatchById(String id);
   Future<Either<Failure, MatchEntity>> createMatch(MatchEntity match);
+  Future<Either<Failure, List<MatchEntity>>> createMatches(
+    List<MatchEntity> matches,
+  );
   Future<Either<Failure, MatchEntity>> updateMatch(MatchEntity match);
   Future<Either<Failure, Unit>> deleteMatch(String id);
 }

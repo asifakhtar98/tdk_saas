@@ -10,11 +10,16 @@ export 'data/models/bracket_model.dart';
 export 'data/models/match_model.dart';
 export 'data/repositories/bracket_repository_implementation.dart';
 export 'data/repositories/match_repository_implementation.dart';
+export 'data/services/single_elimination_bracket_generator_service_implementation.dart';
 
 // Domain exports
 export 'domain/entities/bracket_entity.dart';
+export 'domain/entities/bracket_generation_result.dart';
 export 'domain/entities/match_entity.dart';
 export 'domain/repositories/bracket_repository.dart';
 export 'domain/repositories/match_repository.dart';
+export 'domain/services/single_elimination_bracket_generator_service.dart';
+export 'domain/usecases/generate_single_elimination_bracket_params.dart';
+export 'domain/usecases/generate_single_elimination_bracket_use_case.dart';
 
 // Presentation exports

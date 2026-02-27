@@ -54,7 +54,7 @@ void main() {
       );
     });
 
-    test('barrel file should have twelve export statements', () {
+    test('barrel file should have seventeen export statements', () {
       final barrelFile = File('$basePath/bracket.dart');
       final content = barrelFile.readAsStringSync();
 
@@ -63,8 +63,8 @@ void main() {
 
       expect(
         matches.length,
-        12,
-        reason: 'Barrel file should have twelve exports for bracket & match entity & repo',
+        17,
+        reason: 'Barrel file should have seventeen exports for bracket & match entity & repo + services + usecases',
       );
     });
 
