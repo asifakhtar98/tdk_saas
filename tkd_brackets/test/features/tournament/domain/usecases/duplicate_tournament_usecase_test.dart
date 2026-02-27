@@ -72,14 +72,7 @@ void main() {
     deletedAtTimestamp: DateTime(2026, 1, 1),
   );
 
-  final testActiveTournament = testTournament.copyWith(
-    status: TournamentStatus.active,
-  );
 
-  final testDraftTournament = testTournament.copyWith(
-    status: TournamentStatus.draft,
-    isTemplate: true,
-  );
 
   final testDivision = DivisionEntity(
     id: 'division-123',
@@ -493,7 +486,7 @@ void main() {
           return Right(tournament);
         });
 
-        final result = await useCase(
+        await useCase(
           const DuplicateTournamentParams(sourceTournamentId: 'tournament-123'),
         );
 

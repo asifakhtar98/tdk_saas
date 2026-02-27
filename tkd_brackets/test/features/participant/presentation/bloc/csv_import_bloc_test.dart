@@ -22,9 +22,9 @@ void main() {
   setUp(() {
     mockUseCase = MockBulkImportUseCase();
     
-    final tRow = BulkImportPreviewRow(
+    const tRow = BulkImportPreviewRow(
       sourceRowNumber: 1,
-      rowData: const CSVRowData(
+      rowData: CSVRowData(
         firstName: 'John',
         lastName: 'Doe',
         schoolOrDojangName: 'TDK',
@@ -32,11 +32,11 @@ void main() {
         sourceRowNumber: 1,
       ),
       status: BulkImportRowStatus.valid,
-      duplicateMatches: const [],
-      validationErrors: const {},
+      duplicateMatches: [],
+      validationErrors: {},
     );
 
-    tPreview = BulkImportPreview(
+    tPreview = const BulkImportPreview(
       rows: [tRow],
       validCount: 1,
       warningCount: 0,

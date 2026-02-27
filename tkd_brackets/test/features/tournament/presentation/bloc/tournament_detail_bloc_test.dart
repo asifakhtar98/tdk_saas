@@ -413,7 +413,7 @@ void main() {
         build: buildBloc,
         seed: () => const TournamentDetailInitial(),
         act: (bloc) => bloc.add(const ConflictDismissed('conflict-123')),
-        expect: () => [],
+        expect: () => <TournamentDetailState>[],
       );
     });
   });

@@ -4,12 +4,6 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/participant/domain/entities/participant_entity.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/create_participant_params.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/delete_participant_usecase.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/division_participant_view.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/get_division_participants_usecase.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/transfer_participant_params.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/update_participant_params.dart';
 import 'package:tkd_brackets/features/participant/domain/usecases/usecases.dart';
 import 'package:tkd_brackets/features/participant/presentation/bloc/participant_list_bloc.dart';
 import 'package:tkd_brackets/features/participant/presentation/bloc/participant_list_event.dart';
@@ -151,7 +145,7 @@ void main() {
           currentSort: ParticipantSort.nameAsc,
           filteredParticipants: [tParticipant],
         ),
-        build: () => buildBloc(),
+        build: buildBloc,
         act: (bloc) =>
             bloc.add(const ParticipantListSearchQueryChanged('NonExistent')),
         expect: () => [

@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:uuid/uuid.dart';
-
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/bracket_entity.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/bracket_generation_result.dart';
@@ -12,6 +10,7 @@ import 'package:tkd_brackets/features/bracket/domain/repositories/match_reposito
 import 'package:tkd_brackets/features/bracket/domain/services/single_elimination_bracket_generator_service.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_single_elimination_bracket_params.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_single_elimination_bracket_use_case.dart';
+import 'package:uuid/uuid.dart';
 
 class MockBracketRepository extends Mock
     implements BracketRepository {}
@@ -59,7 +58,7 @@ void main() {
   });
 
   group('GenerateSingleEliminationBracketUseCase', () {
-    final tParams = GenerateSingleEliminationBracketParams(
+    const tParams = GenerateSingleEliminationBracketParams(
       divisionId: 'div-1',
       participantIds: ['p1', 'p2', 'p3', 'p4'],
     );
@@ -113,7 +112,7 @@ void main() {
       'should return ValidationFailure for less than '
       '2 participants',
       () async {
-        final invalidParams =
+        const invalidParams =
             GenerateSingleEliminationBracketParams(
           divisionId: 'div-1',
           participantIds: ['p1'],
@@ -135,7 +134,7 @@ void main() {
       'should return ValidationFailure for empty '
       'participant IDs',
       () async {
-        final invalidParams =
+        const invalidParams =
             GenerateSingleEliminationBracketParams(
           divisionId: 'div-1',
           participantIds: ['p1', '', 'p3'],
@@ -157,7 +156,7 @@ void main() {
       'should return ValidationFailure for whitespace-only '
       'participant IDs',
       () async {
-        final invalidParams =
+        const invalidParams =
             GenerateSingleEliminationBracketParams(
           divisionId: 'div-1',
           participantIds: ['p1', '   ', 'p3'],
@@ -222,7 +221,7 @@ void main() {
 
         expect(
           result,
-          const Left(LocalCacheWriteFailure()),
+          const Left<Failure, BracketGenerationResult>(LocalCacheWriteFailure()),
         );
         verifyNever(
           () => mockMatchRepository.createMatches(any()),
@@ -245,7 +244,7 @@ void main() {
 
         expect(
           result,
-          const Left(LocalCacheWriteFailure()),
+          const Left<Failure, BracketGenerationResult>(LocalCacheWriteFailure()),
         );
         verify(
           () => mockBracketRepository.createBracket(any()),

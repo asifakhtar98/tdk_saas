@@ -563,7 +563,7 @@ void main() {
     });
 
     test('should insert and retrieve match', () async {
-      final matchId = 'match-1';
+      const matchId = 'match-1';
       await database.insertMatch(
         MatchesCompanion.insert(
           id: matchId,

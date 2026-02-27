@@ -1,8 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:tkd_brackets/features/participant/domain/entities/participant_entity.dart';
 import 'package:tkd_brackets/features/participant/domain/usecases/create_participant_params.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/update_participant_params.dart';
 import 'package:tkd_brackets/features/participant/domain/usecases/transfer_participant_params.dart';
+import 'package:tkd_brackets/features/participant/domain/usecases/update_participant_params.dart';
 
 part 'participant_list_event.freezed.dart';
 

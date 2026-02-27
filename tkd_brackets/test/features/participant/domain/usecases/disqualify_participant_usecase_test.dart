@@ -67,7 +67,7 @@ void main() {
       );
 
       test('validates before making repository calls', () async {
-        final result = await useCase(participantId: 'test-id', dqReason: '');
+        await useCase(participantId: 'test-id', dqReason: '');
 
         verifyNever(() => mockRepository.getParticipantById(any()));
         verifyNever(() => mockRepository.updateParticipant(any()));

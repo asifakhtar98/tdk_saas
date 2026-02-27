@@ -1,3 +1,4 @@
+// Test assertion strings naturally exceed 80 chars for readability.
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'package:flutter_test/flutter_test.dart';

@@ -249,7 +249,7 @@ void main() {
         seed: () => const TournamentInitial(),
         act: (bloc) =>
             bloc.add(const TournamentFilterChanged(TournamentFilter.draft)),
-        expect: () => [],
+        expect: () => <TournamentState>[],
       );
     });
 

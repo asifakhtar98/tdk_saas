@@ -127,7 +127,7 @@ void main() {
         'returns InputValidationFailure when '
         'participantId is empty',
         () async {
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: '',
           );
           final result = await useCase(params);
@@ -154,7 +154,7 @@ void main() {
         'returns InputValidationFailure when '
         'no fields are provided for update',
         () async {
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
           );
           final result = await useCase(params);
@@ -175,7 +175,7 @@ void main() {
         'returns InputValidationFailure when '
         'firstName is empty string',
         () async {
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             firstName: '',
           );
@@ -200,7 +200,7 @@ void main() {
         'returns InputValidationFailure when '
         'lastName is whitespace only',
         () async {
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             lastName: '   ',
           );
@@ -225,7 +225,7 @@ void main() {
         'returns InputValidationFailure when '
         'schoolOrDojangName is empty',
         () async {
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             schoolOrDojangName: '',
           );
@@ -250,7 +250,7 @@ void main() {
         'returns InputValidationFailure when '
         'beltRank is invalid',
         () async {
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             beltRank: 'purple',
           );
@@ -275,9 +275,9 @@ void main() {
         'returns InputValidationFailure when '
         'weightKg is negative',
         () async {
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
-            weightKg: -5.0,
+            weightKg: -5,
           );
           final result = await useCase(params);
           expect(result.isLeft(), true);
@@ -300,9 +300,9 @@ void main() {
         'returns InputValidationFailure when '
         'weightKg exceeds maximum',
         () async {
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
-            weightKg: 200.0,
+            weightKg: 200,
           );
           final result = await useCase(params);
           expect(result.isLeft(), true);
@@ -403,10 +403,10 @@ void main() {
       test(
         'validates before making any repository calls',
         () async {
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             firstName: '', // invalid
-            weightKg: -1.0, // invalid
+            weightKg: -1, // invalid
           );
           final result = await useCase(params);
           expect(result.isLeft(), true);
@@ -431,7 +431,7 @@ void main() {
             ),
           );
 
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             firstName: 'Bob',
           );
@@ -471,7 +471,7 @@ void main() {
                 .getTournamentById('tournament-id'),
           ).thenAnswer((_) async => Right(tTournament));
 
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             firstName: 'Bob',
           );
@@ -508,7 +508,7 @@ void main() {
             ),
           );
 
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             firstName: 'Bob',
           );
@@ -543,7 +543,7 @@ void main() {
             ),
           );
 
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             firstName: 'Bob',
           );
@@ -582,7 +582,7 @@ void main() {
             ),
           );
 
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             firstName: 'Bob',
           );
@@ -609,7 +609,7 @@ void main() {
               status: DivisionStatus.inProgress,
             ),
           );
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             firstName: 'Bob',
           );
@@ -635,7 +635,7 @@ void main() {
               status: DivisionStatus.completed,
             ),
           );
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             firstName: 'Bob',
           );
@@ -657,7 +657,7 @@ void main() {
               status: DivisionStatus.ready,
             ),
           );
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             firstName: 'Bob',
           );
@@ -670,7 +670,7 @@ void main() {
     group('successful updates', () {
       test('should update firstName successfully', () async {
         setupSuccessMocks();
-        final params = const UpdateParticipantParams(
+        const params = UpdateParticipantParams(
           participantId: 'participant-id',
           firstName: 'Bob',
         );
@@ -691,7 +691,7 @@ void main() {
 
       test('should trim string values', () async {
         setupSuccessMocks();
-        final params = const UpdateParticipantParams(
+        const params = UpdateParticipantParams(
           participantId: 'participant-id',
           firstName: '  Bob  ',
         );
@@ -737,7 +737,7 @@ void main() {
 
       test('should accept valid belt ranks', () async {
         setupSuccessMocks();
-        final params = const UpdateParticipantParams(
+        const params = UpdateParticipantParams(
           participantId: 'participant-id',
           beltRank: 'White',
         );
@@ -752,7 +752,7 @@ void main() {
       test('should update updatedAtTimestamp', () async {
         final beforeUpdate = DateTime.now();
         setupSuccessMocks();
-        final params = const UpdateParticipantParams(
+        const params = UpdateParticipantParams(
           participantId: 'participant-id',
           firstName: 'Bob',
         );
@@ -785,7 +785,7 @@ void main() {
         'should call updateParticipant on repository',
         () async {
           setupSuccessMocks();
-          final params = const UpdateParticipantParams(
+          const params = UpdateParticipantParams(
             participantId: 'participant-id',
             firstName: 'Bob',
           );

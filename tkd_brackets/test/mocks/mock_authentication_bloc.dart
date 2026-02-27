@@ -35,7 +35,7 @@ class MockAuthenticationBloc extends Mock implements AuthenticationBloc {
 /// sensible defaults.
 ///
 /// Returns the mock with initial state set. Use
-/// [emitState] to change state during tests.
+/// [MockAuthenticationBloc.emitState] to change state during tests.
 ///
 /// Example usage:
 /// ```dart
@@ -51,8 +51,8 @@ class MockAuthenticationBloc extends Mock implements AuthenticationBloc {
 MockAuthenticationBloc createMockAuthenticationBloc({
   AuthenticationState initialState = const AuthenticationState.initial(),
 }) {
-  final mock = MockAuthenticationBloc();
-  mock._state = initialState;
+  final mock = MockAuthenticationBloc()
+    .._state = initialState;
 
   when(() => mock.isClosed).thenReturn(false);
 

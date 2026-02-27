@@ -36,11 +36,11 @@ class DivisionTemplateRepositoryImplementation
           for (final model in remoteModels) {
             try {
               await _localDatasource.insertTemplate(model);
-            } catch (_) {
+            } on Exception catch (_) {
               // Already exists, try update
               try {
                 await _localDatasource.updateTemplate(model);
-              } catch (_) {}
+              } on Exception catch (_) {}
             }
           }
           return Right(remoteModels.map((m) => m.convertToEntity()).toList());

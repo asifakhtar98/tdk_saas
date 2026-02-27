@@ -3,12 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:tkd_brackets/features/dashboard/dashboard.dart';
 import 'package:tkd_brackets/features/demo/presentation/pages/demo_page.dart';
 import 'package:tkd_brackets/features/home/presentation/pages/home_page.dart';
+import 'package:tkd_brackets/features/participant/presentation/pages/csv_import_page.dart';
+import 'package:tkd_brackets/features/participant/presentation/pages/participant_list_page.dart';
 import 'package:tkd_brackets/features/settings/settings.dart';
 import 'package:tkd_brackets/features/tournament/presentation/pages/division_builder_wizard.dart';
 import 'package:tkd_brackets/features/tournament/presentation/pages/tournament_detail_page.dart';
 import 'package:tkd_brackets/features/tournament/presentation/pages/tournament_list_page.dart';
-import 'package:tkd_brackets/features/participant/presentation/pages/participant_list_page.dart';
-import 'package:tkd_brackets/features/participant/presentation/pages/csv_import_page.dart';
 
 part 'routes.g.dart';
 

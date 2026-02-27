@@ -9,9 +9,7 @@ import 'package:tkd_brackets/features/participant/presentation/bloc/csv_import_s
 
 class CSVImportPage extends StatelessWidget {
   const CSVImportPage({
-    super.key,
-    required this.tournamentId,
-    required this.divisionId,
+    required this.tournamentId, required this.divisionId, super.key,
   });
 
   final String tournamentId;
@@ -173,7 +171,7 @@ class _CSVImportView extends StatelessWidget {
           onChanged: isImporting
               ? null
               : (v) => context.read<CSVImportBloc>().add(
-                    CSVImportEvent.selectAllToggled(v ?? false),
+                    CSVImportEvent.selectAllToggled(selectAll: v ?? false),
                   ),
         ),
         const Divider(),

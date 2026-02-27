@@ -144,9 +144,9 @@ void main() {
         ).thenAnswer((_) async => true);
         await _seedDemoData(db);
 
-        // Get original tournament to check its organization reference
+        // Get original tournament to verify its organization reference changes
         final originalTournaments = await db.getActiveTournaments();
-        final originalTournament = originalTournaments.first;
+        expect(originalTournaments, isNotEmpty);
 
         // Perform migration
         const newOrgId = 'production-org-id-123';

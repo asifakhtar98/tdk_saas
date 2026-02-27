@@ -16,3 +16,10 @@ linter:
     public_member_api_docs: false  # Disable for MVP velocity
     avoid_redundant_argument_values: false
     one_member_abstracts: false  # UseCases have single call() method by design
+    lines_longer_than_80_chars: false
+    directives_ordering: false
+    sort_pub_dependencies: false
+    sort_child_properties_last: false
+    sort_constructors_first: false
+    sort_unnamed_constructors_first: false
+    cascade_invocations: false

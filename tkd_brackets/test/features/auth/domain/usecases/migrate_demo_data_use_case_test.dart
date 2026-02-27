@@ -57,7 +57,7 @@ void main() {
         );
 
         // Assert
-        expect(result, equals(const Right(unit)));
+        expect(result, equals(const Right<Failure, Unit>(unit)));
       });
 
       test('calls migrateDemoData with correct organization ID', () async {
@@ -115,7 +115,7 @@ void main() {
         );
 
         // Assert
-        expect(result, equals(const Right(unit)));
+        expect(result, equals(const Right<Failure, Unit>(unit)));
       });
 
       test('does not call migrateDemoData when no demo data', () async {
@@ -168,7 +168,7 @@ void main() {
         );
 
         // Assert - returns success (graceful skip) not failure
-        expect(result, equals(const Right(unit)));
+        expect(result, equals(const Right<Failure, Unit>(unit)));
       });
 
       test(
@@ -344,7 +344,6 @@ void main() {
         () async {
           // Arrange
           final exception = Exception('Database connection lost');
-          final stackTrace = StackTrace.current;
           when(
             () => mockMigrationService.hasDemoData(),
           ).thenAnswer((_) async => true);

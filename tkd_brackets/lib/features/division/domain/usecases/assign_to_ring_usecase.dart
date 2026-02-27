@@ -115,7 +115,7 @@ class AssignToRingUseCase extends UseCase<DivisionEntity, AssignToRingParams> {
     }
 
     final maxOrder = ringDivisions
-        .map((d) => d.displayOrder ?? 0)
+        .map((d) => d.displayOrder)
         .reduce((a, b) => a > b ? a : b);
 
     return maxOrder + 1;

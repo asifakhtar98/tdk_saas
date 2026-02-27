@@ -51,7 +51,7 @@ void main() {
     test('should create entity with optional fields', () {
       final generatedAt = DateTime(2026, 1, 20);
       final finalizedAt = DateTime(2026, 1, 21);
-      final bracketData = {'matches': [], 'rounds': 3};
+      final bracketData = {'matches': <dynamic>[], 'rounds': 3};
 
       final entity = BracketEntity(
         id: '1',

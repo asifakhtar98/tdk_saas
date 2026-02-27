@@ -114,7 +114,7 @@ class ConflictDetectionService {
         divisionIds,
       );
       return result;
-    } catch (e) {
+    } on Exception catch (e) {
       return Left(LocalCacheAccessFailure(technicalDetails: e.toString()));
     }
   }

@@ -1,10 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:uuid/uuid.dart';
-
 import 'package:tkd_brackets/features/bracket/data/services/single_elimination_bracket_generator_service_implementation.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/bracket_entity.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/match_entity.dart';
+import 'package:uuid/uuid.dart';
 
 class MockUuid extends Mock implements Uuid {}
 

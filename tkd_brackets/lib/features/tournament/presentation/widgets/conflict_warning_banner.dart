@@ -12,8 +12,6 @@ class ConflictWarningBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Container(
       width: double.infinity,
       color: Colors.orange.shade100,

@@ -11,7 +11,7 @@ import 'package:tkd_brackets/core/database/tables/brackets_table.dart';
 /// - Tree navigation: winner_advances_to / loser_advances_to (self-referential FKs)
 ///
 /// Self-referential FKs enable bracket tree traversal:
-/// ```
+/// ```text
 /// Round 1, Match 1 ──winner──→ Round 2, Match 1
 /// Round 1, Match 2 ──winner──→ Round 2, Match 1
 ///                   ──loser──→ Losers Bracket Match X (double elim only)

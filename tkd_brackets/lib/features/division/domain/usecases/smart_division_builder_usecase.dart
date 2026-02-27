@@ -63,7 +63,7 @@ class SmartDivisionBuilderUseCase
       }
 
       return Right(savedDivisions);
-    } catch (e) {
+    } on Exception catch (e) {
       return Left(
         ServerResponseFailure(
           userFriendlyMessage: 'Failed to generate divisions: $e',
@@ -100,7 +100,7 @@ class SmartDivisionBuilderUseCase
             ),
           )
           .toList();
-    } catch (e) {
+    } on Exception catch (_) {
       return [];
     }
   }

@@ -19,8 +19,9 @@ class CSVImportEvent with _$CSVImportEvent {
       CSVImportRowSelectionToggled;
 
   /// Request to toggle selection of all rows in the preview.
-  const factory CSVImportEvent.selectAllToggled(bool selectAll) =
-      CSVImportSelectAllToggled;
+  const factory CSVImportEvent.selectAllToggled({
+    required bool selectAll,
+  }) = CSVImportSelectAllToggled;
 
   /// Request to perform the actual import.
   const factory CSVImportEvent.importRequested({

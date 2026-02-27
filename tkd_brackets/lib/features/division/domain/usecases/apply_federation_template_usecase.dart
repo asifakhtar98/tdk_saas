@@ -62,7 +62,7 @@ class ApplyFederationTemplateUseCase
       }
 
       return Right(divisions);
-    } catch (e) {
+    } on Exception catch (e) {
       return Left(
         ServerResponseFailure(
           userFriendlyMessage: 'Failed to apply templates: $e',

@@ -215,7 +215,7 @@ class DuplicateTournamentUseCase
 
     // STEP 7: Return the newly created tournament
     // TODO(AC16): Emit domain event for BLoC state management
-    // TODO: Once eventBus is available, emit TournamentDuplicatedEvent:
+    // TODO(Author): Once eventBus is available, emit TournamentDuplicatedEvent:
     // eventBus.fire(TournamentDuplicatedEvent(
     //   newTournamentId: createdTournament.id,
     //   sourceTournamentId: params.sourceTournamentId,

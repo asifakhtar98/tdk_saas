@@ -440,7 +440,8 @@ John,Smith,2099-01-01,Kim's TKD,Blue''';
       final tooYoung = DateTime(now.year - 2, now.month, now.day);
       final dobStr =
           '${tooYoung.year}-${tooYoung.month.toString().padLeft(2, '0')}-${tooYoung.day.toString().padLeft(2, '0')}';
-      final fixture = '''FirstName,LastName,DOB,Dojang,Belt
+      final fixture = '''
+FirstName,LastName,DOB,Dojang,Belt
 John,Smith,$dobStr,Kim's TKD,Blue''';
 
       final result = await service.parseCSV(
@@ -461,7 +462,8 @@ John,Smith,$dobStr,Kim's TKD,Blue''';
       final tooOld = DateTime(now.year - 85, now.month, now.day);
       final dobStr =
           '${tooOld.year}-${tooOld.month.toString().padLeft(2, '0')}-${tooOld.day.toString().padLeft(2, '0')}';
-      final fixture = '''FirstName,LastName,DOB,Dojang,Belt
+      final fixture = '''
+FirstName,LastName,DOB,Dojang,Belt
 John,Smith,$dobStr,Kim's TKD,Blue''';
 
       final result = await service.parseCSV(

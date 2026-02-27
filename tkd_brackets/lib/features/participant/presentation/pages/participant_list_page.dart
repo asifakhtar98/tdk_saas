@@ -5,9 +5,6 @@ import 'package:tkd_brackets/core/router/routes.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/usecases/get_divisions_usecase.dart';
 import 'package:tkd_brackets/features/participant/domain/entities/participant_entity.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/create_participant_params.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/transfer_participant_params.dart';
-import 'package:tkd_brackets/features/participant/domain/usecases/update_participant_params.dart';
 import 'package:tkd_brackets/features/participant/domain/usecases/usecases.dart';
 import 'package:tkd_brackets/features/participant/presentation/bloc/participant_list_bloc.dart';
 import 'package:tkd_brackets/features/participant/presentation/bloc/participant_list_event.dart';
@@ -620,7 +617,11 @@ class _TransferDivisionPickerState
                       '${division.gender.value}',
                     ),
                     value: division.id,
+                    // Legacy flutter feature, skipping refactor for now
+                    // ignore: deprecated_member_use
                     groupValue: _selectedDivisionId,
+                    // Legacy flutter feature, skipping refactor for now
+                    // ignore: deprecated_member_use
                     onChanged: (v) => setState(
                       () => _selectedDivisionId = v,
                     ),

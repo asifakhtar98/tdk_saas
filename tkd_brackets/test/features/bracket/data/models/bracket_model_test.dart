@@ -27,7 +27,7 @@ void main() {
       syncVersion: 1,
       createdAtTimestamp: now,
       updatedAtTimestamp: now,
-      bracketDataJson: const {'matches': []},
+      bracketDataJson: const {'matches': <dynamic>[]},
     );
 
     test('fromJson should return valid model', () {

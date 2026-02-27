@@ -153,7 +153,7 @@ void main() {
         'returns InputValidationFailure when '
         'participantId is empty',
         () async {
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: '',
             targetDivisionId: 'target-division-id',
           );
@@ -181,7 +181,7 @@ void main() {
         'returns InputValidationFailure when '
         'targetDivisionId is empty',
         () async {
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: '',
           );
@@ -217,7 +217,7 @@ void main() {
             ),
           );
 
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -266,7 +266,7 @@ void main() {
                 .getTournamentById('tournament-id'),
           ).thenAnswer((_) async => Right(tTournament));
 
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -303,7 +303,7 @@ void main() {
             ),
           );
 
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -338,7 +338,7 @@ void main() {
             ),
           );
 
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -379,7 +379,7 @@ void main() {
             ),
           );
 
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -426,7 +426,7 @@ void main() {
             ),
           );
 
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -458,7 +458,7 @@ void main() {
             (_) async => Right(targetParticipant),
           );
 
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -484,7 +484,7 @@ void main() {
               tournamentId: 'other-tournament',
             ),
           );
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -512,7 +512,7 @@ void main() {
               status: DivisionStatus.inProgress,
             ),
           );
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -538,7 +538,7 @@ void main() {
               status: DivisionStatus.completed,
             ),
           );
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -561,7 +561,7 @@ void main() {
               status: DivisionStatus.inProgress,
             ),
           );
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -584,7 +584,7 @@ void main() {
               status: DivisionStatus.completed,
             ),
           );
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -610,7 +610,7 @@ void main() {
               status: DivisionStatus.ready,
             ),
           );
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -625,7 +625,7 @@ void main() {
         'transfers participant and resets seedNumber',
         () async {
           setupSuccessMocks();
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -651,7 +651,7 @@ void main() {
       test('should update updatedAtTimestamp', () async {
         final beforeUpdate = DateTime.now();
         setupSuccessMocks();
-        final params = const TransferParticipantParams(
+        const params = TransferParticipantParams(
           participantId: 'participant-id',
           targetDivisionId: 'target-division-id',
         );
@@ -684,7 +684,7 @@ void main() {
         'should call updateParticipant on repository',
         () async {
           setupSuccessMocks();
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
@@ -700,7 +700,7 @@ void main() {
         'preserves other participant fields on transfer',
         () async {
           setupSuccessMocks();
-          final params = const TransferParticipantParams(
+          const params = TransferParticipantParams(
             participantId: 'participant-id',
             targetDivisionId: 'target-division-id',
           );
