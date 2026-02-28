@@ -4,3 +4,5 @@ Fix All, in small multiple shots, dont overcommunicate
 Continue, do in small multiple shots, dont overcommunicate
 
 build for web , ref [@README.md](file:///Users/asak/Documents/dev/proj/personal/taekwondo_fix/tkd_brackets/README.md)
+
+are we done with the story, cross check code with the story
