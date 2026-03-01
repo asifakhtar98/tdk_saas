@@ -5,12 +5,18 @@ part 'conflict_warning.g.dart';
 
 @freezed
 class ConflictWarning with _$ConflictWarning {
-
   const factory ConflictWarning({
     required String id,
     required String participantId,
     required String participantName,
-    required String divisionId1, required String divisionName1, required int? ringNumber1, required String divisionId2, required String divisionName2, required int? ringNumber2, required ConflictType conflictType, String? dojangName,
+    required String divisionId1,
+    required String divisionName1,
+    required int? ringNumber1,
+    required String divisionId2,
+    required String divisionName2,
+    required int? ringNumber2,
+    required ConflictType conflictType,
+    String? dojangName,
   }) = _ConflictWarning;
   const ConflictWarning._();
 

@@ -29,9 +29,11 @@ class BracketRepositoryImplementation implements BracketRepository {
       final models = await _localDatasource.getBracketsForDivision(divisionId);
       return Right(models.map((m) => m.convertToEntity()).toList());
     } on Exception catch (e) {
-      return Left(LocalCacheAccessFailure(
-        technicalDetails: 'Failed to get brackets for division: $e',
-      ));
+      return Left(
+        LocalCacheAccessFailure(
+          technicalDetails: 'Failed to get brackets for division: $e',
+        ),
+      );
     }
   }
 
@@ -41,12 +43,11 @@ class BracketRepositoryImplementation implements BracketRepository {
       final model = await _localDatasource.getBracketById(id);
       if (model != null) return Right(model.convertToEntity());
 
-      final hasConnection =
-          await _connectivityService.hasInternetConnection();
+      final hasConnection = await _connectivityService.hasInternetConnection();
       if (!hasConnection) {
-        return const Left(NotFoundFailure(
-          userFriendlyMessage: 'Bracket not found',
-        ));
+        return const Left(
+          NotFoundFailure(userFriendlyMessage: 'Bracket not found'),
+        );
       }
 
       try {
@@ -59,13 +60,13 @@ class BracketRepositoryImplementation implements BracketRepository {
         // Remote fetch failed, return not found
       }
 
-      return const Left(NotFoundFailure(
-        userFriendlyMessage: 'Bracket not found',
-      ));
+      return const Left(
+        NotFoundFailure(userFriendlyMessage: 'Bracket not found'),
+      );
     } on Exception catch (e) {
-      return Left(LocalCacheAccessFailure(
-        technicalDetails: 'Failed to get bracket: $e',
-      ));
+      return Left(
+        LocalCacheAccessFailure(technicalDetails: 'Failed to get bracket: $e'),
+      );
     }
   }
 
@@ -77,8 +78,7 @@ class BracketRepositoryImplementation implements BracketRepository {
       final model = BracketModel.convertFromEntity(bracket);
       await _localDatasource.insertBracket(model);
 
-      final hasConnection =
-          await _connectivityService.hasInternetConnection();
+      final hasConnection = await _connectivityService.hasInternetConnection();
       if (hasConnection) {
         try {
           await _remoteDatasource.insertBracket(model);
@@ -89,9 +89,11 @@ class BracketRepositoryImplementation implements BracketRepository {
 
       return Right(bracket);
     } on Exception catch (e) {
-      return Left(LocalCacheWriteFailure(
-        technicalDetails: 'Failed to create bracket: $e',
-      ));
+      return Left(
+        LocalCacheWriteFailure(
+          technicalDetails: 'Failed to create bracket: $e',
+        ),
+      );
     }
   }
 
@@ -107,8 +109,7 @@ class BracketRepositoryImplementation implements BracketRepository {
       final model = BracketModel.convertFromEntity(updatedEntity);
       await _localDatasource.updateBracket(model);
 
-      final hasConnection =
-          await _connectivityService.hasInternetConnection();
+      final hasConnection = await _connectivityService.hasInternetConnection();
       if (hasConnection) {
         try {
           await _remoteDatasource.updateBracket(model);
@@ -119,9 +120,11 @@ class BracketRepositoryImplementation implements BracketRepository {
 
       return Right(updatedEntity);
     } on Exception catch (e) {
-      return Left(LocalCacheWriteFailure(
-        technicalDetails: 'Failed to update bracket: $e',
-      ));
+      return Left(
+        LocalCacheWriteFailure(
+          technicalDetails: 'Failed to update bracket: $e',
+        ),
+      );
     }
   }
 
@@ -130,8 +133,7 @@ class BracketRepositoryImplementation implements BracketRepository {
     try {
       await _localDatasource.deleteBracket(id);
 
-      final hasConnection =
-          await _connectivityService.hasInternetConnection();
+      final hasConnection = await _connectivityService.hasInternetConnection();
       if (hasConnection) {
         try {
           await _remoteDatasource.deleteBracket(id);
@@ -142,9 +144,11 @@ class BracketRepositoryImplementation implements BracketRepository {
 
       return const Right(unit);
     } on Exception catch (e) {
-      return Left(LocalCacheWriteFailure(
-        technicalDetails: 'Failed to delete bracket: $e',
-      ));
+      return Left(
+        LocalCacheWriteFailure(
+          technicalDetails: 'Failed to delete bracket: $e',
+        ),
+      );
     }
   }
 }

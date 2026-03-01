@@ -29,9 +29,11 @@ class MatchRepositoryImplementation implements MatchRepository {
       final models = await _localDatasource.getMatchesForBracket(bracketId);
       return Right(models.map((m) => m.convertToEntity()).toList());
     } on Exception catch (e) {
-      return Left(LocalCacheAccessFailure(
-        technicalDetails: 'Failed to get matches for bracket: $e',
-      ));
+      return Left(
+        LocalCacheAccessFailure(
+          technicalDetails: 'Failed to get matches for bracket: $e',
+        ),
+      );
     }
   }
 
@@ -41,13 +43,17 @@ class MatchRepositoryImplementation implements MatchRepository {
     int roundNumber,
   ) async {
     try {
-      final models =
-          await _localDatasource.getMatchesForRound(bracketId, roundNumber);
+      final models = await _localDatasource.getMatchesForRound(
+        bracketId,
+        roundNumber,
+      );
       return Right(models.map((m) => m.convertToEntity()).toList());
     } on Exception catch (e) {
-      return Left(LocalCacheAccessFailure(
-        technicalDetails: 'Failed to get matches for round: $e',
-      ));
+      return Left(
+        LocalCacheAccessFailure(
+          technicalDetails: 'Failed to get matches for round: $e',
+        ),
+      );
     }
   }
 
@@ -57,12 +63,11 @@ class MatchRepositoryImplementation implements MatchRepository {
       final model = await _localDatasource.getMatchById(id);
       if (model != null) return Right(model.convertToEntity());
 
-      final hasConnection =
-          await _connectivityService.hasInternetConnection();
+      final hasConnection = await _connectivityService.hasInternetConnection();
       if (!hasConnection) {
-        return const Left(NotFoundFailure(
-          userFriendlyMessage: 'Match not found',
-        ));
+        return const Left(
+          NotFoundFailure(userFriendlyMessage: 'Match not found'),
+        );
       }
 
       try {
@@ -75,26 +80,23 @@ class MatchRepositoryImplementation implements MatchRepository {
         // Remote fetch failed, return not found
       }
 
-      return const Left(NotFoundFailure(
-        userFriendlyMessage: 'Match not found',
-      ));
+      return const Left(
+        NotFoundFailure(userFriendlyMessage: 'Match not found'),
+      );
     } on Exception catch (e) {
-      return Left(LocalCacheAccessFailure(
-        technicalDetails: 'Failed to get match: $e',
-      ));
+      return Left(
+        LocalCacheAccessFailure(technicalDetails: 'Failed to get match: $e'),
+      );
     }
   }
 
   @override
-  Future<Either<Failure, MatchEntity>> createMatch(
-    MatchEntity match,
-  ) async {
+  Future<Either<Failure, MatchEntity>> createMatch(MatchEntity match) async {
     try {
       final model = MatchModel.convertFromEntity(match);
       await _localDatasource.insertMatch(model);
 
-      final hasConnection =
-          await _connectivityService.hasInternetConnection();
+      final hasConnection = await _connectivityService.hasInternetConnection();
       if (hasConnection) {
         try {
           await _remoteDatasource.insertMatch(model);
@@ -105,9 +107,9 @@ class MatchRepositoryImplementation implements MatchRepository {
 
       return Right(match);
     } on Exception catch (e) {
-      return Left(LocalCacheWriteFailure(
-        technicalDetails: 'Failed to create match: $e',
-      ));
+      return Left(
+        LocalCacheWriteFailure(technicalDetails: 'Failed to create match: $e'),
+      );
     }
   }
 
@@ -116,22 +118,20 @@ class MatchRepositoryImplementation implements MatchRepository {
     List<MatchEntity> matchEntities,
   ) async {
     try {
-      final models = matchEntities
-          .map(MatchModel.convertFromEntity)
-          .toList();
+      final models = matchEntities.map(MatchModel.convertFromEntity).toList();
       await _localDatasource.insertMatches(models);
       return Right(matchEntities);
     } on Exception catch (e) {
-      return Left(LocalCacheWriteFailure(
-        technicalDetails: 'Failed to create matches in batch: $e',
-      ));
+      return Left(
+        LocalCacheWriteFailure(
+          technicalDetails: 'Failed to create matches in batch: $e',
+        ),
+      );
     }
   }
 
   @override
-  Future<Either<Failure, MatchEntity>> updateMatch(
-    MatchEntity match,
-  ) async {
+  Future<Either<Failure, MatchEntity>> updateMatch(MatchEntity match) async {
     try {
       final existing = await _localDatasource.getMatchById(match.id);
       final newSyncVersion = (existing?.syncVersion ?? 0) + 1;
@@ -140,8 +140,7 @@ class MatchRepositoryImplementation implements MatchRepository {
       final model = MatchModel.convertFromEntity(updatedEntity);
       await _localDatasource.updateMatch(model);
 
-      final hasConnection =
-          await _connectivityService.hasInternetConnection();
+      final hasConnection = await _connectivityService.hasInternetConnection();
       if (hasConnection) {
         try {
           await _remoteDatasource.updateMatch(model);
@@ -152,9 +151,9 @@ class MatchRepositoryImplementation implements MatchRepository {
 
       return Right(updatedEntity);
     } on Exception catch (e) {
-      return Left(LocalCacheWriteFailure(
-        technicalDetails: 'Failed to update match: $e',
-      ));
+      return Left(
+        LocalCacheWriteFailure(technicalDetails: 'Failed to update match: $e'),
+      );
     }
   }
 
@@ -163,8 +162,7 @@ class MatchRepositoryImplementation implements MatchRepository {
     try {
       await _localDatasource.deleteMatch(id);
 
-      final hasConnection =
-          await _connectivityService.hasInternetConnection();
+      final hasConnection = await _connectivityService.hasInternetConnection();
       if (hasConnection) {
         try {
           await _remoteDatasource.deleteMatch(id);
@@ -175,9 +173,9 @@ class MatchRepositoryImplementation implements MatchRepository {
 
       return const Right(unit);
     } on Exception catch (e) {
-      return Left(LocalCacheWriteFailure(
-        technicalDetails: 'Failed to delete match: $e',
-      ));
+      return Left(
+        LocalCacheWriteFailure(technicalDetails: 'Failed to delete match: $e'),
+      );
     }
   }
 }

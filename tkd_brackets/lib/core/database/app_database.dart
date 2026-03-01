@@ -435,10 +435,12 @@ class AppDatabase extends _$AppDatabase {
       final current = await getBracketById(id);
       if (current == null) return false;
       final rows = await (update(brackets)..where((b) => b.id.equals(id)))
-          .write(bracket.copyWith(
-            syncVersion: Value(current.syncVersion + 1),
-            updatedAtTimestamp: Value(DateTime.now()),
-          ));
+          .write(
+            bracket.copyWith(
+              syncVersion: Value(current.syncVersion + 1),
+              updatedAtTimestamp: Value(DateTime.now()),
+            ),
+          );
       return rows > 0;
     });
   }
@@ -446,11 +448,13 @@ class AppDatabase extends _$AppDatabase {
   /// Soft delete a bracket.
   Future<bool> softDeleteBracket(String id) {
     return (update(brackets)..where((b) => b.id.equals(id)))
-        .write(BracketsCompanion(
-          isDeleted: const Value(true),
-          deletedAtTimestamp: Value(DateTime.now()),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ))
+        .write(
+          BracketsCompanion(
+            isDeleted: const Value(true),
+            deletedAtTimestamp: Value(DateTime.now()),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        )
         .then((rows) => rows > 0);
   }
 
@@ -476,7 +480,10 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// Get matches for a specific round within a bracket.
-  Future<List<MatchEntry>> getMatchesByRound(String bracketId, int roundNumber) {
+  Future<List<MatchEntry>> getMatchesByRound(
+    String bracketId,
+    int roundNumber,
+  ) {
     return (select(matches)
           ..where((m) => m.bracketId.equals(bracketId))
           ..where((m) => m.roundNumber.equals(roundNumber))
@@ -507,11 +514,12 @@ class AppDatabase extends _$AppDatabase {
     return transaction(() async {
       final current = await getMatchById(id);
       if (current == null) return false;
-      final rows = await (update(matches)..where((m) => m.id.equals(id)))
-          .write(match.copyWith(
-            syncVersion: Value(current.syncVersion + 1),
-            updatedAtTimestamp: Value(DateTime.now()),
-          ));
+      final rows = await (update(matches)..where((m) => m.id.equals(id))).write(
+        match.copyWith(
+          syncVersion: Value(current.syncVersion + 1),
+          updatedAtTimestamp: Value(DateTime.now()),
+        ),
+      );
       return rows > 0;
     });
   }
@@ -519,11 +527,13 @@ class AppDatabase extends _$AppDatabase {
   /// Soft delete a match.
   Future<bool> softDeleteMatch(String id) {
     return (update(matches)..where((m) => m.id.equals(id)))
-        .write(MatchesCompanion(
-          isDeleted: const Value(true),
-          deletedAtTimestamp: Value(DateTime.now()),
-          updatedAtTimestamp: Value(DateTime.now()),
-        ))
+        .write(
+          MatchesCompanion(
+            isDeleted: const Value(true),
+            deletedAtTimestamp: Value(DateTime.now()),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        )
         .then((rows) => rows > 0);
   }
 

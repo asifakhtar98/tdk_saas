@@ -21,7 +21,7 @@ void main() {
 
   setUp(() {
     mockUseCase = MockBulkImportUseCase();
-    
+
     const tRow = BulkImportPreviewRow(
       sourceRowNumber: 1,
       rowData: CSVRowData(
@@ -63,20 +63,28 @@ void main() {
         'emits [previewInProgress, previewSuccess] when preview generated successfully',
         seed: () => const CSVImportInitial(csvContent: 'test,csv'),
         build: () {
-          when(() => mockUseCase.generatePreview(
-                csvContent: any(named: 'csvContent'),
-                divisionId: any(named: 'divisionId'),
-                tournamentId: any(named: 'tournamentId'),
-              )).thenAnswer((_) async => Right(tPreview));
+          when(
+            () => mockUseCase.generatePreview(
+              csvContent: any(named: 'csvContent'),
+              divisionId: any(named: 'divisionId'),
+              tournamentId: any(named: 'tournamentId'),
+            ),
+          ).thenAnswer((_) async => Right(tPreview));
           return buildBloc();
         },
-        act: (bloc) => bloc.add(const CSVImportPreviewRequested(
-          divisionId: 'div-123',
-          tournamentId: 'tour-123',
-        )),
+        act: (bloc) => bloc.add(
+          const CSVImportPreviewRequested(
+            divisionId: 'div-123',
+            tournamentId: 'tour-123',
+          ),
+        ),
         expect: () => [
           isA<CSVImportPreviewInProgress>(),
-          isA<CSVImportPreviewSuccess>().having((s) => s.preview, 'preview', tPreview),
+          isA<CSVImportPreviewSuccess>().having(
+            (s) => s.preview,
+            'preview',
+            tPreview,
+          ),
         ],
       );
     });
@@ -90,15 +98,16 @@ void main() {
           selectedRowIndexes: const {0},
         ),
         build: () {
-          when(() => mockUseCase.importSelected(
-                selectedRows: any(named: 'selectedRows'),
-                divisionId: any(named: 'divisionId'),
-              )).thenAnswer((_) async => Right(tResult));
+          when(
+            () => mockUseCase.importSelected(
+              selectedRows: any(named: 'selectedRows'),
+              divisionId: any(named: 'divisionId'),
+            ),
+          ).thenAnswer((_) async => Right(tResult));
           return buildBloc();
         },
-        act: (bloc) => bloc.add(const CSVImportImportRequested(
-          divisionId: 'div-123',
-        )),
+        act: (bloc) =>
+            bloc.add(const CSVImportImportRequested(divisionId: 'div-123')),
         expect: () => [
           isA<CSVImportImportInProgress>(),
           CSVImportImportSuccess(result: tResult),

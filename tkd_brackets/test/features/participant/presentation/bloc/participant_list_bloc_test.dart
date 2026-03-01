@@ -52,7 +52,7 @@ void main() {
     registerFallbackValue(FakeCreateParticipantParams());
     registerFallbackValue(FakeUpdateParticipantParams());
     registerFallbackValue(FakeTransferParticipantParams());
-    
+
     // Register named argument fallbacks for mocktail
     registerFallbackValue(ParticipantStatus.pending);
   });
@@ -115,9 +115,9 @@ void main() {
       blocTest<ParticipantListBloc, ParticipantListState>(
         'emits [loadInProgress, loadSuccess] when loaded successfully',
         build: () {
-          when(() => mockGetParticipants(any())).thenAnswer(
-            (_) async => Right(tView),
-          );
+          when(
+            () => mockGetParticipants(any()),
+          ).thenAnswer((_) async => Right(tView));
           return buildBloc();
         },
         act: (bloc) =>
@@ -171,20 +171,24 @@ void main() {
           filteredParticipants: [tParticipant],
         ),
         build: () {
-          when(() => mockUpdateStatus(
-                participantId: any(named: 'participantId'),
-                newStatus: any(named: 'newStatus'),
-                dqReason: any(named: 'dqReason'),
-              )).thenAnswer((_) async => Right(tParticipant));
-          when(() => mockGetParticipants(any())).thenAnswer(
-            (_) async => Right(tView),
-          );
+          when(
+            () => mockUpdateStatus(
+              participantId: any(named: 'participantId'),
+              newStatus: any(named: 'newStatus'),
+              dqReason: any(named: 'dqReason'),
+            ),
+          ).thenAnswer((_) async => Right(tParticipant));
+          when(
+            () => mockGetParticipants(any()),
+          ).thenAnswer((_) async => Right(tView));
           return buildBloc();
         },
-        act: (bloc) => bloc.add(const ParticipantListStatusChangeRequested(
-          participantId: 'part-123',
-          newStatus: ParticipantStatus.checkedIn,
-        )),
+        act: (bloc) => bloc.add(
+          const ParticipantListStatusChangeRequested(
+            participantId: 'part-123',
+            newStatus: ParticipantStatus.checkedIn,
+          ),
+        ),
         expect: () => [
           ParticipantListLoadSuccess(
             view: tView,
@@ -205,10 +209,12 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockUpdateStatus(
-                participantId: 'part-123',
-                newStatus: ParticipantStatus.checkedIn,
-              )).called(1);
+          verify(
+            () => mockUpdateStatus(
+              participantId: 'part-123',
+              newStatus: ParticipantStatus.checkedIn,
+            ),
+          ).called(1);
         },
       );
     });
@@ -224,15 +230,17 @@ void main() {
           filteredParticipants: [tParticipant],
         ),
         build: () {
-          when(() => mockDelete(any())).thenAnswer((_) async => const Right(unit));
-          when(() => mockGetParticipants(any())).thenAnswer(
-            (_) async => Right(tView),
-          );
+          when(
+            () => mockDelete(any()),
+          ).thenAnswer((_) async => const Right(unit));
+          when(
+            () => mockGetParticipants(any()),
+          ).thenAnswer((_) async => Right(tView));
           return buildBloc();
         },
-        act: (bloc) => bloc.add(const ParticipantListRemoveRequested(
-          participantId: 'part-123',
-        )),
+        act: (bloc) => bloc.add(
+          const ParticipantListRemoveRequested(participantId: 'part-123'),
+        ),
         expect: () => [
           ParticipantListLoadSuccess(
             view: tView,

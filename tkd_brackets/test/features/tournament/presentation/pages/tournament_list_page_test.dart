@@ -51,14 +51,16 @@ void main() {
     statusController = StreamController<SyncStatus>.broadcast();
 
     // Register mock use cases in GetIt
-    GetIt.instance
-        .registerSingleton<GetTournamentsUseCase>(mockGetTournaments);
-    GetIt.instance
-        .registerSingleton<ArchiveTournamentUseCase>(mockArchiveTournament);
-    GetIt.instance
-        .registerSingleton<DeleteTournamentUseCase>(mockDeleteTournament);
-    GetIt.instance
-        .registerSingleton<CreateTournamentUseCase>(mockCreateTournament);
+    GetIt.instance.registerSingleton<GetTournamentsUseCase>(mockGetTournaments);
+    GetIt.instance.registerSingleton<ArchiveTournamentUseCase>(
+      mockArchiveTournament,
+    );
+    GetIt.instance.registerSingleton<DeleteTournamentUseCase>(
+      mockDeleteTournament,
+    );
+    GetIt.instance.registerSingleton<CreateTournamentUseCase>(
+      mockCreateTournament,
+    );
 
     // Register mock SyncService (needed by SyncStatusIndicatorWidget)
     GetIt.instance.registerSingleton<SyncService>(mockSyncService);

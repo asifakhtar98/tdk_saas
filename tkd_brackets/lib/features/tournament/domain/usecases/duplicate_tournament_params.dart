@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/duplicate_tournament_usecase.dart' show DuplicateTournamentUseCase;
-import 'package:tkd_brackets/features/tournament/tournament.dart' show DuplicateTournamentUseCase;
+import 'package:tkd_brackets/features/tournament/domain/usecases/duplicate_tournament_usecase.dart'
+    show DuplicateTournamentUseCase;
+import 'package:tkd_brackets/features/tournament/tournament.dart'
+    show DuplicateTournamentUseCase;
 
 part 'duplicate_tournament_params.freezed.dart';
 

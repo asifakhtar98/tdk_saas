@@ -33,11 +33,7 @@ class ParticipantListPage extends StatelessWidget {
         getIt<TransferParticipantUseCase>(),
         getIt<UpdateParticipantStatusUseCase>(),
         getIt<DeleteParticipantUseCase>(),
-      )..add(
-          ParticipantListEvent.loadRequested(
-            divisionId: divisionId,
-          ),
-        ),
+      )..add(ParticipantListEvent.loadRequested(divisionId: divisionId)),
       child: _ParticipantListView(
         tournamentId: tournamentId,
         divisionId: divisionId,
@@ -57,39 +53,25 @@ class _ParticipantListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<
-      ParticipantListBloc,
-      ParticipantListState
-    >(
+    return BlocConsumer<ParticipantListBloc, ParticipantListState>(
       listenWhen: (prev, curr) {
         if (prev is ParticipantListLoadSuccess &&
             curr is ParticipantListLoadSuccess) {
-          return prev.actionStatus !=
-              curr.actionStatus;
+          return prev.actionStatus != curr.actionStatus;
         }
         return false;
       },
       listener: (context, state) {
         if (state is ParticipantListLoadSuccess) {
-          if (state.actionStatus ==
-              ActionStatus.success) {
+          if (state.actionStatus == ActionStatus.success) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.actionMessage ?? 'Success',
-                ),
-              ),
+              SnackBar(content: Text(state.actionMessage ?? 'Success')),
             );
-          } else if (state.actionStatus ==
-              ActionStatus.failure) {
+          } else if (state.actionStatus == ActionStatus.failure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(
-                  state.actionMessage ??
-                      'Error occurred',
-                ),
-                backgroundColor:
-                    Theme.of(context).colorScheme.error,
+                content: Text(state.actionMessage ?? 'Error occurred'),
+                backgroundColor: Theme.of(context).colorScheme.error,
               ),
             );
           }
@@ -97,43 +79,31 @@ class _ParticipantListView extends StatelessWidget {
       },
       builder: (context, state) {
         return state.when(
-          initial: () => const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          loadInProgress: () => const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
+          initial: () =>
+              const Scaffold(body: Center(child: CircularProgressIndicator())),
+          loadInProgress: () =>
+              const Scaffold(body: Center(child: CircularProgressIndicator())),
           loadFailure: (msg, details) => Scaffold(
             appBar: AppBar(title: const Text('Error')),
             body: Center(
               child: Column(
-                mainAxisAlignment:
-                    MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.error_outline,
                     size: 64,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .error,
+                    color: Theme.of(context).colorScheme.error,
                   ),
                   const SizedBox(height: 16),
                   Text(msg),
                   const SizedBox(height: 16),
                   FilledButton.icon(
                     onPressed: () {
-                      context
-                          .read<ParticipantListBloc>()
-                          .add(
-                            ParticipantListEvent
-                                .loadRequested(
-                              divisionId: divisionId,
-                            ),
-                          );
+                      context.read<ParticipantListBloc>().add(
+                        ParticipantListEvent.loadRequested(
+                          divisionId: divisionId,
+                        ),
+                      );
                     },
                     icon: const Icon(Icons.refresh),
                     label: const Text('Retry'),
@@ -142,24 +112,16 @@ class _ParticipantListView extends StatelessWidget {
               ),
             ),
           ),
-          loadSuccess: (
-            view,
-            query,
-            filter,
-            sort,
-            filtered,
-            status,
-            msg,
-          ) =>
+          loadSuccess: (view, query, filter, sort, filtered, status, msg) =>
               _buildLoadedScaffold(
-            context,
-            view,
-            query,
-            filter,
-            sort,
-            filtered,
-            status,
-          ),
+                context,
+                view,
+                query,
+                filter,
+                sort,
+                filtered,
+                status,
+              ),
         );
       },
     );
@@ -182,16 +144,13 @@ class _ParticipantListView extends StatelessWidget {
             Text(view.division.name),
             Text(
               '${view.participantCount} participants',
-              style:
-                  Theme.of(context).textTheme.bodySmall,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.file_upload_outlined,
-            ),
+            icon: const Icon(Icons.file_upload_outlined),
             onPressed: () => CsvImportRoute(
               tournamentId: tournamentId,
               divisionId: divisionId,
@@ -200,12 +159,9 @@ class _ParticipantListView extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => context
-                .read<ParticipantListBloc>()
-                .add(
-                  const ParticipantListEvent
-                      .refreshRequested(),
-                ),
+            onPressed: () => context.read<ParticipantListBloc>().add(
+              const ParticipantListEvent.refreshRequested(),
+            ),
           ),
         ],
       ),
@@ -215,12 +171,9 @@ class _ParticipantListView extends StatelessWidget {
             children: [
               ParticipantSearchBar(
                 initialQuery: query,
-                onSearch: (q) => context
-                    .read<ParticipantListBloc>()
-                    .add(
-                      ParticipantListEvent
-                          .searchQueryChanged(q),
-                    ),
+                onSearch: (q) => context.read<ParticipantListBloc>().add(
+                  ParticipantListEvent.searchQueryChanged(q),
+                ),
               ),
               _buildFilterChips(context, filter),
               const Divider(),
@@ -233,46 +186,22 @@ class _ParticipantListView extends StatelessWidget {
                           final p = filtered[index];
                           return ParticipantCard(
                             participant: p,
-                            onStatusChange:
-                                (newStatus) {
-                              if (newStatus ==
-                                  ParticipantStatus
-                                      .disqualified) {
-                                _showDisqualifyDialog(
-                                  context,
-                                  p.id,
-                                );
+                            onStatusChange: (newStatus) {
+                              if (newStatus == ParticipantStatus.disqualified) {
+                                _showDisqualifyDialog(context, p.id);
                               } else {
-                                context
-                                    .read<
-                                      ParticipantListBloc
-                                    >()
-                                    .add(
-                                      ParticipantListStatusChangeRequested(
-                                        participantId:
-                                            p.id,
-                                        newStatus:
-                                            newStatus,
-                                      ),
-                                    );
+                                context.read<ParticipantListBloc>().add(
+                                  ParticipantListStatusChangeRequested(
+                                    participantId: p.id,
+                                    newStatus: newStatus,
+                                  ),
+                                );
                               }
                             },
                             onEdit: () =>
-                                _showFormDialog(
-                              context,
-                              divisionId,
-                              p,
-                            ),
-                            onDelete: () =>
-                                _showDeleteConfirmation(
-                              context,
-                              p,
-                            ),
-                            onTransfer: () =>
-                                _showTransferDialog(
-                              context,
-                              p,
-                            ),
+                                _showFormDialog(context, divisionId, p),
+                            onDelete: () => _showDeleteConfirmation(context, p),
+                            onTransfer: () => _showTransferDialog(context, p),
                           );
                         },
                       ),
@@ -283,19 +212,13 @@ class _ParticipantListView extends StatelessWidget {
             const Positioned.fill(
               child: ColoredBox(
                 color: Colors.black12,
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
+                child: Center(child: CircularProgressIndicator()),
               ),
             ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showFormDialog(
-          context,
-          divisionId,
-          null,
-        ),
+        onPressed: () => _showFormDialog(context, divisionId, null),
         child: const Icon(Icons.add),
       ),
     );
@@ -309,16 +232,12 @@ class _ParticipantListView extends StatelessWidget {
           Icon(
             Icons.people_outline,
             size: 64,
-            color: Theme.of(context)
-                .colorScheme
-                .primary
-                .withValues(alpha: 0.5),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
             'No participants found',
-            style:
-                Theme.of(context).textTheme.titleMedium,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 8),
           const Text(
@@ -336,9 +255,7 @@ class _ParticipantListView extends StatelessWidget {
   ) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: ParticipantFilter.values.map((filter) {
           return Padding(
@@ -350,13 +267,9 @@ class _ParticipantListView extends StatelessWidget {
                     : filter.name.toUpperCase(),
               ),
               selected: activeFilter == filter,
-              onSelected: (_) => context
-                  .read<ParticipantListBloc>()
-                  .add(
-                    ParticipantListEvent.filterChanged(
-                      filter,
-                    ),
-                  ),
+              onSelected: (_) => context.read<ParticipantListBloc>().add(
+                ParticipantListEvent.filterChanged(filter),
+              ),
             ),
           );
         }).toList(),
@@ -377,27 +290,19 @@ class _ParticipantListView extends StatelessWidget {
         onSave: (params) {
           if (params is CreateParticipantParams) {
             context.read<ParticipantListBloc>().add(
-                  ParticipantListEvent.createRequested(
-                    params: params,
-                  ),
-                );
-          } else if (params
-              is UpdateParticipantParams) {
+              ParticipantListEvent.createRequested(params: params),
+            );
+          } else if (params is UpdateParticipantParams) {
             context.read<ParticipantListBloc>().add(
-                  ParticipantListEvent.editRequested(
-                    params: params,
-                  ),
-                );
+              ParticipantListEvent.editRequested(params: params),
+            );
           }
         },
       ),
     );
   }
 
-  void _showDisqualifyDialog(
-    BuildContext context,
-    String participantId,
-  ) {
+  void _showDisqualifyDialog(BuildContext context, String participantId) {
     final controller = TextEditingController();
     showDialog<void>(
       context: context,
@@ -405,31 +310,24 @@ class _ParticipantListView extends StatelessWidget {
         title: const Text('Disqualify Participant'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Reason for DQ',
-          ),
+          decoration: const InputDecoration(labelText: 'Reason for DQ'),
         ),
         actions: [
           TextButton(
-            onPressed: () =>
-                Navigator.pop(dialogContext),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () {
-              final reason =
-                  controller.text.trim();
+              final reason = controller.text.trim();
               if (reason.isNotEmpty) {
-                context
-                    .read<ParticipantListBloc>()
-                    .add(
-                      ParticipantListStatusChangeRequested(
-                        participantId: participantId,
-                        newStatus: ParticipantStatus
-                            .disqualified,
-                        dqReason: reason,
-                      ),
-                    );
+                context.read<ParticipantListBloc>().add(
+                  ParticipantListStatusChangeRequested(
+                    participantId: participantId,
+                    newStatus: ParticipantStatus.disqualified,
+                    dqReason: reason,
+                  ),
+                );
                 Navigator.pop(dialogContext);
               }
             },
@@ -455,22 +353,20 @@ class _ParticipantListView extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () =>
-                Navigator.pop(dialogContext),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () {
               context.read<ParticipantListBloc>().add(
-                    ParticipantListEvent.removeRequested(
-                      participantId: participant.id,
-                    ),
-                  );
+                ParticipantListEvent.removeRequested(
+                  participantId: participant.id,
+                ),
+              );
               Navigator.pop(dialogContext);
             },
             style: FilledButton.styleFrom(
-              backgroundColor:
-                  Theme.of(context).colorScheme.error,
+              backgroundColor: Theme.of(context).colorScheme.error,
             ),
             child: const Text('Remove'),
           ),
@@ -483,8 +379,7 @@ class _ParticipantListView extends StatelessWidget {
     BuildContext context,
     ParticipantEntity participant,
   ) {
-    final getDivisionsUseCase =
-        getIt<GetDivisionsUseCase>();
+    final getDivisionsUseCase = getIt<GetDivisionsUseCase>();
 
     showDialog<void>(
       context: context,
@@ -492,15 +387,11 @@ class _ParticipantListView extends StatelessWidget {
         return FutureBuilder(
           future: getDivisionsUseCase(tournamentId),
           builder: (context, snapshot) {
-            if (snapshot.connectionState !=
-                ConnectionState.done) {
+            if (snapshot.connectionState != ConnectionState.done) {
               return const AlertDialog(
                 content: SizedBox(
                   height: 100,
-                  child: Center(
-                    child:
-                        CircularProgressIndicator(),
-                  ),
+                  child: Center(child: CircularProgressIndicator()),
                 ),
               );
             }
@@ -509,13 +400,10 @@ class _ParticipantListView extends StatelessWidget {
             if (result == null) {
               return AlertDialog(
                 title: const Text('Error'),
-                content: const Text(
-                  'Failed to load divisions',
-                ),
+                content: const Text('Failed to load divisions'),
                 actions: [
                   TextButton(
-                    onPressed: () =>
-                        Navigator.pop(dialogContext),
+                    onPressed: () => Navigator.pop(dialogContext),
                     child: const Text('Close'),
                   ),
                 ],
@@ -525,42 +413,31 @@ class _ParticipantListView extends StatelessWidget {
             return result.fold(
               (failure) => AlertDialog(
                 title: const Text('Error'),
-                content: Text(
-                  failure.userFriendlyMessage,
-                ),
+                content: Text(failure.userFriendlyMessage),
                 actions: [
                   TextButton(
-                    onPressed: () =>
-                        Navigator.pop(dialogContext),
+                    onPressed: () => Navigator.pop(dialogContext),
                     child: const Text('Close'),
                   ),
                 ],
               ),
               (divisions) {
                 final otherDivisions = divisions
-                    .where(
-                      (d) => d.id != divisionId,
-                    )
+                    .where((d) => d.id != divisionId)
                     .toList();
 
                 return _TransferDivisionPicker(
                   participant: participant,
                   divisions: otherDivisions,
                   onTransfer: (targetDivisionId) {
-                    context
-                        .read<ParticipantListBloc>()
-                        .add(
-                          ParticipantListEvent
-                              .transferRequested(
-                            params:
-                                TransferParticipantParams(
-                              participantId:
-                                  participant.id,
-                              targetDivisionId:
-                                  targetDivisionId,
-                            ),
-                          ),
-                        );
+                    context.read<ParticipantListBloc>().add(
+                      ParticipantListEvent.transferRequested(
+                        params: TransferParticipantParams(
+                          participantId: participant.id,
+                          targetDivisionId: targetDivisionId,
+                        ),
+                      ),
+                    );
                     Navigator.pop(dialogContext);
                   },
                 );
@@ -589,8 +466,7 @@ class _TransferDivisionPicker extends StatefulWidget {
       _TransferDivisionPickerState();
 }
 
-class _TransferDivisionPickerState
-    extends State<_TransferDivisionPicker> {
+class _TransferDivisionPickerState extends State<_TransferDivisionPicker> {
   String? _selectedDivisionId;
 
   @override
@@ -608,8 +484,7 @@ class _TransferDivisionPickerState
                 shrinkWrap: true,
                 itemCount: widget.divisions.length,
                 itemBuilder: (context, index) {
-                  final division =
-                      widget.divisions[index];
+                  final division = widget.divisions[index];
                   return RadioListTile<String>(
                     title: Text(division.name),
                     subtitle: Text(
@@ -622,9 +497,7 @@ class _TransferDivisionPickerState
                     groupValue: _selectedDivisionId,
                     // Legacy flutter feature, skipping refactor for now
                     // ignore: deprecated_member_use
-                    onChanged: (v) => setState(
-                      () => _selectedDivisionId = v,
-                    ),
+                    onChanged: (v) => setState(() => _selectedDivisionId = v),
                   );
                 },
               ),
@@ -637,9 +510,7 @@ class _TransferDivisionPickerState
         FilledButton(
           onPressed: _selectedDivisionId == null
               ? null
-              : () => widget.onTransfer(
-                    _selectedDivisionId!,
-                  ),
+              : () => widget.onTransfer(_selectedDivisionId!),
           child: const Text('Transfer'),
         ),
       ],

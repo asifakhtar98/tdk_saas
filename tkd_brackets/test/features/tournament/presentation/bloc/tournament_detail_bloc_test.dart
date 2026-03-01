@@ -289,7 +289,12 @@ void main() {
           return buildBloc();
         },
         act: (bloc) => bloc.add(
-          const TournamentDetailUpdateRequested('tournament-123', '', null, null),
+          const TournamentDetailUpdateRequested(
+            'tournament-123',
+            '',
+            null,
+            null,
+          ),
         ),
         expect: () => [
           const TournamentDetailUpdateInProgress(),

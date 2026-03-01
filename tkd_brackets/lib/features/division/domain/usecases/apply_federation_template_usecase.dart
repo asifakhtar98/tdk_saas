@@ -55,10 +55,7 @@ class ApplyFederationTemplateUseCase
         );
 
         final result = await _divisionRepository.createDivision(division);
-        result.fold(
-          (failure) => divisions.add(division),
-          divisions.add,
-        );
+        result.fold((failure) => divisions.add(division), divisions.add);
       }
 
       return Right(divisions);

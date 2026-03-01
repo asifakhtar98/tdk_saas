@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart' show ArchiveTournamentUseCase;
-import 'package:tkd_brackets/features/tournament/tournament.dart' show ArchiveTournamentUseCase;
+import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart'
+    show ArchiveTournamentUseCase;
+import 'package:tkd_brackets/features/tournament/tournament.dart'
+    show ArchiveTournamentUseCase;
 
 part 'archive_tournament_params.freezed.dart';
 

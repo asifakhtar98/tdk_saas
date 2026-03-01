@@ -19,14 +19,12 @@ class CSVImportEvent with _$CSVImportEvent {
       CSVImportRowSelectionToggled;
 
   /// Request to toggle selection of all rows in the preview.
-  const factory CSVImportEvent.selectAllToggled({
-    required bool selectAll,
-  }) = CSVImportSelectAllToggled;
+  const factory CSVImportEvent.selectAllToggled({required bool selectAll}) =
+      CSVImportSelectAllToggled;
 
   /// Request to perform the actual import.
-  const factory CSVImportEvent.importRequested({
-    required String divisionId,
-  }) = CSVImportImportRequested;
+  const factory CSVImportEvent.importRequested({required String divisionId}) =
+      CSVImportImportRequested;
 
   /// Request to reset the import flow.
   const factory CSVImportEvent.resetRequested() = CSVImportResetRequested;

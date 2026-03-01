@@ -16,7 +16,13 @@ part 'division_template_model.g.dart';
 class DivisionTemplateModel with _$DivisionTemplateModel {
   const factory DivisionTemplateModel({
     required String id,
-    required String federationType, required String category, required String name, required String gender, required DateTime createdAtTimestamp, required DateTime updatedAtTimestamp, String? organizationId,
+    required String federationType,
+    required String category,
+    required String name,
+    required String gender,
+    required DateTime createdAtTimestamp,
+    required DateTime updatedAtTimestamp,
+    String? organizationId,
     int? ageMin,
     int? ageMax,
     double? weightMinKg,

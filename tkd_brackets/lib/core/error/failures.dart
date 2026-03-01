@@ -220,3 +220,26 @@ class BracketGenerationFailure extends Failure {
     super.technicalDetails,
   });
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Seeding Failures
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// Failure during seeding algorithm execution.
+class SeedingFailure extends Failure {
+  const SeedingFailure({
+    required super.userFriendlyMessage,
+    super.technicalDetails,
+    this.constraintViolations = const [],
+  });
+
+  /// List of constraint names that were violated.
+  final List<String> constraintViolations;
+
+  @override
+  List<Object?> get props => [
+    userFriendlyMessage,
+    technicalDetails,
+    constraintViolations,
+  ];
+}

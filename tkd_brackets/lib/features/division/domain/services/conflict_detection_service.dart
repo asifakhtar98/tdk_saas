@@ -38,9 +38,7 @@ class ConflictDetectionService {
         divisions.map((d) => d.id).toList(),
       );
 
-      return allParticipantsResult.fold(Left.new, (
-        allParticipantsRaw,
-      ) {
+      return allParticipantsResult.fold(Left.new, (allParticipantsRaw) {
         final allParticipants = allParticipantsRaw
             .where((p) => p.isDeleted == false)
             .toList();
@@ -143,19 +141,13 @@ class ConflictDetectionService {
   Future<Either<Failure, bool>> hasConflicts(String tournamentId) async {
     final result = await detectConflicts(tournamentId);
 
-    return result.fold(
-      Left.new,
-      (conflicts) => Right(conflicts.isNotEmpty),
-    );
+    return result.fold(Left.new, (conflicts) => Right(conflicts.isNotEmpty));
   }
 
   Future<Either<Failure, int>> getConflictCount(String tournamentId) async {
     final result = await detectConflicts(tournamentId);
 
-    return result.fold(
-      Left.new,
-      (conflicts) => Right(conflicts.length),
-    );
+    return result.fold(Left.new, (conflicts) => Right(conflicts.length));
   }
 
   Future<Either<Failure, List<ConflictWarning>>> detectConflictsForParticipant(
@@ -181,9 +173,7 @@ class ConflictDetectionService {
         divisionsList.map((d) => d.id).toList(),
       );
 
-      return participantsResult.fold(Left.new, (
-        allParticipants,
-      ) {
+      return participantsResult.fold(Left.new, (allParticipants) {
         // Filter to entries for this specific participant
         final participantEntries = allParticipants
             .where((p) => p.id == participantId && p.isDeleted == false)

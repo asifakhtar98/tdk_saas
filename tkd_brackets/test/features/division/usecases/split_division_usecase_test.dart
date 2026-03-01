@@ -74,15 +74,12 @@ void main() {
         name: 'Cadets -40kg',
       );
 
-      final fakeParticipants = List<ParticipantEntry>.generate(
-        4,
-        (i) {
-          final mock = MockParticipantEntry();
-          when(() => mock.lastName).thenReturn('User $i');
-          when(() => mock.firstName).thenReturn('Test');
-          return mock;
-        },
-      );
+      final fakeParticipants = List<ParticipantEntry>.generate(4, (i) {
+        final mock = MockParticipantEntry();
+        when(() => mock.lastName).thenReturn('User $i');
+        when(() => mock.firstName).thenReturn('Test');
+        return mock;
+      });
 
       when(
         () => mockRepository.getDivision('div-a'),
@@ -128,15 +125,12 @@ void main() {
         tournamentId: 'tournament-1',
       );
 
-      final fakeParticipants = List<ParticipantEntry>.generate(
-        4,
-        (i) {
-          final mock = MockParticipantEntry();
-          when(() => mock.lastName).thenReturn('User $i');
-          when(() => mock.firstName).thenReturn('Test');
-          return mock;
-        },
-      );
+      final fakeParticipants = List<ParticipantEntry>.generate(4, (i) {
+        final mock = MockParticipantEntry();
+        when(() => mock.lastName).thenReturn('User $i');
+        when(() => mock.firstName).thenReturn('Test');
+        return mock;
+      });
 
       when(
         () => mockRepository.getDivision('div-a'),

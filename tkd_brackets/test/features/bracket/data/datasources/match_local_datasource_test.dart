@@ -38,8 +38,9 @@ void main() {
 
   group('MatchLocalDatasource', () {
     test('getMatchesForBracket should call database method', () async {
-      when(() => mockDatabase.getMatchesForBracket(any()))
-          .thenAnswer((_) async => [testMatchEntry]);
+      when(
+        () => mockDatabase.getMatchesForBracket(any()),
+      ).thenAnswer((_) async => [testMatchEntry]);
 
       final result = await datasource.getMatchesForBracket('b1');
 
@@ -49,8 +50,9 @@ void main() {
     });
 
     test('getMatchesForRound should call database method', () async {
-      when(() => mockDatabase.getMatchesByRound(any(), any()))
-          .thenAnswer((_) async => [testMatchEntry]);
+      when(
+        () => mockDatabase.getMatchesByRound(any(), any()),
+      ).thenAnswer((_) async => [testMatchEntry]);
 
       final result = await datasource.getMatchesForRound('b1', 1);
 
@@ -59,8 +61,9 @@ void main() {
     });
 
     test('getMatchById should call database method', () async {
-      when(() => mockDatabase.getMatchById(any()))
-          .thenAnswer((_) async => testMatchEntry);
+      when(
+        () => mockDatabase.getMatchById(any()),
+      ).thenAnswer((_) async => testMatchEntry);
 
       final result = await datasource.getMatchById('m1');
 
@@ -77,8 +80,9 @@ void main() {
     });
 
     test('updateMatch should call database method', () async {
-      when(() => mockDatabase.updateMatch(any(), any()))
-          .thenAnswer((_) async => true);
+      when(
+        () => mockDatabase.updateMatch(any(), any()),
+      ).thenAnswer((_) async => true);
 
       await datasource.updateMatch(testMatchModel);
 
@@ -86,8 +90,9 @@ void main() {
     });
 
     test('deleteMatch should call database softDelete method', () async {
-      when(() => mockDatabase.softDeleteMatch(any()))
-          .thenAnswer((_) async => true);
+      when(
+        () => mockDatabase.softDeleteMatch(any()),
+      ).thenAnswer((_) async => true);
 
       await datasource.deleteMatch('m1');
 

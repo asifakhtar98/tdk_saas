@@ -29,12 +29,12 @@ class SingleEliminationBracketGeneratorServiceImplementation
 
     // Calculate total matches (excluding 3rd place for now)
     final tournamentMatches = bracketSize - 1;
-    final totalMatches = tournamentMatches +
+    final totalMatches =
+        tournamentMatches +
         (includeThirdPlaceMatch && totalRounds >= 2 ? 1 : 0);
 
     // Generate ALL match IDs upfront
-    final matchIds =
-        List.generate(totalMatches, (_) => _uuid.v4());
+    final matchIds = List.generate(totalMatches, (_) => _uuid.v4());
 
     final matches = <MatchEntity>[];
 
@@ -161,19 +161,14 @@ class SingleEliminationBracketGeneratorServiceImplementation
       final r2Matches = matchMap[2]!;
       for (var m = 1; m <= r1Count; m++) {
         final match = r1Matches[m]!;
-        if (match.resultType == MatchResultType.bye &&
-            match.winnerId != null) {
+        if (match.resultType == MatchResultType.bye && match.winnerId != null) {
           final nextMatchNum = (m + 1) ~/ 2;
           var nextMatch = r2Matches[nextMatchNum]!;
 
           if (m % 2 != 0) {
-            nextMatch = nextMatch.copyWith(
-              participantRedId: match.winnerId,
-            );
+            nextMatch = nextMatch.copyWith(participantRedId: match.winnerId);
           } else {
-            nextMatch = nextMatch.copyWith(
-              participantBlueId: match.winnerId,
-            );
+            nextMatch = nextMatch.copyWith(participantBlueId: match.winnerId);
           }
           r2Matches[nextMatchNum] = nextMatch;
         }
@@ -189,9 +184,6 @@ class SingleEliminationBracketGeneratorServiceImplementation
       matches.add(thirdPlaceMatch);
     }
 
-    return BracketGenerationResult(
-      bracket: bracket,
-      matches: matches,
-    );
+    return BracketGenerationResult(bracket: bracket, matches: matches);
   }
 }

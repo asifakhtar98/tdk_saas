@@ -15,12 +15,11 @@ void main() {
   setUp(() {
     mockUuid = MockUuid();
     uuidCounter = 0;
-    generator =
-        SingleEliminationBracketGeneratorServiceImplementation(mockUuid);
-
-    when(() => mockUuid.v4()).thenAnswer(
-      (_) => 'match-${uuidCounter++}',
+    generator = SingleEliminationBracketGeneratorServiceImplementation(
+      mockUuid,
     );
+
+    when(() => mockUuid.v4()).thenAnswer((_) => 'match-${uuidCounter++}');
   });
 
   List<String> makeParticipants(int count) =>
@@ -140,108 +139,87 @@ void main() {
         expect(m2.winnerAdvancesToMatchId, m3.id);
       });
 
-      test(
-        'should have null winnerAdvancesToMatchId for final',
-        () {
-          final result = generator.generate(
-            divisionId: 'div-1',
-            participantIds: makeParticipants(4),
-            bracketId: 'bracket-1',
-          );
+      test('should have null winnerAdvancesToMatchId for final', () {
+        final result = generator.generate(
+          divisionId: 'div-1',
+          participantIds: makeParticipants(4),
+          bracketId: 'bracket-1',
+        );
 
-          final finalMatch = result.matches.firstWhere(
-            (m) =>
-                m.roundNumber == result.bracket.totalRounds &&
-                m.matchNumberInRound == 1,
-          );
+        final finalMatch = result.matches.firstWhere(
+          (m) =>
+              m.roundNumber == result.bracket.totalRounds &&
+              m.matchNumberInRound == 1,
+        );
 
-          expect(finalMatch.winnerAdvancesToMatchId, isNull);
-        },
-      );
+        expect(finalMatch.winnerAdvancesToMatchId, isNull);
+      });
 
-      test(
-        'should have correct match count: bracketSize - 1',
-        () {
-          // 8 participants → bracketSize 8 → 7 matches
-          final result = generator.generate(
-            divisionId: 'div-1',
-            participantIds: makeParticipants(8),
-            bracketId: 'bracket-1',
-          );
-          expect(result.matches.length, 7);
+      test('should have correct match count: bracketSize - 1', () {
+        // 8 participants → bracketSize 8 → 7 matches
+        final result = generator.generate(
+          divisionId: 'div-1',
+          participantIds: makeParticipants(8),
+          bracketId: 'bracket-1',
+        );
+        expect(result.matches.length, 7);
 
-          // 5 participants → bracketSize 8 → 7 matches
-          final result2 = generator.generate(
-            divisionId: 'div-1',
-            participantIds: makeParticipants(5),
-            bracketId: 'bracket-2',
-          );
-          expect(result2.matches.length, 7);
-        },
-      );
+        // 5 participants → bracketSize 8 → 7 matches
+        final result2 = generator.generate(
+          divisionId: 'div-1',
+          participantIds: makeParticipants(5),
+          bracketId: 'bracket-2',
+        );
+        expect(result2.matches.length, 7);
+      });
     });
 
     group('bye handling', () {
-      test(
-        'should create 0 byes for power-of-2 participants',
-        () {
-          final result = generator.generate(
-            divisionId: 'div-1',
-            participantIds: makeParticipants(4),
-            bracketId: 'bracket-1',
-          );
+      test('should create 0 byes for power-of-2 participants', () {
+        final result = generator.generate(
+          divisionId: 'div-1',
+          participantIds: makeParticipants(4),
+          bracketId: 'bracket-1',
+        );
 
-          final byes = result.matches
-              .where(
-                (m) => m.resultType == MatchResultType.bye,
-              )
-              .toList();
-          expect(byes.length, 0);
-        },
-      );
+        final byes = result.matches
+            .where((m) => m.resultType == MatchResultType.bye)
+            .toList();
+        expect(byes.length, 0);
+      });
 
-      test(
-        'should create correct bye count: bracketSize - N',
-        () {
-          // 5 participants → bracketSize 8 → 3 byes
-          final result = generator.generate(
-            divisionId: 'div-1',
-            participantIds: makeParticipants(5),
-            bracketId: 'bracket-1',
-          );
+      test('should create correct bye count: bracketSize - N', () {
+        // 5 participants → bracketSize 8 → 3 byes
+        final result = generator.generate(
+          divisionId: 'div-1',
+          participantIds: makeParticipants(5),
+          bracketId: 'bracket-1',
+        );
 
-          final byes = result.matches
-              .where(
-                (m) => m.resultType == MatchResultType.bye,
-              )
-              .toList();
-          expect(byes.length, 3);
-        },
-      );
+        final byes = result.matches
+            .where((m) => m.resultType == MatchResultType.bye)
+            .toList();
+        expect(byes.length, 3);
+      });
 
-      test(
-        'should mark bye matches as completed with '
-        'resultType bye',
-        () {
-          final result = generator.generate(
-            divisionId: 'div-1',
-            participantIds: makeParticipants(3),
-            bracketId: 'bracket-1',
-          );
+      test('should mark bye matches as completed with '
+          'resultType bye', () {
+        final result = generator.generate(
+          divisionId: 'div-1',
+          participantIds: makeParticipants(3),
+          bracketId: 'bracket-1',
+        );
 
-          final byes = result.matches
-              .where(
-                (m) => m.resultType == MatchResultType.bye,
-              )
-              .toList();
-          expect(byes.length, 1);
+        final byes = result.matches
+            .where((m) => m.resultType == MatchResultType.bye)
+            .toList();
+        expect(byes.length, 1);
 
-          final bye = byes.first;
-          expect(bye.status, MatchStatus.completed);
-          expect(bye.resultType, MatchResultType.bye);
-          expect(bye.completedAtTimestamp, isNotNull);
-        },
-      );
+        final bye = byes.first;
+        expect(bye.status, MatchStatus.completed);
+        expect(bye.resultType, MatchResultType.bye);
+        expect(bye.completedAtTimestamp, isNotNull);
+      });
 
       test('should set winnerId on bye matches', () {
         final result = generator.generate(
@@ -258,32 +236,26 @@ void main() {
         expect(bye.winnerId, bye.participantRedId);
       });
 
-      test(
-        'should distribute byes evenly from top of bracket',
-        () {
-          // 5 participants → 3 byes → M1, M2, M3 are byes
-          final result = generator.generate(
-            divisionId: 'div-1',
-            participantIds: makeParticipants(5),
-            bracketId: 'bracket-1',
+      test('should distribute byes evenly from top of bracket', () {
+        // 5 participants → 3 byes → M1, M2, M3 are byes
+        final result = generator.generate(
+          divisionId: 'div-1',
+          participantIds: makeParticipants(5),
+          bracketId: 'bracket-1',
+        );
+
+        final r1 = result.matches.where((m) => m.roundNumber == 1).toList()
+          ..sort(
+            (a, b) => a.matchNumberInRound.compareTo(b.matchNumberInRound),
           );
 
-          final r1 = result.matches
-              .where((m) => m.roundNumber == 1)
-              .toList()
-            ..sort(
-              (a, b) => a.matchNumberInRound
-                  .compareTo(b.matchNumberInRound),
-            );
-
-          // First 3 matches should be byes
-          expect(r1[0].resultType, MatchResultType.bye);
-          expect(r1[1].resultType, MatchResultType.bye);
-          expect(r1[2].resultType, MatchResultType.bye);
-          // Last match is a normal match
-          expect(r1[3].resultType, isNull);
-        },
-      );
+        // First 3 matches should be byes
+        expect(r1[0].resultType, MatchResultType.bye);
+        expect(r1[1].resultType, MatchResultType.bye);
+        expect(r1[2].resultType, MatchResultType.bye);
+        // Last match is a normal match
+        expect(r1[3].resultType, isNull);
+      });
 
       test('should advance bye winner to Round 2', () {
         final result = generator.generate(
@@ -293,12 +265,10 @@ void main() {
         );
 
         final m1 = result.matches.firstWhere(
-          (m) =>
-              m.roundNumber == 1 && m.matchNumberInRound == 1,
+          (m) => m.roundNumber == 1 && m.matchNumberInRound == 1,
         );
         final m3 = result.matches.firstWhere(
-          (m) =>
-              m.roundNumber == 2 && m.matchNumberInRound == 1,
+          (m) => m.roundNumber == 2 && m.matchNumberInRound == 1,
         );
 
         expect(m1.winnerId, 'p1');
@@ -307,102 +277,74 @@ void main() {
     });
 
     group('3rd-place match', () {
-      test(
-        'should create 3rd-place match when configured',
-        () {
-          final result = generator.generate(
-            divisionId: 'div-1',
-            participantIds: makeParticipants(4),
-            bracketId: 'bracket-1',
-            includeThirdPlaceMatch: true,
-          );
+      test('should create 3rd-place match when configured', () {
+        final result = generator.generate(
+          divisionId: 'div-1',
+          participantIds: makeParticipants(4),
+          bracketId: 'bracket-1',
+          includeThirdPlaceMatch: true,
+        );
 
-          // 3 bracket matches + 1 third-place = 4
-          expect(result.matches.length, 4);
+        // 3 bracket matches + 1 third-place = 4
+        expect(result.matches.length, 4);
 
-          final third = result.matches.firstWhere(
-            (m) =>
-                m.roundNumber == 2 &&
-                m.matchNumberInRound == 2,
-          );
-          expect(third, isNotNull);
-        },
-      );
+        final third = result.matches.firstWhere(
+          (m) => m.roundNumber == 2 && m.matchNumberInRound == 2,
+        );
+        expect(third, isNotNull);
+      });
 
-      test(
-        'should link semifinal losers to 3rd-place match',
-        () {
-          final result = generator.generate(
-            divisionId: 'div-1',
-            participantIds: makeParticipants(4),
-            bracketId: 'bracket-1',
-            includeThirdPlaceMatch: true,
-          );
+      test('should link semifinal losers to 3rd-place match', () {
+        final result = generator.generate(
+          divisionId: 'div-1',
+          participantIds: makeParticipants(4),
+          bracketId: 'bracket-1',
+          includeThirdPlaceMatch: true,
+        );
 
-          final semi1 = result.matches.firstWhere(
-            (m) =>
-                m.roundNumber == 1 &&
-                m.matchNumberInRound == 1,
-          );
-          final semi2 = result.matches.firstWhere(
-            (m) =>
-                m.roundNumber == 1 &&
-                m.matchNumberInRound == 2,
-          );
-          final thirdPlace = result.matches.firstWhere(
-            (m) =>
-                m.roundNumber == 2 &&
-                m.matchNumberInRound == 2,
-          );
+        final semi1 = result.matches.firstWhere(
+          (m) => m.roundNumber == 1 && m.matchNumberInRound == 1,
+        );
+        final semi2 = result.matches.firstWhere(
+          (m) => m.roundNumber == 1 && m.matchNumberInRound == 2,
+        );
+        final thirdPlace = result.matches.firstWhere(
+          (m) => m.roundNumber == 2 && m.matchNumberInRound == 2,
+        );
 
-          expect(
-            semi1.loserAdvancesToMatchId,
-            thirdPlace.id,
-          );
-          expect(
-            semi2.loserAdvancesToMatchId,
-            thirdPlace.id,
-          );
-        },
-      );
+        expect(semi1.loserAdvancesToMatchId, thirdPlace.id);
+        expect(semi2.loserAdvancesToMatchId, thirdPlace.id);
+      });
 
-      test(
-        'should not create 3rd-place match by default',
-        () {
-          final result = generator.generate(
-            divisionId: 'div-1',
-            participantIds: makeParticipants(4),
-            bracketId: 'bracket-1',
-          );
+      test('should not create 3rd-place match by default', () {
+        final result = generator.generate(
+          divisionId: 'div-1',
+          participantIds: makeParticipants(4),
+          bracketId: 'bracket-1',
+        );
 
-          // Only 3 bracket matches, no 3rd-place
-          expect(result.matches.length, 3);
+        // Only 3 bracket matches, no 3rd-place
+        expect(result.matches.length, 3);
 
-          final thirdPlaces = result.matches.where(
-            (m) =>
-                m.roundNumber == 2 &&
-                m.matchNumberInRound == 2,
-          );
-          expect(thirdPlaces, isEmpty);
-        },
-      );
+        final thirdPlaces = result.matches.where(
+          (m) => m.roundNumber == 2 && m.matchNumberInRound == 2,
+        );
+        expect(thirdPlaces, isEmpty);
+      });
 
-      test(
-        'should not create 3rd-place match for '
-        '2-participant bracket',
-        () {
-          final result = generator.generate(
-            divisionId: 'div-1',
-            participantIds: makeParticipants(2),
-            bracketId: 'bracket-1',
-            includeThirdPlaceMatch: true,
-          );
+      test('should not create 3rd-place match for '
+          '2-participant bracket', () {
+        final result = generator.generate(
+          divisionId: 'div-1',
+          participantIds: makeParticipants(2),
+          bracketId: 'bracket-1',
+          includeThirdPlaceMatch: true,
+        );
 
-          // Only 1 match (the final), no 3rd-place
-          // because totalRounds < 2
-          expect(result.matches.length, 1);
-        },
-      );
+        // Only 1 match (the final), no 3rd-place
+        // because totalRounds < 2
+        expect(result.matches.length, 1);
+      });
     });
 
     group('bracket entity', () {
@@ -417,14 +359,8 @@ void main() {
         expect(result.bracket.divisionId, 'div-1');
         expect(result.bracket.bracketType, BracketType.winners);
         expect(result.bracket.isFinalized, isFalse);
-        expect(
-          result.bracket.generatedAtTimestamp,
-          isNotNull,
-        );
-        expect(
-          result.bracket.bracketDataJson?['participantCount'],
-          4,
-        );
+        expect(result.bracket.generatedAtTimestamp, isNotNull);
+        expect(result.bracket.bracketDataJson?['participantCount'], 4);
       });
     });
 

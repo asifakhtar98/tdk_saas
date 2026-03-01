@@ -67,34 +67,38 @@ class RoundRobinBracketGeneratorServiceImplementation
 
         if (isBye) {
           final realParticipant = topParticipant ?? bottomParticipant;
-          matches.add(MatchEntity(
-            id: matchId,
-            bracketId: bracketId,
-            roundNumber: roundNumber,
-            matchNumberInRound: matchNumber,
-            participantRedId: realParticipant,
-            // participantBlueId defaults to null (bye)
-            winnerId: realParticipant,
-            status: MatchStatus.completed,
-            resultType: MatchResultType.bye,
-            completedAtTimestamp: now,
-            createdAtTimestamp: now,
-            updatedAtTimestamp: now,
-          ));
+          matches.add(
+            MatchEntity(
+              id: matchId,
+              bracketId: bracketId,
+              roundNumber: roundNumber,
+              matchNumberInRound: matchNumber,
+              participantRedId: realParticipant,
+              // participantBlueId defaults to null (bye)
+              winnerId: realParticipant,
+              status: MatchStatus.completed,
+              resultType: MatchResultType.bye,
+              completedAtTimestamp: now,
+              createdAtTimestamp: now,
+              updatedAtTimestamp: now,
+            ),
+          );
         } else {
-          matches.add(MatchEntity(
-            id: matchId,
-            bracketId: bracketId,
-            roundNumber: roundNumber,
-            matchNumberInRound: matchNumber,
-            participantRedId: topParticipant,
-            participantBlueId: bottomParticipant,
-            status: MatchStatus.pending,
-            createdAtTimestamp: now,
-            updatedAtTimestamp: now,
-            // winnerAdvancesToMatchId: null (round robin — no tree!)
-            // loserAdvancesToMatchId: null (round robin — no tree!)
-          ));
+          matches.add(
+            MatchEntity(
+              id: matchId,
+              bracketId: bracketId,
+              roundNumber: roundNumber,
+              matchNumberInRound: matchNumber,
+              participantRedId: topParticipant,
+              participantBlueId: bottomParticipant,
+              status: MatchStatus.pending,
+              createdAtTimestamp: now,
+              updatedAtTimestamp: now,
+              // winnerAdvancesToMatchId: null (round robin — no tree!)
+              // loserAdvancesToMatchId: null (round robin — no tree!)
+            ),
+          );
         }
       }
 
@@ -118,15 +122,9 @@ class RoundRobinBracketGeneratorServiceImplementation
       createdAtTimestamp: now,
       updatedAtTimestamp: now,
       generatedAtTimestamp: now,
-      bracketDataJson: {
-        'roundRobin': true,
-        'participantCount': n,
-      },
+      bracketDataJson: {'roundRobin': true, 'participantCount': n},
     );
 
-    return BracketGenerationResult(
-      bracket: bracket,
-      matches: matches,
-    );
+    return BracketGenerationResult(bracket: bracket, matches: matches);
   }
 }

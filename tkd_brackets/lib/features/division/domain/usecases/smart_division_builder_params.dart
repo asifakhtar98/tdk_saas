@@ -21,7 +21,6 @@ class SmartDivisionBuilderParams with _$SmartDivisionBuilderParams {
 }
 
 class AgeGroupConfig {
-
   const AgeGroupConfig({
     required this.name,
     required this.minAge,
@@ -55,7 +54,6 @@ class AgeGroupConfig {
 }
 
 class BeltGroupConfig {
-
   const BeltGroupConfig({
     required this.name,
     required this.minOrder,
@@ -79,7 +77,6 @@ class BeltGroupConfig {
 }
 
 class DivisionCategoryConfig {
-
   const DivisionCategoryConfig({
     required this.category,
     this.applyWeightClasses = true,
@@ -93,7 +90,6 @@ enum DivisionCategoryType { sparring, poomsae, breaking, demoTeam }
 enum DivisionGenderType { male, female, mixed }
 
 class WeightClassConfig {
-
   const WeightClassConfig({
     required this.federationType,
     required this.maleClasses,
@@ -181,7 +177,6 @@ class WeightClassConfig {
 }
 
 class WeightClass {
-
   const WeightClass({required this.name, required this.maxWeight});
   final String name;
   final double maxWeight;

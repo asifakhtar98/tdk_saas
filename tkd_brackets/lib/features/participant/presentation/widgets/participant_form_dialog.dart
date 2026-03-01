@@ -23,12 +23,10 @@ class ParticipantFormDialog extends StatefulWidget {
   final void Function(Object params) onSave;
 
   @override
-  State<ParticipantFormDialog> createState() =>
-      _ParticipantFormDialogState();
+  State<ParticipantFormDialog> createState() => _ParticipantFormDialogState();
 }
 
-class _ParticipantFormDialogState
-    extends State<ParticipantFormDialog> {
+class _ParticipantFormDialogState extends State<ParticipantFormDialog> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
@@ -44,27 +42,19 @@ class _ParticipantFormDialogState
   void initState() {
     super.initState();
     final p = widget.participant;
-    _firstNameController = TextEditingController(
-      text: p?.firstName ?? '',
-    );
-    _lastNameController = TextEditingController(
-      text: p?.lastName ?? '',
-    );
+    _firstNameController = TextEditingController(text: p?.firstName ?? '');
+    _lastNameController = TextEditingController(text: p?.lastName ?? '');
     _schoolController = TextEditingController(
       text: p?.schoolOrDojangName ?? '',
     );
-    _beltController = TextEditingController(
-      text: p?.beltRank ?? '',
-    );
+    _beltController = TextEditingController(text: p?.beltRank ?? '');
     _weightController = TextEditingController(
       text: p?.weightKg?.toString() ?? '',
     );
     _regNumberController = TextEditingController(
       text: p?.registrationNumber ?? '',
     );
-    _notesController = TextEditingController(
-      text: p?.notes ?? '',
-    );
+    _notesController = TextEditingController(text: p?.notes ?? '');
     _dateOfBirth = p?.dateOfBirth;
     _gender = p?.gender;
   }
@@ -86,40 +76,28 @@ class _ParticipantFormDialogState
       if (widget.participant == null) {
         final params = CreateParticipantParams(
           divisionId: widget.divisionId,
-          firstName:
-              _firstNameController.text.trim(),
-          lastName:
-              _lastNameController.text.trim(),
-          schoolOrDojangName:
-              _schoolController.text.trim(),
+          firstName: _firstNameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
+          schoolOrDojangName: _schoolController.text.trim(),
           beltRank: _beltController.text.trim(),
           dateOfBirth: _dateOfBirth,
           gender: _gender,
-          weightKg: double.tryParse(
-            _weightController.text,
-          ),
-          registrationNumber:
-              _regNumberController.text.trim(),
+          weightKg: double.tryParse(_weightController.text),
+          registrationNumber: _regNumberController.text.trim(),
           notes: _notesController.text.trim(),
         );
         widget.onSave(params);
       } else {
         final params = UpdateParticipantParams(
           participantId: widget.participant!.id,
-          firstName:
-              _firstNameController.text.trim(),
-          lastName:
-              _lastNameController.text.trim(),
-          schoolOrDojangName:
-              _schoolController.text.trim(),
+          firstName: _firstNameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
+          schoolOrDojangName: _schoolController.text.trim(),
           beltRank: _beltController.text.trim(),
           dateOfBirth: _dateOfBirth,
           gender: _gender,
-          weightKg: double.tryParse(
-            _weightController.text,
-          ),
-          registrationNumber:
-              _regNumberController.text.trim(),
+          weightKg: double.tryParse(_weightController.text),
+          registrationNumber: _regNumberController.text.trim(),
           notes: _notesController.text.trim(),
         );
         widget.onSave(params);
@@ -132,11 +110,7 @@ class _ParticipantFormDialogState
   Widget build(BuildContext context) {
     final isEdit = widget.participant != null;
     return AlertDialog(
-      title: Text(
-        isEdit
-            ? 'Edit Participant'
-            : 'Add Participant',
-      ),
+      title: Text(isEdit ? 'Edit Participant' : 'Add Participant'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -145,23 +119,15 @@ class _ParticipantFormDialogState
             children: [
               TextFormField(
                 controller: _firstNameController,
-                decoration: const InputDecoration(
-                  labelText: 'First Name *',
-                ),
+                decoration: const InputDecoration(labelText: 'First Name *'),
                 validator: (v) =>
-                    v == null || v.trim().isEmpty
-                        ? 'Required'
-                        : null,
+                    v == null || v.trim().isEmpty ? 'Required' : null,
               ),
               TextFormField(
                 controller: _lastNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Last Name *',
-                ),
+                decoration: const InputDecoration(labelText: 'Last Name *'),
                 validator: (v) =>
-                    v == null || v.trim().isEmpty
-                        ? 'Required'
-                        : null,
+                    v == null || v.trim().isEmpty ? 'Required' : null,
               ),
               TextFormField(
                 controller: _schoolController,
@@ -169,63 +135,43 @@ class _ParticipantFormDialogState
                   labelText: 'School / Dojang *',
                 ),
                 validator: (v) =>
-                    v == null || v.trim().isEmpty
-                        ? 'Required'
-                        : null,
+                    v == null || v.trim().isEmpty ? 'Required' : null,
               ),
               TextFormField(
                 controller: _beltController,
-                decoration: const InputDecoration(
-                  labelText: 'Belt Rank *',
-                ),
+                decoration: const InputDecoration(labelText: 'Belt Rank *'),
                 validator: (v) =>
-                    v == null || v.trim().isEmpty
-                        ? 'Required'
-                        : null,
+                    v == null || v.trim().isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
-                    child: DropdownButtonFormField<
-                      Gender
-                    >(
+                    child: DropdownButtonFormField<Gender>(
                       initialValue: _gender,
-                      decoration:
-                          const InputDecoration(
-                        labelText: 'Gender',
-                      ),
+                      decoration: const InputDecoration(labelText: 'Gender'),
                       items: Gender.values.map((g) {
                         return DropdownMenuItem(
                           value: g,
-                          child: Text(
-                            g.value.toUpperCase(),
-                          ),
+                          child: Text(g.value.toUpperCase()),
                         );
                       }).toList(),
-                      onChanged: (v) =>
-                          setState(() => _gender = v),
+                      onChanged: (v) => setState(() => _gender = v),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: TextFormField(
                       controller: _weightController,
-                      decoration:
-                          const InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Weight (kg)',
                         suffixText: 'kg',
                       ),
-                      keyboardType:
-                          TextInputType.number,
+                      keyboardType: TextInputType.number,
                       validator: (v) {
-                        if (v != null &&
-                            v.isNotEmpty) {
-                          final w =
-                              double.tryParse(v);
-                          if (w == null ||
-                              w < 0 ||
-                              w > 150) {
+                        if (v != null && v.isNotEmpty) {
+                          final w = double.tryParse(v);
+                          if (w == null || w < 0 || w > 150) {
                             return '0-150 kg';
                           }
                         }
@@ -242,38 +188,29 @@ class _ParticipantFormDialogState
                   _dateOfBirth == null
                       ? 'Select Date of Birth'
                       : 'DOB: ${_dateOfBirth!.year}-'
-                          '${_dateOfBirth!.month}-'
-                          '${_dateOfBirth!.day}',
+                            '${_dateOfBirth!.month}-'
+                            '${_dateOfBirth!.day}',
                 ),
-                trailing:
-                    const Icon(Icons.calendar_today),
+                trailing: const Icon(Icons.calendar_today),
                 onTap: () async {
-                  final picked =
-                      await showDatePicker(
+                  final picked = await showDatePicker(
                     context: context,
-                    initialDate:
-                        _dateOfBirth ?? DateTime(2010),
+                    initialDate: _dateOfBirth ?? DateTime(2010),
                     firstDate: DateTime(1950),
                     lastDate: DateTime.now(),
                   );
                   if (picked != null) {
-                    setState(
-                      () => _dateOfBirth = picked,
-                    );
+                    setState(() => _dateOfBirth = picked);
                   }
                 },
               ),
               TextFormField(
                 controller: _regNumberController,
-                decoration: const InputDecoration(
-                  labelText: 'Registration #',
-                ),
+                decoration: const InputDecoration(labelText: 'Registration #'),
               ),
               TextFormField(
                 controller: _notesController,
-                decoration: const InputDecoration(
-                  labelText: 'Notes',
-                ),
+                decoration: const InputDecoration(labelText: 'Notes'),
                 maxLines: 2,
               ),
             ],
@@ -285,10 +222,7 @@ class _ParticipantFormDialogState
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        FilledButton(
-          onPressed: _submit,
-          child: const Text('Save'),
-        ),
+        FilledButton(onPressed: _submit, child: const Text('Save')),
       ],
     );
   }

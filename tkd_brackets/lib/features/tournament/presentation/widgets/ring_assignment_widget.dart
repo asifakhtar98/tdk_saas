@@ -3,7 +3,10 @@ import 'package:tkd_brackets/features/division/domain/entities/division_entity.d
 
 class RingAssignmentWidget extends StatelessWidget {
   const RingAssignmentWidget({
-    required this.ringCount, required this.divisions, required this.onDivisionMoved, super.key,
+    required this.ringCount,
+    required this.divisions,
+    required this.onDivisionMoved,
+    super.key,
   });
 
   final int ringCount;

@@ -15,9 +15,7 @@ void main() {
   setUp(() {
     mockUuid = MockUuid();
     uuidCounter = 0;
-    when(() => mockUuid.v4()).thenAnswer(
-      (_) => 'match-${uuidCounter++}',
-    );
+    when(() => mockUuid.v4()).thenAnswer((_) => 'match-${uuidCounter++}');
     service = RoundRobinBracketGeneratorServiceImplementation(mockUuid);
   });
 
@@ -44,13 +42,16 @@ void main() {
             match.participantRedId != null &&
             match.participantBlueId != null) {
           final pair = [match.participantRedId!, match.participantBlueId!]
-              ..sort();
+            ..sort();
           actualPairs.add(pair.join('-'));
         }
       }
 
-      expect(actualPairs, expectedPairs,
-          reason: 'All participant pairs should be covered exactly once');
+      expect(
+        actualPairs,
+        expectedPairs,
+        reason: 'All participant pairs should be covered exactly once',
+      );
     }
 
     // Helper: verify no participant appears more than once per round
@@ -62,7 +63,8 @@ void main() {
           expect(
             roundParticipants[match.roundNumber]!.add(match.participantRedId!),
             isTrue,
-            reason: 'Participant ${match.participantRedId} appears twice '
+            reason:
+                'Participant ${match.participantRedId} appears twice '
                 'in round ${match.roundNumber}',
           );
         }
@@ -70,7 +72,8 @@ void main() {
           expect(
             roundParticipants[match.roundNumber]!.add(match.participantBlueId!),
             isTrue,
-            reason: 'Participant ${match.participantBlueId} appears twice '
+            reason:
+                'Participant ${match.participantBlueId} appears twice '
                 'in round ${match.roundNumber}',
           );
         }
@@ -87,7 +90,7 @@ void main() {
 
       expect(result.bracket.totalRounds, 1);
       expect(result.matches.length, 1);
-      
+
       final m = result.matches.first;
       expect(m.roundNumber, 1);
       expect(m.matchNumberInRound, 1);
@@ -112,8 +115,12 @@ void main() {
       expect(result.bracket.totalRounds, 3);
       expect(result.matches.length, 6);
 
-      final realMatches = result.matches.where((m) => m.resultType != MatchResultType.bye).toList();
-      final byeMatches = result.matches.where((m) => m.resultType == MatchResultType.bye).toList();
+      final realMatches = result.matches
+          .where((m) => m.resultType != MatchResultType.bye)
+          .toList();
+      final byeMatches = result.matches
+          .where((m) => m.resultType == MatchResultType.bye)
+          .toList();
 
       expect(realMatches.length, 3);
       expect(byeMatches.length, 3);
@@ -156,7 +163,9 @@ void main() {
       expect(result.bracket.totalRounds, 5);
       expect(result.matches.length, 15); // (5+1)/2 * 5
 
-      final byeMatches = result.matches.where((m) => m.resultType == MatchResultType.bye).toList();
+      final byeMatches = result.matches
+          .where((m) => m.resultType == MatchResultType.bye)
+          .toList();
       expect(byeMatches.length, 5);
 
       verifyAllPairsCovered(result.matches, pIds);
@@ -245,39 +254,53 @@ void main() {
       expect(result.bracket.bracketDataJson?['participantCount'], 4);
     });
 
-    test('should assign correct 1-indexed roundNumber and matchNumberInRound', () {
-      final pIds = makeParticipants(4);
-      final result = service.generate(
-        divisionId: 'div-1',
-        participantIds: pIds,
-        bracketId: 'b-1',
-      );
+    test(
+      'should assign correct 1-indexed roundNumber and matchNumberInRound',
+      () {
+        final pIds = makeParticipants(4);
+        final result = service.generate(
+          divisionId: 'div-1',
+          participantIds: pIds,
+          bracketId: 'b-1',
+        );
 
-      // 3 rounds, 2 matches per round
-      for (var r = 1; r <= 3; r++) {
-        final roundMatches =
-            result.matches.where((m) => m.roundNumber == r).toList();
-        expect(roundMatches.length, 2, reason: 'Round $r should have 2 matches');
-        final matchNumbers =
-            roundMatches.map((m) => m.matchNumberInRound).toSet();
-        expect(matchNumbers, {1, 2},
-            reason: 'Round $r should have match numbers 1 and 2');
-      }
-    });
+        // 3 rounds, 2 matches per round
+        for (var r = 1; r <= 3; r++) {
+          final roundMatches = result.matches
+              .where((m) => m.roundNumber == r)
+              .toList();
+          expect(
+            roundMatches.length,
+            2,
+            reason: 'Round $r should have 2 matches',
+          );
+          final matchNumbers = roundMatches
+              .map((m) => m.matchNumberInRound)
+              .toSet();
+          expect(matchNumbers, {
+            1,
+            2,
+          }, reason: 'Round $r should have match numbers 1 and 2');
+        }
+      },
+    );
 
-    test('should ensure winnerAdvancesToMatchId and loserAdvancesToMatchId are null', () {
-      final pIds = makeParticipants(4);
-      final result = service.generate(
-        divisionId: 'div-1',
-        participantIds: pIds,
-        bracketId: 'b-1',
-      );
+    test(
+      'should ensure winnerAdvancesToMatchId and loserAdvancesToMatchId are null',
+      () {
+        final pIds = makeParticipants(4);
+        final result = service.generate(
+          divisionId: 'div-1',
+          participantIds: pIds,
+          bracketId: 'b-1',
+        );
 
-      for (final m in result.matches) {
-        expect(m.winnerAdvancesToMatchId, isNull);
-        expect(m.loserAdvancesToMatchId, isNull);
-      }
-    });
+        for (final m in result.matches) {
+          expect(m.winnerAdvancesToMatchId, isNull);
+          expect(m.loserAdvancesToMatchId, isNull);
+        }
+      },
+    );
 
     test('should use custom poolIdentifier', () {
       final pIds = makeParticipants(2);
@@ -306,11 +329,17 @@ void main() {
       // Each participant should appear as the bye recipient exactly once
       final byeRecipients = byeMatches.map((m) => m.participantRedId).toList();
       expect(byeRecipients.length, 5);
-      expect(byeRecipients.toSet().length, 5,
-          reason: 'Each of the 5 participants should get exactly 1 bye');
+      expect(
+        byeRecipients.toSet().length,
+        5,
+        reason: 'Each of the 5 participants should get exactly 1 bye',
+      );
       for (final pId in pIds) {
-        expect(byeRecipients.contains(pId), isTrue,
-            reason: 'Participant $pId should have exactly one bye');
+        expect(
+          byeRecipients.contains(pId),
+          isTrue,
+          reason: 'Participant $pId should have exactly one bye',
+        );
       }
     });
   });

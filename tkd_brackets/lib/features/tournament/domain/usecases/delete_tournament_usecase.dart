@@ -90,10 +90,7 @@ class DeleteTournamentUseCase
       final hardDeleteResult = await _repository.hardDeleteTournament(
         params.tournamentId,
       );
-      return hardDeleteResult.fold(
-        Left.new,
-        (_) => Right(tournament),
-      );
+      return hardDeleteResult.fold(Left.new, (_) => Right(tournament));
     } else {
       await _cascadeSoftDelete(tournament.id);
 
@@ -107,10 +104,7 @@ class DeleteTournamentUseCase
         deletedTournament,
       );
 
-      return updateResult.fold(
-        Left.new,
-        Right.new,
-      );
+      return updateResult.fold(Left.new, Right.new);
     }
   }
 

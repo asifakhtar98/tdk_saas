@@ -64,7 +64,8 @@ void main() {
       expect(
         matches.length,
         26,
-        reason: 'Barrel file should have twenty-six exports for bracket & match entity & repo + services + usecases',
+        reason:
+            'Barrel file should have twenty-six exports for bracket & match entity & repo + services + usecases',
       );
     });
 
@@ -116,26 +117,23 @@ void main() {
         );
       });
 
-      test(
-        'parent directories should have .gitkeep for consistency',
-        () {
-          final parentDirs = [
-            '$basePath/data',
-            '$basePath/domain',
-            '$basePath/presentation',
-          ];
+      test('parent directories should have .gitkeep for consistency', () {
+        final parentDirs = [
+          '$basePath/data',
+          '$basePath/domain',
+          '$basePath/presentation',
+        ];
 
-          for (final dir in parentDirs) {
-            expect(
-              File('$dir/.gitkeep').existsSync(),
-              isTrue,
-              reason:
-                  'Parent directory $dir should have '
-                  '.gitkeep file',
-            );
-          }
-        },
-      );
+        for (final dir in parentDirs) {
+          expect(
+            File('$dir/.gitkeep').existsSync(),
+            isTrue,
+            reason:
+                'Parent directory $dir should have '
+                '.gitkeep file',
+          );
+        }
+      });
     });
 
     group('Documentation', () {

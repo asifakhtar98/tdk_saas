@@ -23,8 +23,12 @@ class ParticipantEntity with _$ParticipantEntity {
     required String lastName,
 
     /// When the participant was created.
-    required DateTime createdAtTimestamp, /// When the participant was last updated.
-    required DateTime updatedAtTimestamp, /// Date of birth for age verification.
+    required DateTime createdAtTimestamp,
+
+    /// When the participant was last updated.
+    required DateTime updatedAtTimestamp,
+
+    /// Date of birth for age verification.
     DateTime? dateOfBirth,
 
     /// Participant gender.

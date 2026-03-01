@@ -260,8 +260,7 @@ class DoubleEliminationBracketGeneratorServiceImplementation
       final r1Count = r1Matches.length;
       for (var m = 1; m <= r1Count; m++) {
         final match = r1Matches[m]!;
-        if (match.resultType == MatchResultType.bye &&
-            match.winnerId != null) {
+        if (match.resultType == MatchResultType.bye && match.winnerId != null) {
           final nextMatchNum = (m + 1) ~/ 2;
           var nextMatch = wbMatchMap[2]![nextMatchNum]!;
           if (m % 2 != 0) {

@@ -10,7 +10,6 @@ import 'package:tkd_brackets/features/division/domain/usecases/smart_division_na
 import 'package:uuid/uuid.dart';
 
 class _ParticipantData {
-
   _ParticipantData({
     required this.age,
     required this.weightKg,

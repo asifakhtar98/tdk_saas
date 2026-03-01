@@ -3,7 +3,9 @@ import 'package:tkd_brackets/features/tournament/domain/entities/tournament_enti
 
 class TournamentCard extends StatelessWidget {
   const TournamentCard({
-    required this.tournament, required this.onTap, super.key,
+    required this.tournament,
+    required this.onTap,
+    super.key,
     this.onDelete,
     this.onArchive,
   });

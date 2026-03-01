@@ -7,7 +7,6 @@ part 'create_custom_division_params.g.dart';
 
 @freezed
 class CreateCustomDivisionParams with _$CreateCustomDivisionParams {
-
   const factory CreateCustomDivisionParams({
     required String tournamentId,
     required String name,

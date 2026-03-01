@@ -7,14 +7,12 @@ part 'csv_import_state.freezed.dart';
 @freezed
 class CSVImportState with _$CSVImportState {
   /// Initial state, awaiting CSV input.
-  const factory CSVImportState.initial({
-    @Default('') String csvContent,
-  }) = CSVImportInitial;
+  const factory CSVImportState.initial({@Default('') String csvContent}) =
+      CSVImportInitial;
 
   /// State when parsing CSV and generating preview.
-  const factory CSVImportState.previewInProgress({
-    required String csvContent,
-  }) = CSVImportPreviewInProgress;
+  const factory CSVImportState.previewInProgress({required String csvContent}) =
+      CSVImportPreviewInProgress;
 
   /// State when preview is ready for user selection.
   const factory CSVImportState.previewSuccess({

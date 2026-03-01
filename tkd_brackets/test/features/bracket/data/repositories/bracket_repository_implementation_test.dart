@@ -16,14 +16,11 @@ class MockBracketRemoteDatasource extends Mock
 
 class MockConnectivityService extends Mock implements ConnectivityService {}
 
-
-
 void main() {
   late BracketRepositoryImplementation repository;
   late MockBracketLocalDatasource mockLocalDatasource;
   late MockBracketRemoteDatasource mockRemoteDatasource;
   late MockConnectivityService mockConnectivityService;
-
 
   final testDateTime = DateTime(2026, 1, 15, 10, 30);
 
@@ -76,24 +73,27 @@ void main() {
         (l) => fail('Should not return Left'),
         (r) => expect(r.first.id, 'bracket-1'),
       );
-      verify(() => mockLocalDatasource.getBracketsForDivision('division-1'))
-          .called(1);
-    });
-
-    test('should return Left with LocalCacheAccessFailure on exception',
-        () async {
-      when(
+      verify(
         () => mockLocalDatasource.getBracketsForDivision('division-1'),
-      ).thenThrow(Exception('DB error'));
-
-      final result = await repository.getBracketsForDivision('division-1');
-
-      expect(result.isLeft(), true);
-      result.fold(
-        (l) => expect(l, isA<LocalCacheAccessFailure>()),
-        (r) => fail('Should not return Right'),
-      );
+      ).called(1);
     });
+
+    test(
+      'should return Left with LocalCacheAccessFailure on exception',
+      () async {
+        when(
+          () => mockLocalDatasource.getBracketsForDivision('division-1'),
+        ).thenThrow(Exception('DB error'));
+
+        final result = await repository.getBracketsForDivision('division-1');
+
+        expect(result.isLeft(), true);
+        result.fold(
+          (l) => expect(l, isA<LocalCacheAccessFailure>()),
+          (r) => fail('Should not return Right'),
+        );
+      },
+    );
   });
 
   group('getBracketById', () {
@@ -129,34 +129,39 @@ void main() {
       verify(() => mockLocalDatasource.insertBracket(any())).called(1);
     });
 
-    test('should return NotFoundFailure when not found locally and offline',
-        () async {
-      when(
-        () => mockLocalDatasource.getBracketById('bracket-1'),
-      ).thenAnswer((_) async => null);
-      when(
-        () => mockConnectivityService.hasInternetConnection(),
-      ).thenAnswer((_) async => false);
+    test(
+      'should return NotFoundFailure when not found locally and offline',
+      () async {
+        when(
+          () => mockLocalDatasource.getBracketById('bracket-1'),
+        ).thenAnswer((_) async => null);
+        when(
+          () => mockConnectivityService.hasInternetConnection(),
+        ).thenAnswer((_) async => false);
 
-      final result = await repository.getBracketById('bracket-1');
+        final result = await repository.getBracketById('bracket-1');
 
-      expect(result.isLeft(), true);
-      result.fold(
-        (l) => expect(l, isA<NotFoundFailure>()),
-        (r) => fail('Should not return Right'),
-      );
-      verifyNever(() => mockRemoteDatasource.getBracketById(any()));
-    });
+        expect(result.isLeft(), true);
+        result.fold(
+          (l) => expect(l, isA<NotFoundFailure>()),
+          (r) => fail('Should not return Right'),
+        );
+        verifyNever(() => mockRemoteDatasource.getBracketById(any()));
+      },
+    );
   });
 
   group('createBracket', () {
     test('should return Right and call both datasources when online', () async {
-      when(() => mockLocalDatasource.insertBracket(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => true);
-      when(() => mockRemoteDatasource.insertBracket(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockLocalDatasource.insertBracket(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRemoteDatasource.insertBracket(any()),
+      ).thenAnswer((_) async {});
 
       final result = await repository.createBracket(testEntity);
 
@@ -166,10 +171,12 @@ void main() {
     });
 
     test('should return Right with only local insert when offline', () async {
-      when(() => mockLocalDatasource.insertBracket(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.insertBracket(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final result = await repository.createBracket(testEntity);
 
@@ -178,29 +185,35 @@ void main() {
       verifyNever(() => mockRemoteDatasource.insertBracket(any()));
     });
 
-    test('should return Left with LocalCacheWriteFailure on exception',
-        () async {
-      when(() => mockLocalDatasource.insertBracket(any()))
-          .thenThrow(Exception('DB write failed'));
+    test(
+      'should return Left with LocalCacheWriteFailure on exception',
+      () async {
+        when(
+          () => mockLocalDatasource.insertBracket(any()),
+        ).thenThrow(Exception('DB write failed'));
 
-      final result = await repository.createBracket(testEntity);
+        final result = await repository.createBracket(testEntity);
 
-      expect(result.isLeft(), true);
-      result.fold(
-        (l) => expect(l, isA<LocalCacheWriteFailure>()),
-        (r) => fail('Should not return Right'),
-      );
-    });
+        expect(result.isLeft(), true);
+        result.fold(
+          (l) => expect(l, isA<LocalCacheWriteFailure>()),
+          (r) => fail('Should not return Right'),
+        );
+      },
+    );
   });
 
   group('updateBracket', () {
     test('should increment syncVersion and call local update', () async {
-      when(() => mockLocalDatasource.getBracketById('bracket-1'))
-          .thenAnswer((_) async => testModel);
-      when(() => mockLocalDatasource.updateBracket(any()))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.getBracketById('bracket-1'),
+      ).thenAnswer((_) async => testModel);
+      when(
+        () => mockLocalDatasource.updateBracket(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final result = await repository.updateBracket(testEntity);
 
@@ -214,10 +227,12 @@ void main() {
 
   group('deleteBracket', () {
     test('should call local delete', () async {
-      when(() => mockLocalDatasource.deleteBracket('bracket-1'))
-          .thenAnswer((_) async {});
-      when(() => mockConnectivityService.hasInternetConnection())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockLocalDatasource.deleteBracket('bracket-1'),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockConnectivityService.hasInternetConnection(),
+      ).thenAnswer((_) async => false);
 
       final result = await repository.deleteBracket('bracket-1');
 
@@ -225,18 +240,21 @@ void main() {
       verify(() => mockLocalDatasource.deleteBracket('bracket-1')).called(1);
     });
 
-    test('should return Left with LocalCacheWriteFailure on exception',
-        () async {
-      when(() => mockLocalDatasource.deleteBracket('bracket-1'))
-          .thenThrow(Exception('DB delete failed'));
+    test(
+      'should return Left with LocalCacheWriteFailure on exception',
+      () async {
+        when(
+          () => mockLocalDatasource.deleteBracket('bracket-1'),
+        ).thenThrow(Exception('DB delete failed'));
 
-      final result = await repository.deleteBracket('bracket-1');
+        final result = await repository.deleteBracket('bracket-1');
 
-      expect(result.isLeft(), true);
-      result.fold(
-        (l) => expect(l, isA<LocalCacheWriteFailure>()),
-        (r) => fail('Should not return Right'),
-      );
-    });
+        expect(result.isLeft(), true);
+        result.fold(
+          (l) => expect(l, isA<LocalCacheWriteFailure>()),
+          (r) => fail('Should not return Right'),
+        );
+      },
+    );
   });
 }

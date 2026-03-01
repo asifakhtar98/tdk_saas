@@ -87,9 +87,6 @@ class ArchiveTournamentUseCase
 
     final updateResult = await _repository.updateTournament(archivedTournament);
 
-    return updateResult.fold(
-      Left.new,
-      Right.new,
-    );
+    return updateResult.fold(Left.new, Right.new);
   }
 }

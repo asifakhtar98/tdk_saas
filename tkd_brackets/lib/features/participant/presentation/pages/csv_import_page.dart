@@ -9,7 +9,9 @@ import 'package:tkd_brackets/features/participant/presentation/bloc/csv_import_s
 
 class CSVImportPage extends StatelessWidget {
   const CSVImportPage({
-    required this.tournamentId, required this.divisionId, super.key,
+    required this.tournamentId,
+    required this.divisionId,
+    super.key,
   });
 
   final String tournamentId;
@@ -25,10 +27,7 @@ class CSVImportPage extends StatelessWidget {
 }
 
 class _CSVImportView extends StatelessWidget {
-  const _CSVImportView({
-    required this.tournamentId,
-    required this.divisionId,
-  });
+  const _CSVImportView({required this.tournamentId, required this.divisionId});
 
   final String tournamentId;
   final String divisionId;
@@ -68,7 +67,8 @@ class _CSVImportView extends StatelessWidget {
     if (state is CSVImportPreviewInProgress) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (state is CSVImportPreviewSuccess || state is CSVImportImportInProgress) {
+    if (state is CSVImportPreviewSuccess ||
+        state is CSVImportImportInProgress) {
       return _buildPreviewStep(context, state);
     }
     if (state is CSVImportImportSuccess) {
@@ -90,10 +90,7 @@ class _CSVImportView extends StatelessWidget {
     return '';
   }
 
-  Widget _buildInputStep(
-    BuildContext context,
-    CSVImportState state,
-  ) {
+  Widget _buildInputStep(BuildContext context, CSVImportState state) {
     final csvContent = _extractCsvContent(state);
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -110,12 +107,13 @@ class _CSVImportView extends StatelessWidget {
               maxLines: null,
               expands: true,
               decoration: const InputDecoration(
-                hintText: 'first_name,last_name,school,belt\nJohn,Doe,Academy,red',
+                hintText:
+                    'first_name,last_name,school,belt\nJohn,Doe,Academy,red',
                 border: OutlineInputBorder(),
               ),
               onChanged: (v) => context.read<CSVImportBloc>().add(
-                    CSVImportEvent.csvContentChanged(v),
-                  ),
+                CSVImportEvent.csvContentChanged(v),
+              ),
               controller: TextEditingController(text: csvContent)
                 ..selection = TextSelection.fromPosition(
                   TextPosition(offset: csvContent.length),
@@ -127,11 +125,11 @@ class _CSVImportView extends StatelessWidget {
             onPressed: csvContent.isEmpty
                 ? null
                 : () => context.read<CSVImportBloc>().add(
-                      CSVImportEvent.previewRequested(
-                        divisionId: divisionId,
-                        tournamentId: tournamentId,
-                      ),
+                    CSVImportEvent.previewRequested(
+                      divisionId: divisionId,
+                      tournamentId: tournamentId,
                     ),
+                  ),
             child: const Text('Analyze & Preview'),
           ),
         ],
@@ -140,7 +138,8 @@ class _CSVImportView extends StatelessWidget {
   }
 
   Widget _buildPreviewStep(BuildContext context, CSVImportState state) {
-    if (state is! CSVImportPreviewSuccess && state is! CSVImportImportInProgress) {
+    if (state is! CSVImportPreviewSuccess &&
+        state is! CSVImportImportInProgress) {
       return const SizedBox();
     }
 
@@ -158,21 +157,38 @@ class _CSVImportView extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              _SummaryCard(label: 'Total', value: '${preview.totalRows}', color: Colors.blue),
-              _SummaryCard(label: 'Valid', value: '${preview.validCount}', color: Colors.green),
-              _SummaryCard(label: 'Warning', value: '${preview.warningCount}', color: Colors.orange),
-              _SummaryCard(label: 'Error', value: '${preview.errorCount}', color: Colors.red),
+              _SummaryCard(
+                label: 'Total',
+                value: '${preview.totalRows}',
+                color: Colors.blue,
+              ),
+              _SummaryCard(
+                label: 'Valid',
+                value: '${preview.validCount}',
+                color: Colors.green,
+              ),
+              _SummaryCard(
+                label: 'Warning',
+                value: '${preview.warningCount}',
+                color: Colors.orange,
+              ),
+              _SummaryCard(
+                label: 'Error',
+                value: '${preview.errorCount}',
+                color: Colors.red,
+              ),
             ],
           ),
         ),
         CheckboxListTile(
           title: const Text('Select All Valid Rows'),
-          value: selection.length == (preview.validCount + preview.warningCount),
+          value:
+              selection.length == (preview.validCount + preview.warningCount),
           onChanged: isImporting
               ? null
               : (v) => context.read<CSVImportBloc>().add(
-                    CSVImportEvent.selectAllToggled(selectAll: v ?? false),
-                  ),
+                  CSVImportEvent.selectAllToggled(selectAll: v ?? false),
+                ),
         ),
         const Divider(),
         Expanded(
@@ -183,15 +199,18 @@ class _CSVImportView extends StatelessWidget {
               return CheckboxListTile(
                 secondary: _RowStatusIcon(status: row.status),
                 title: Text('${row.rowData.firstName} ${row.rowData.lastName}'),
-                subtitle: Text(row.status == BulkImportRowStatus.error
-                    ? row.validationErrors.values.join(', ')
-                    : row.rowData.schoolOrDojangName),
+                subtitle: Text(
+                  row.status == BulkImportRowStatus.error
+                      ? row.validationErrors.values.join(', ')
+                      : row.rowData.schoolOrDojangName,
+                ),
                 value: selection.contains(index),
-                onChanged: isImporting || row.status == BulkImportRowStatus.error
+                onChanged:
+                    isImporting || row.status == BulkImportRowStatus.error
                     ? null
                     : (_) => context.read<CSVImportBloc>().add(
-                          CSVImportEvent.rowSelectionToggled(index),
-                        ),
+                        CSVImportEvent.rowSelectionToggled(index),
+                      ),
               );
             },
           ),
@@ -204,8 +223,8 @@ class _CSVImportView extends StatelessWidget {
                 onPressed: isImporting
                     ? null
                     : () => context.read<CSVImportBloc>().add(
-                          const CSVImportEvent.resetRequested(),
-                        ),
+                        const CSVImportEvent.resetRequested(),
+                      ),
                 child: const Text('Back'),
               ),
               const Spacer(),
@@ -213,13 +232,16 @@ class _CSVImportView extends StatelessWidget {
                 onPressed: isImporting || selection.isEmpty
                     ? null
                     : () => context.read<CSVImportBloc>().add(
-                          CSVImportEvent.importRequested(divisionId: divisionId),
-                        ),
+                        CSVImportEvent.importRequested(divisionId: divisionId),
+                      ),
                 child: isImporting
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : Text('Import ${selection.length} Participants'),
               ),
@@ -238,7 +260,11 @@ class _CSVImportView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.check_circle_outline, size: 80, color: Colors.green),
+            const Icon(
+              Icons.check_circle_outline,
+              size: 80,
+              color: Colors.green,
+            ),
             const SizedBox(height: 24),
             Text(
               'Import Complete!',
@@ -269,7 +295,11 @@ class _CSVImportView extends StatelessWidget {
 }
 
 class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({required this.label, required this.value, required this.color});
+  const _SummaryCard({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
   final String label;
   final String value;
   final Color color;
@@ -282,15 +312,20 @@ class _SummaryCard extends StatelessWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: BorderSide(
-            color: color.withValues(alpha: 0.2),
-          ),
+          side: BorderSide(color: color.withValues(alpha: 0.2)),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Column(
             children: [
-              Text(value, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 18)),
+              Text(
+                value,
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
               Text(label, style: TextStyle(color: color, fontSize: 10)),
             ],
           ),

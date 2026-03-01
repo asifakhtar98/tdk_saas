@@ -143,8 +143,9 @@ class MatchModel with _$MatchModel {
       scheduledRingNumber: scheduledRingNumber,
       scheduledTime: scheduledTime,
       status: MatchStatus.fromString(status),
-      resultType:
-          resultType != null ? MatchResultType.fromString(resultType!) : null,
+      resultType: resultType != null
+          ? MatchResultType.fromString(resultType!)
+          : null,
       notes: notes,
       startedAtTimestamp: startedAtTimestamp,
       completedAtTimestamp: completedAtTimestamp,

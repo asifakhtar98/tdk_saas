@@ -17,8 +17,6 @@ class MockParticipantRemoteDatasource extends Mock
 
 class MockConnectivityService extends Mock implements ConnectivityService {}
 
-
-
 void main() {
   late ParticipantRepositoryImplementation repository;
   late MockParticipantLocalDatasource mockLocalDatasource;

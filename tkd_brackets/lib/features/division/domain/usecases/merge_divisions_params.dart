@@ -5,7 +5,6 @@ part 'merge_divisions_params.g.dart';
 
 @freezed
 class MergeDivisionsParams with _$MergeDivisionsParams {
-
   const factory MergeDivisionsParams({
     required String divisionIdA,
     required String divisionIdB,

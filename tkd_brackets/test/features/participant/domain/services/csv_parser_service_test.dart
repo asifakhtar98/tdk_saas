@@ -13,14 +13,12 @@ void main() {
     service = CSVParserService();
   });
 
-  const standardCSVFixture =
-      '''
+  const standardCSVFixture = '''
 FirstName,LastName,DOB,Gender,Dojang,Belt,Weight,RegNumber,Notes
 John,Smith,2010-05-15,M,Kim's TKD,Blue,45.5,,
 Jane,Doe,2012-08-22,F,Elite TKD,Green,38.0,REG001,Allergy note''';
 
-  const alternateHeadersFixture =
-      '''
+  const alternateHeadersFixture = '''
 first_name,last_name,birthday,sex,school,rank,weight_kg
 Jane,Doe,2012-08-22,F,Elite TKD,Green,38.0''';
 

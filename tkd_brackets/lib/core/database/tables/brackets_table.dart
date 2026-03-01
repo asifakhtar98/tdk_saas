@@ -19,8 +19,7 @@ class Brackets extends Table with BaseSyncMixin, BaseAuditMixin {
   TextColumn get bracketType => text().named('bracket_type')();
 
   /// Pool identifier: A-H (nullable, only for pool brackets).
-  TextColumn get poolIdentifier =>
-      text().named('pool_identifier').nullable()();
+  TextColumn get poolIdentifier => text().named('pool_identifier').nullable()();
 
   /// Total number of rounds in this bracket.
   IntColumn get totalRounds => integer().named('total_rounds')();

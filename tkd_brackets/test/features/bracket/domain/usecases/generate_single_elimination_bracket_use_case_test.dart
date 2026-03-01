@@ -12,11 +12,9 @@ import 'package:tkd_brackets/features/bracket/domain/usecases/generate_single_el
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_single_elimination_bracket_use_case.dart';
 import 'package:uuid/uuid.dart';
 
-class MockBracketRepository extends Mock
-    implements BracketRepository {}
+class MockBracketRepository extends Mock implements BracketRepository {}
 
-class MockMatchRepository extends Mock
-    implements MatchRepository {}
+class MockMatchRepository extends Mock implements MatchRepository {}
 
 class MockGeneratorService extends Mock
     implements SingleEliminationBracketGeneratorService {}
@@ -45,14 +43,16 @@ void main() {
 
     when(() => mockUuid.v4()).thenReturn('test-uuid');
 
-    registerFallbackValue(BracketEntity(
-      id: '',
-      divisionId: '',
-      bracketType: BracketType.winners,
-      totalRounds: 0,
-      createdAtTimestamp: DateTime.now(),
-      updatedAtTimestamp: DateTime.now(),
-    ));
+    registerFallbackValue(
+      BracketEntity(
+        id: '',
+        divisionId: '',
+        bracketType: BracketType.winners,
+        totalRounds: 0,
+        createdAtTimestamp: DateTime.now(),
+        updatedAtTimestamp: DateTime.now(),
+      ),
+    );
 
     registerFallbackValue(<MatchEntity>[]);
   });
@@ -96,160 +96,120 @@ void main() {
           divisionId: any(named: 'divisionId'),
           participantIds: any(named: 'participantIds'),
           bracketId: any(named: 'bracketId'),
-          includeThirdPlaceMatch:
-              any(named: 'includeThirdPlaceMatch'),
+          includeThirdPlaceMatch: any(named: 'includeThirdPlaceMatch'),
         ),
       ).thenReturn(tResult);
 
-      when(() => mockBracketRepository.createBracket(any()))
-          .thenAnswer((_) async => Right(tBracket));
+      when(
+        () => mockBracketRepository.createBracket(any()),
+      ).thenAnswer((_) async => Right(tBracket));
 
-      when(() => mockMatchRepository.createMatches(any()))
-          .thenAnswer((_) async => Right(tMatches));
+      when(
+        () => mockMatchRepository.createMatches(any()),
+      ).thenAnswer((_) async => Right(tMatches));
     }
 
-    test(
-      'should return ValidationFailure for less than '
-      '2 participants',
-      () async {
-        const invalidParams =
-            GenerateSingleEliminationBracketParams(
+    test('should return ValidationFailure for less than '
+        '2 participants', () async {
+      const invalidParams = GenerateSingleEliminationBracketParams(
+        divisionId: 'div-1',
+        participantIds: ['p1'],
+      );
+
+      final result = await useCase(invalidParams);
+
+      expect(result.isLeft(), isTrue);
+      result.fold(
+        (failure) => expect(failure, isA<ValidationFailure>()),
+        (_) => fail('Should have failed'),
+      );
+      verifyZeroInteractions(mockGeneratorService);
+    });
+
+    test('should return ValidationFailure for empty '
+        'participant IDs', () async {
+      const invalidParams = GenerateSingleEliminationBracketParams(
+        divisionId: 'div-1',
+        participantIds: ['p1', '', 'p3'],
+      );
+
+      final result = await useCase(invalidParams);
+
+      expect(result.isLeft(), isTrue);
+      result.fold(
+        (failure) => expect(failure, isA<ValidationFailure>()),
+        (_) => fail('Should have failed'),
+      );
+      verifyZeroInteractions(mockGeneratorService);
+    });
+
+    test('should return ValidationFailure for whitespace-only '
+        'participant IDs', () async {
+      const invalidParams = GenerateSingleEliminationBracketParams(
+        divisionId: 'div-1',
+        participantIds: ['p1', '   ', 'p3'],
+      );
+
+      final result = await useCase(invalidParams);
+
+      expect(result.isLeft(), isTrue);
+      result.fold(
+        (failure) => expect(failure, isA<ValidationFailure>()),
+        (_) => fail('Should have failed'),
+      );
+    });
+
+    test('should generate and persist bracket and matches '
+        'successfully', () async {
+      stubSuccessful();
+
+      final result = await useCase(tParams);
+
+      expect(result.isRight(), isTrue);
+      result.fold((l) => fail('Should be right'), (r) {
+        expect(r.bracket, tBracket);
+        expect(r.matches, tMatches);
+      });
+      verify(
+        () => mockGeneratorService.generate(
           divisionId: 'div-1',
-          participantIds: ['p1'],
-        );
+          participantIds: tParams.participantIds,
+          bracketId: 'test-uuid',
+          includeThirdPlaceMatch: false,
+        ),
+      ).called(1);
+      verify(() => mockBracketRepository.createBracket(any())).called(1);
+      verify(() => mockMatchRepository.createMatches(tMatches)).called(1);
+    });
 
-        final result = await useCase(invalidParams);
+    test('should return failure when bracket creation fails', () async {
+      stubSuccessful();
+      when(
+        () => mockBracketRepository.createBracket(any()),
+      ).thenAnswer((_) async => const Left(LocalCacheWriteFailure()));
 
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) =>
-              expect(failure, isA<ValidationFailure>()),
-          (_) => fail('Should have failed'),
-        );
-        verifyZeroInteractions(mockGeneratorService);
-      },
-    );
+      final result = await useCase(tParams);
 
-    test(
-      'should return ValidationFailure for empty '
-      'participant IDs',
-      () async {
-        const invalidParams =
-            GenerateSingleEliminationBracketParams(
-          divisionId: 'div-1',
-          participantIds: ['p1', '', 'p3'],
-        );
+      expect(
+        result,
+        const Left<Failure, BracketGenerationResult>(LocalCacheWriteFailure()),
+      );
+      verifyNever(() => mockMatchRepository.createMatches(any()));
+    });
 
-        final result = await useCase(invalidParams);
+    test('should return failure when match creation fails', () async {
+      stubSuccessful();
+      when(
+        () => mockMatchRepository.createMatches(any()),
+      ).thenAnswer((_) async => const Left(LocalCacheWriteFailure()));
 
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) =>
-              expect(failure, isA<ValidationFailure>()),
-          (_) => fail('Should have failed'),
-        );
-        verifyZeroInteractions(mockGeneratorService);
-      },
-    );
+      final result = await useCase(tParams);
 
-    test(
-      'should return ValidationFailure for whitespace-only '
-      'participant IDs',
-      () async {
-        const invalidParams =
-            GenerateSingleEliminationBracketParams(
-          divisionId: 'div-1',
-          participantIds: ['p1', '   ', 'p3'],
-        );
-
-        final result = await useCase(invalidParams);
-
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) =>
-              expect(failure, isA<ValidationFailure>()),
-          (_) => fail('Should have failed'),
-        );
-      },
-    );
-
-    test(
-      'should generate and persist bracket and matches '
-      'successfully',
-      () async {
-        stubSuccessful();
-
-        final result = await useCase(tParams);
-
-        expect(result.isRight(), isTrue);
-        result.fold(
-          (l) => fail('Should be right'),
-          (r) {
-            expect(r.bracket, tBracket);
-            expect(r.matches, tMatches);
-          },
-        );
-        verify(
-          () => mockGeneratorService.generate(
-            divisionId: 'div-1',
-            participantIds: tParams.participantIds,
-            bracketId: 'test-uuid',
-            includeThirdPlaceMatch: false,
-          ),
-        ).called(1);
-        verify(
-          () => mockBracketRepository.createBracket(any()),
-        ).called(1);
-        verify(
-          () => mockMatchRepository.createMatches(tMatches),
-        ).called(1);
-      },
-    );
-
-    test(
-      'should return failure when bracket creation fails',
-      () async {
-        stubSuccessful();
-        when(
-          () => mockBracketRepository.createBracket(any()),
-        ).thenAnswer(
-          (_) async =>
-              const Left(LocalCacheWriteFailure()),
-        );
-
-        final result = await useCase(tParams);
-
-        expect(
-          result,
-          const Left<Failure, BracketGenerationResult>(LocalCacheWriteFailure()),
-        );
-        verifyNever(
-          () => mockMatchRepository.createMatches(any()),
-        );
-      },
-    );
-
-    test(
-      'should return failure when match creation fails',
-      () async {
-        stubSuccessful();
-        when(
-          () => mockMatchRepository.createMatches(any()),
-        ).thenAnswer(
-          (_) async =>
-              const Left(LocalCacheWriteFailure()),
-        );
-
-        final result = await useCase(tParams);
-
-        expect(
-          result,
-          const Left<Failure, BracketGenerationResult>(LocalCacheWriteFailure()),
-        );
-        verify(
-          () => mockBracketRepository.createBracket(any()),
-        ).called(1);
-      },
-    );
+      expect(
+        result,
+        const Left<Failure, BracketGenerationResult>(LocalCacheWriteFailure()),
+      );
+      verify(() => mockBracketRepository.createBracket(any())).called(1);
+    });
   });
 }

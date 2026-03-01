@@ -108,10 +108,8 @@ class ParticipantListRoute extends GoRouteData {
   final String divisionId;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => ParticipantListPage(
-        tournamentId: tournamentId,
-        divisionId: divisionId,
-      );
+  Widget build(BuildContext context, GoRouterState state) =>
+      ParticipantListPage(tournamentId: tournamentId, divisionId: divisionId);
 }
 
 /// CSV Import route.
@@ -119,17 +117,12 @@ class ParticipantListRoute extends GoRouteData {
   path: '/tournaments/:tournamentId/divisions/:divisionId/participants/import',
 )
 class CsvImportRoute extends GoRouteData {
-  const CsvImportRoute({
-    required this.tournamentId,
-    required this.divisionId,
-  });
+  const CsvImportRoute({required this.tournamentId, required this.divisionId});
 
   final String tournamentId;
   final String divisionId;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => CSVImportPage(
-        tournamentId: tournamentId,
-        divisionId: divisionId,
-      );
+  Widget build(BuildContext context, GoRouterState state) =>
+      CSVImportPage(tournamentId: tournamentId, divisionId: divisionId);
 }

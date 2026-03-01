@@ -64,8 +64,7 @@ class Matches extends Table with BaseSyncMixin, BaseAuditMixin {
       dateTime().named('scheduled_time').nullable()();
 
   /// Match lifecycle status: pending, ready, in_progress, completed, cancelled.
-  TextColumn get status =>
-      text().withDefault(const Constant('pending'))();
+  TextColumn get status => text().withDefault(const Constant('pending'))();
 
   /// How the match was decided (nullable - set on completion).
   TextColumn get resultType => text().named('result_type').nullable()();

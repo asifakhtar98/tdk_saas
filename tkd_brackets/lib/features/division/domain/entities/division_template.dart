@@ -11,10 +11,13 @@ part 'division_template.g.dart';
 
 @freezed
 class DivisionTemplate with _$DivisionTemplate {
-
   const factory DivisionTemplate({
     required String id,
-    required FederationType federation, required DivisionCategory category, required String name, required DivisionGender gender, String? organizationId,
+    required FederationType federation,
+    required DivisionCategory category,
+    required String name,
+    required DivisionGender gender,
+    String? organizationId,
     int? ageMin,
     int? ageMax,
     double? weightMinKg,

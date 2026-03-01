@@ -51,8 +51,7 @@ class MockAuthenticationBloc extends Mock implements AuthenticationBloc {
 MockAuthenticationBloc createMockAuthenticationBloc({
   AuthenticationState initialState = const AuthenticationState.initial(),
 }) {
-  final mock = MockAuthenticationBloc()
-    .._state = initialState;
+  final mock = MockAuthenticationBloc().._state = initialState;
 
   when(() => mock.isClosed).thenReturn(false);
 

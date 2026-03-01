@@ -33,32 +33,35 @@ void main() {
       verify(() => mockDatabase.getBracketsForDivision('division-1')).called(1);
     });
 
-    test('should return list of models when database returns entries', () async {
-      final entries = [
-        BracketEntry(
-          id: 'bracket-1',
-          divisionId: 'division-1',
-          bracketType: 'winners',
-          totalRounds: 4,
-          isFinalized: false,
-          syncVersion: 1,
-          isDeleted: false,
-          isDemoData: false,
-          createdAtTimestamp: testDateTime,
-          updatedAtTimestamp: testDateTime,
-        ),
-      ];
+    test(
+      'should return list of models when database returns entries',
+      () async {
+        final entries = [
+          BracketEntry(
+            id: 'bracket-1',
+            divisionId: 'division-1',
+            bracketType: 'winners',
+            totalRounds: 4,
+            isFinalized: false,
+            syncVersion: 1,
+            isDeleted: false,
+            isDemoData: false,
+            createdAtTimestamp: testDateTime,
+            updatedAtTimestamp: testDateTime,
+          ),
+        ];
 
-      when(
-        () => mockDatabase.getBracketsForDivision('division-1'),
-      ).thenAnswer((_) async => entries);
+        when(
+          () => mockDatabase.getBracketsForDivision('division-1'),
+        ).thenAnswer((_) async => entries);
 
-      final result = await datasource.getBracketsForDivision('division-1');
+        final result = await datasource.getBracketsForDivision('division-1');
 
-      expect(result.length, 1);
-      expect(result.first.id, 'bracket-1');
-      expect(result.first.bracketType, 'winners');
-    });
+        expect(result.length, 1);
+        expect(result.first.id, 'bracket-1');
+        expect(result.first.bracketType, 'winners');
+      },
+    );
   });
 
   group('getBracketById', () {
@@ -129,8 +132,9 @@ void main() {
         updatedAtTimestamp: testDateTime,
       );
 
-      when(() => mockDatabase.updateBracket(any(), any()))
-          .thenAnswer((_) async => true);
+      when(
+        () => mockDatabase.updateBracket(any(), any()),
+      ).thenAnswer((_) async => true);
 
       await datasource.updateBracket(model);
 
@@ -140,8 +144,9 @@ void main() {
 
   group('deleteBracket', () {
     test('should call database soft delete', () async {
-      when(() => mockDatabase.softDeleteBracket(any()))
-          .thenAnswer((_) async => true);
+      when(
+        () => mockDatabase.softDeleteBracket(any()),
+      ).thenAnswer((_) async => true);
 
       await datasource.deleteBracket('bracket-1');
 

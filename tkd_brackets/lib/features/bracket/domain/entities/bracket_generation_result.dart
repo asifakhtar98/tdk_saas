@@ -7,10 +7,7 @@ import 'package:tkd_brackets/features/bracket/domain/entities/match_entity.dart'
 /// its associated [MatchEntity] records.
 @immutable
 class BracketGenerationResult {
-  const BracketGenerationResult({
-    required this.bracket,
-    required this.matches,
-  });
+  const BracketGenerationResult({required this.bracket, required this.matches});
 
   final BracketEntity bracket;
   final List<MatchEntity> matches;

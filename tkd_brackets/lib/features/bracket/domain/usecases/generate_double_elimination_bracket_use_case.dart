@@ -13,8 +13,11 @@ import 'package:uuid/uuid.dart';
 /// Orchestrates validation, generation, and persistence.
 @injectable
 class GenerateDoubleEliminationBracketUseCase
-    extends UseCase<DoubleEliminationBracketGenerationResult,
-        GenerateDoubleEliminationBracketParams> {
+    extends
+        UseCase<
+          DoubleEliminationBracketGenerationResult,
+          GenerateDoubleEliminationBracketParams
+        > {
   GenerateDoubleEliminationBracketUseCase(
     this._generatorService,
     this._bracketRepository,
@@ -33,16 +36,21 @@ class GenerateDoubleEliminationBracketUseCase
   ) async {
     // 1. Validation
     if (params.participantIds.length < 2) {
-      return const Left(ValidationFailure(
-        userFriendlyMessage: 'At least 2 participants are required '
-            'to generate a bracket.',
-      ));
+      return const Left(
+        ValidationFailure(
+          userFriendlyMessage:
+              'At least 2 participants are required '
+              'to generate a bracket.',
+        ),
+      );
     }
 
     if (params.participantIds.any((id) => id.trim().isEmpty)) {
-      return const Left(ValidationFailure(
-        userFriendlyMessage: 'Participant list contains empty IDs.',
-      ));
+      return const Left(
+        ValidationFailure(
+          userFriendlyMessage: 'Participant list contains empty IDs.',
+        ),
+      );
     }
 
     // 2. Generate bracket IDs
@@ -63,29 +71,20 @@ class GenerateDoubleEliminationBracketUseCase
       generationResult.winnersBracket,
     );
 
-    return winnersResult.fold(
-      Left.new,
-      (_) async {
-        // 5. Persist losers bracket — CHECK Either result!
-        final losersResult = await _bracketRepository.createBracket(
-          generationResult.losersBracket,
+    return winnersResult.fold(Left.new, (_) async {
+      // 5. Persist losers bracket — CHECK Either result!
+      final losersResult = await _bracketRepository.createBracket(
+        generationResult.losersBracket,
+      );
+
+      return losersResult.fold(Left.new, (_) async {
+        // 6. Persist all matches (batch) — CHECK Either result!
+        final matchesResult = await _matchRepository.createMatches(
+          generationResult.allMatches,
         );
 
-        return losersResult.fold(
-          Left.new,
-          (_) async {
-            // 6. Persist all matches (batch) — CHECK Either result!
-            final matchesResult = await _matchRepository.createMatches(
-              generationResult.allMatches,
-            );
-
-            return matchesResult.fold(
-              Left.new,
-              (_) => Right(generationResult),
-            );
-          },
-        );
-      },
-    );
+        return matchesResult.fold(Left.new, (_) => Right(generationResult));
+      });
+    });
   }
 }

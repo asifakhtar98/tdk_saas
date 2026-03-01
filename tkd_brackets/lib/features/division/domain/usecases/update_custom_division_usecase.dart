@@ -22,9 +22,7 @@ class UpdateCustomDivisionUseCase
       params.divisionId,
     );
 
-    return existingResult.fold(Left.new, (
-      existingDivision,
-    ) async {
+    return existingResult.fold(Left.new, (existingDivision) async {
       if (existingDivision.isCustom == false) {
         return const Left(
           ValidationFailure(

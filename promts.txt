@@ -5,4 +5,4 @@ Continue, do in small multiple shots, dont overcommunicate
 
 build for web , ref [@README.md](file:///Users/asak/Documents/dev/proj/personal/taekwondo_fix/tkd_brackets/README.md)
 
-are we 100% done implementing the story, cross check code with the story. if not, complete it.
+are we 100% done implementing the story, fresh cross check code with the story. if not, complete it.

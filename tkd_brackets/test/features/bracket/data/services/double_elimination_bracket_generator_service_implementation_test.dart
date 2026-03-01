@@ -15,11 +15,11 @@ void main() {
   setUp(() {
     mockUuid = MockUuid();
     uuidCounter = 0;
-    generator = DoubleEliminationBracketGeneratorServiceImplementation(mockUuid);
-
-    when(() => mockUuid.v4()).thenAnswer(
-      (_) => 'match-${uuidCounter++}',
+    generator = DoubleEliminationBracketGeneratorServiceImplementation(
+      mockUuid,
     );
+
+    when(() => mockUuid.v4()).thenAnswer((_) => 'match-${uuidCounter++}');
   });
 
   List<String> makeParticipants(int count) =>
@@ -61,12 +61,21 @@ void main() {
           losersBracketId: 'lb',
         );
 
-        expect(result.winnersBracket.totalRounds, expected[0],
-            reason: 'n=$n wRounds');
-        expect(result.losersBracket.totalRounds, expected[1],
-            reason: 'n=$n lRounds');
-        expect(result.allMatches.length, expected[2],
-            reason: 'n=$n totalMatches');
+        expect(
+          result.winnersBracket.totalRounds,
+          expected[0],
+          reason: 'n=$n wRounds',
+        );
+        expect(
+          result.losersBracket.totalRounds,
+          expected[1],
+          reason: 'n=$n lRounds',
+        );
+        expect(
+          result.allMatches.length,
+          expected[2],
+          reason: 'n=$n totalMatches',
+        );
       });
     });
 
@@ -147,7 +156,10 @@ void main() {
       );
 
       expect(result.resetMatch, isNotNull);
-      expect(result.grandFinalsMatch.winnerAdvancesToMatchId, result.resetMatch!.id);
+      expect(
+        result.grandFinalsMatch.winnerAdvancesToMatchId,
+        result.resetMatch!.id,
+      );
     });
 
     test('should not have reset match when disabled', () {
@@ -278,7 +290,7 @@ void main() {
       final wbMatch = result.allMatches.firstWhere(
         (m) => m.bracketId == 'wb' && m.roundNumber == 1,
       );
-      
+
       expect(wbMatch.winnerAdvancesToMatchId, result.grandFinalsMatch.id);
       expect(wbMatch.loserAdvancesToMatchId, result.grandFinalsMatch.id);
     });

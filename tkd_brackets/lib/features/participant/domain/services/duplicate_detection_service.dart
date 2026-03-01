@@ -25,7 +25,6 @@ class DuplicateConfidence {
 /// (Levenshtein distance), and date of birth comparison.
 @lazySingleton
 class DuplicateDetectionService {
-
   DuplicateDetectionService(this._divisionRepository);
   final DivisionRepository _divisionRepository;
 

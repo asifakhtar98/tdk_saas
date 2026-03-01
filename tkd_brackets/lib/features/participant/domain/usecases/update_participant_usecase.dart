@@ -118,7 +118,8 @@ class UpdateParticipantUseCase {
     if (tournament.organizationId != user.organizationId) {
       return const Left(
         AuthorizationPermissionDeniedFailure(
-          userFriendlyMessage: 'You do not have permission '
+          userFriendlyMessage:
+              'You do not have permission '
               'to edit participants in this tournament',
         ),
       );
@@ -129,7 +130,8 @@ class UpdateParticipantUseCase {
         division.status != DivisionStatus.ready) {
       return const Left(
         InputValidationFailure(
-          userFriendlyMessage: 'Cannot edit participants in '
+          userFriendlyMessage:
+              'Cannot edit participants in '
               'a division that is in progress or completed',
           fieldErrors: {
             'divisionId': 'Division is not accepting modifications',

@@ -62,8 +62,10 @@ void main() {
       expect(model.id, testModel.id);
       expect(model.bracketType, testModel.bracketType);
       // Compare decoded JSON as strings might have different whitespace
-      expect(jsonDecode(model.bracketDataJson!),
-          jsonDecode(testModel.bracketDataJson!));
+      expect(
+        jsonDecode(model.bracketDataJson!),
+        jsonDecode(testModel.bracketDataJson!),
+      );
     });
 
     test('toDriftCompanion should have all required values', () {

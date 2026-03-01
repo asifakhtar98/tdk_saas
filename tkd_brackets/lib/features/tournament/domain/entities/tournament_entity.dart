@@ -23,13 +23,27 @@ class TournamentEntity with _$TournamentEntity {
     required String name,
 
     /// Federation type (WT, ITF, ATA, or custom).
-    required FederationType federationType, /// Current tournament status.
-    required TournamentStatus status, /// Number of rings/courts available for the tournament.
-    required int numberOfRings, /// JSON blob for additional tournament settings.
-    required Map<String, dynamic> settingsJson, /// Whether this tournament is a template for creating new tournaments.
-    required bool isTemplate, /// When the tournament was created.
-    required DateTime createdAt, /// When the tournament was last updated.
-    required DateTime updatedAtTimestamp, /// Scheduled date for the tournament.
+    required FederationType federationType,
+
+    /// Current tournament status.
+    required TournamentStatus status,
+
+    /// Number of rings/courts available for the tournament.
+    required int numberOfRings,
+
+    /// JSON blob for additional tournament settings.
+    required Map<String, dynamic> settingsJson,
+
+    /// Whether this tournament is a template for creating new tournaments.
+    required bool isTemplate,
+
+    /// When the tournament was created.
+    required DateTime createdAt,
+
+    /// When the tournament was last updated.
+    required DateTime updatedAtTimestamp,
+
+    /// Scheduled date for the tournament.
     DateTime? scheduledDate,
 
     /// Optional tournament description.

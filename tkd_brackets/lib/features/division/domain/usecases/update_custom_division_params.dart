@@ -7,7 +7,6 @@ part 'update_custom_division_params.g.dart';
 
 @freezed
 class UpdateCustomDivisionParams with _$UpdateCustomDivisionParams {
-
   const factory UpdateCustomDivisionParams({
     required String divisionId,
     String? name,

@@ -26,12 +26,14 @@ void main() {
   setUp(() {
     mockRepository = MockDivisionRepository();
     mockDatabase = MockAppDatabase();
-    
-    when(() => mockDatabase.getActiveParticipants())
-        .thenAnswer((_) async => []);
-    when(() => mockDatabase.getDivisionsForTournament(any()))
-        .thenAnswer((_) async => []);
-        
+
+    when(
+      () => mockDatabase.getActiveParticipants(),
+    ).thenAnswer((_) async => []);
+    when(
+      () => mockDatabase.getDivisionsForTournament(any()),
+    ).thenAnswer((_) async => []);
+
     useCase = SmartDivisionBuilderUseCase(mockRepository, mockDatabase);
   });
 

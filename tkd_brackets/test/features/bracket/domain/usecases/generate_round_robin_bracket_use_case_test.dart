@@ -13,9 +13,12 @@ import 'package:tkd_brackets/features/bracket/domain/usecases/generate_round_rob
 import 'package:uuid/uuid.dart';
 
 class MockBracketRepository extends Mock implements BracketRepository {}
+
 class MockMatchRepository extends Mock implements MatchRepository {}
+
 class MockGeneratorService extends Mock
     implements RoundRobinBracketGeneratorService {}
+
 class MockUuid extends Mock implements Uuid {}
 
 void main() {
@@ -26,14 +29,16 @@ void main() {
   late MockUuid mockUuid;
 
   setUpAll(() {
-    registerFallbackValue(BracketEntity(
-      id: '',
-      divisionId: '',
-      bracketType: BracketType.pool,
-      totalRounds: 0,
-      createdAtTimestamp: DateTime.now(),
-      updatedAtTimestamp: DateTime.now(),
-    ));
+    registerFallbackValue(
+      BracketEntity(
+        id: '',
+        divisionId: '',
+        bracketType: BracketType.pool,
+        totalRounds: 0,
+        createdAtTimestamp: DateTime.now(),
+        updatedAtTimestamp: DateTime.now(),
+      ),
+    );
     registerFallbackValue(<MatchEntity>[]);
   });
 
@@ -97,31 +102,33 @@ void main() {
         ),
       ).thenReturn(tResult);
 
-      when(() => mockBracketRepository.createBracket(any()))
-          .thenAnswer((_) async => Right<Failure, BracketEntity>(tBracket));
+      when(
+        () => mockBracketRepository.createBracket(any()),
+      ).thenAnswer((_) async => Right<Failure, BracketEntity>(tBracket));
 
-      when(() => mockMatchRepository.createMatches(any()))
-          .thenAnswer((_) async => Right<Failure, List<MatchEntity>>(tMatches));
+      when(
+        () => mockMatchRepository.createMatches(any()),
+      ).thenAnswer((_) async => Right<Failure, List<MatchEntity>>(tMatches));
     }
 
-    test('should return ValidationFailure when participant count < 2', () async {
-      const params = GenerateRoundRobinBracketParams(
-        divisionId: 'div-1',
-        participantIds: ['p1'],
-      );
+    test(
+      'should return ValidationFailure when participant count < 2',
+      () async {
+        const params = GenerateRoundRobinBracketParams(
+          divisionId: 'div-1',
+          participantIds: ['p1'],
+        );
 
-      final result = await useCase(params);
+        final result = await useCase(params);
 
-      expect(result.isLeft(), isTrue);
-      result.fold(
-        (failure) {
+        expect(result.isLeft(), isTrue);
+        result.fold((failure) {
           expect(failure, isA<ValidationFailure>());
           final vf = failure as ValidationFailure;
           expect(vf.userFriendlyMessage, contains('At least 2 participants'));
-        },
-        (_) => fail('Should have returned Left'),
-      );
-    });
+        }, (_) => fail('Should have returned Left'));
+      },
+    );
 
     test('should return ValidationFailure for empty participant IDs', () async {
       const params = GenerateRoundRobinBracketParams(
@@ -132,52 +139,54 @@ void main() {
       final result = await useCase(params);
 
       expect(result.isLeft(), isTrue);
-      result.fold(
-        (failure) {
+      result.fold((failure) {
+        expect(failure, isA<ValidationFailure>());
+        final vf = failure as ValidationFailure;
+        expect(vf.userFriendlyMessage, contains('contains empty IDs'));
+      }, (_) => fail('Should have returned Left'));
+    });
+
+    test(
+      'should return ValidationFailure for whitespace-only participant IDs',
+      () async {
+        const params = GenerateRoundRobinBracketParams(
+          divisionId: 'div-1',
+          participantIds: ['p1', '   ', 'p3'],
+        );
+
+        final result = await useCase(params);
+
+        expect(result.isLeft(), isTrue);
+        result.fold((failure) {
           expect(failure, isA<ValidationFailure>());
           final vf = failure as ValidationFailure;
           expect(vf.userFriendlyMessage, contains('contains empty IDs'));
-        },
-        (_) => fail('Should have returned Left'),
-      );
-    });
+        }, (_) => fail('Should have returned Left'));
+      },
+    );
 
-    test('should return ValidationFailure for whitespace-only participant IDs', () async {
-      const params = GenerateRoundRobinBracketParams(
-        divisionId: 'div-1',
-        participantIds: ['p1', '   ', 'p3'],
-      );
+    test(
+      'should call service, repository, and return result on success',
+      () async {
+        stubSuccessful();
 
-      final result = await useCase(params);
+        final result = await useCase(tParams);
 
-      expect(result.isLeft(), isTrue);
-      result.fold(
-        (failure) {
-          expect(failure, isA<ValidationFailure>());
-          final vf = failure as ValidationFailure;
-          expect(vf.userFriendlyMessage, contains('contains empty IDs'));
-        },
-        (_) => fail('Should have returned Left'),
-      );
-    });
+        expect(result, Right<Failure, BracketGenerationResult>(tResult));
 
-    test('should call service, repository, and return result on success', () async {
-      stubSuccessful();
-
-      final result = await useCase(tParams);
-
-      expect(result, Right<Failure, BracketGenerationResult>(tResult));
-
-      verify(() => mockGeneratorService.generate(
+        verify(
+          () => mockGeneratorService.generate(
             divisionId: tParams.divisionId,
             participantIds: tParams.participantIds,
             bracketId: 'test-uuid',
             poolIdentifier: tParams.poolIdentifier,
-          )).called(1);
+          ),
+        ).called(1);
 
-      verify(() => mockBracketRepository.createBracket(tBracket)).called(1);
-      verify(() => mockMatchRepository.createMatches(tMatches)).called(1);
-    });
+        verify(() => mockBracketRepository.createBracket(tBracket)).called(1);
+        verify(() => mockMatchRepository.createMatches(tMatches)).called(1);
+      },
+    );
 
     test('should propagate failure and stop if createBracket fails', () async {
       when(
@@ -190,8 +199,9 @@ void main() {
       ).thenReturn(tResult);
 
       const tFailure = LocalCacheWriteFailure();
-      when(() => mockBracketRepository.createBracket(any()))
-          .thenAnswer((_) async => const Left<Failure, BracketEntity>(tFailure));
+      when(
+        () => mockBracketRepository.createBracket(any()),
+      ).thenAnswer((_) async => const Left<Failure, BracketEntity>(tFailure));
 
       final result = await useCase(tParams);
 
@@ -210,12 +220,14 @@ void main() {
         ),
       ).thenReturn(tResult);
 
-      when(() => mockBracketRepository.createBracket(any()))
-          .thenAnswer((_) async => Right<Failure, BracketEntity>(tBracket));
+      when(
+        () => mockBracketRepository.createBracket(any()),
+      ).thenAnswer((_) async => Right<Failure, BracketEntity>(tBracket));
 
       const tFailure = LocalCacheWriteFailure();
-      when(() => mockMatchRepository.createMatches(any()))
-          .thenAnswer((_) async => const Left<Failure, List<MatchEntity>>(tFailure));
+      when(() => mockMatchRepository.createMatches(any())).thenAnswer(
+        (_) async => const Left<Failure, List<MatchEntity>>(tFailure),
+      );
 
       final result = await useCase(tParams);
 

@@ -36,9 +36,7 @@ class DivisionTemplateRemoteDatasourceImplementation
         .order('display_order', ascending: true);
 
     return response
-        .map<DivisionTemplateModel>(
-          DivisionTemplateModel.fromJson,
-        )
+        .map<DivisionTemplateModel>(DivisionTemplateModel.fromJson)
         .toList();
   }
 
@@ -54,9 +52,7 @@ class DivisionTemplateRemoteDatasourceImplementation
         .order('display_order', ascending: true);
 
     return response
-        .map<DivisionTemplateModel>(
-          DivisionTemplateModel.fromJson,
-        )
+        .map<DivisionTemplateModel>(DivisionTemplateModel.fromJson)
         .toList();
   }
 

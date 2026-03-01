@@ -45,11 +45,13 @@ class CSVImportBloc extends Bloc<CSVImportEvent, CSVImportState> {
     );
 
     result.fold(
-      (failure) => emit(CSVImportFailure(
-        userFriendlyMessage: failure.userFriendlyMessage,
-        technicalDetails: failure.technicalDetails,
-        csvContent: csvContent,
-      )),
+      (failure) => emit(
+        CSVImportFailure(
+          userFriendlyMessage: failure.userFriendlyMessage,
+          technicalDetails: failure.technicalDetails,
+          csvContent: csvContent,
+        ),
+      ),
       (preview) {
         // By default, select all valid and warning rows
         final selectedIndexes = <int>{};
@@ -59,11 +61,13 @@ class CSVImportBloc extends Bloc<CSVImportEvent, CSVImportState> {
           }
         }
 
-        emit(CSVImportPreviewSuccess(
-          csvContent: csvContent,
-          preview: preview,
-          selectedRowIndexes: selectedIndexes,
-        ));
+        emit(
+          CSVImportPreviewSuccess(
+            csvContent: csvContent,
+            preview: preview,
+            selectedRowIndexes: selectedIndexes,
+          ),
+        );
       },
     );
   }
@@ -117,11 +121,13 @@ class CSVImportBloc extends Bloc<CSVImportEvent, CSVImportState> {
 
     if (currentState.selectedRowIndexes.isEmpty) return;
 
-    emit(CSVImportImportInProgress(
-      csvContent: currentState.csvContent,
-      preview: currentState.preview,
-      selectedRowIndexes: currentState.selectedRowIndexes,
-    ));
+    emit(
+      CSVImportImportInProgress(
+        csvContent: currentState.csvContent,
+        preview: currentState.preview,
+        selectedRowIndexes: currentState.selectedRowIndexes,
+      ),
+    );
 
     final selectedRows = currentState.selectedRowIndexes
         .map((idx) => currentState.preview.rows[idx])
@@ -133,11 +139,13 @@ class CSVImportBloc extends Bloc<CSVImportEvent, CSVImportState> {
     );
 
     result.fold(
-      (failure) => emit(CSVImportFailure(
-        userFriendlyMessage: failure.userFriendlyMessage,
-        technicalDetails: failure.technicalDetails,
-        csvContent: currentState.csvContent,
-      )),
+      (failure) => emit(
+        CSVImportFailure(
+          userFriendlyMessage: failure.userFriendlyMessage,
+          technicalDetails: failure.technicalDetails,
+          csvContent: currentState.csvContent,
+        ),
+      ),
       (importResult) => emit(CSVImportImportSuccess(result: importResult)),
     );
   }

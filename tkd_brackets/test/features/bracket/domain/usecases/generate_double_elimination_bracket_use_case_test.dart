@@ -43,14 +43,16 @@ void main() {
 
     when(() => mockUuid.v4()).thenReturn('test-uuid');
 
-    registerFallbackValue(BracketEntity(
-      id: '',
-      divisionId: '',
-      bracketType: BracketType.winners,
-      totalRounds: 0,
-      createdAtTimestamp: DateTime.now(),
-      updatedAtTimestamp: DateTime.now(),
-    ));
+    registerFallbackValue(
+      BracketEntity(
+        id: '',
+        divisionId: '',
+        bracketType: BracketType.winners,
+        totalRounds: 0,
+        createdAtTimestamp: DateTime.now(),
+        updatedAtTimestamp: DateTime.now(),
+      ),
+    );
 
     registerFallbackValue(<MatchEntity>[]);
   });
@@ -119,29 +121,33 @@ void main() {
         ),
       ).thenReturn(tResult);
 
-      when(() => mockBracketRepository.createBracket(any()))
-          .thenAnswer((_) async => Right(tWinnersBracket));
+      when(
+        () => mockBracketRepository.createBracket(any()),
+      ).thenAnswer((_) async => Right(tWinnersBracket));
 
-      when(() => mockMatchRepository.createMatches(any()))
-          .thenAnswer((_) async => Right(tMatches));
+      when(
+        () => mockMatchRepository.createMatches(any()),
+      ).thenAnswer((_) async => Right(tMatches));
     }
 
-    test('should return ValidationFailure for less than 2 participants',
-        () async {
-      const invalidParams = GenerateDoubleEliminationBracketParams(
-        divisionId: 'div-1',
-        participantIds: ['p1'],
-      );
+    test(
+      'should return ValidationFailure for less than 2 participants',
+      () async {
+        const invalidParams = GenerateDoubleEliminationBracketParams(
+          divisionId: 'div-1',
+          participantIds: ['p1'],
+        );
 
-      final result = await useCase(invalidParams);
+        final result = await useCase(invalidParams);
 
-      expect(result.isLeft(), isTrue);
-      result.fold(
-        (failure) => expect(failure, isA<ValidationFailure>()),
-        (_) => fail('Should have failed'),
-      );
-      verifyZeroInteractions(mockGeneratorService);
-    });
+        expect(result.isLeft(), isTrue);
+        result.fold(
+          (failure) => expect(failure, isA<ValidationFailure>()),
+          (_) => fail('Should have failed'),
+        );
+        verifyZeroInteractions(mockGeneratorService);
+      },
+    );
 
     test('should return ValidationFailure for empty participant IDs', () async {
       const invalidParams = GenerateDoubleEliminationBracketParams(
@@ -159,42 +165,44 @@ void main() {
       verifyZeroInteractions(mockGeneratorService);
     });
 
-    test('should generate and persist brackets and matches successfully',
-        () async {
-      stubSuccessful();
+    test(
+      'should generate and persist brackets and matches successfully',
+      () async {
+        stubSuccessful();
 
-      final result = await useCase(tParams);
+        final result = await useCase(tParams);
 
-      expect(result.isRight(), isTrue);
-      result.fold(
-        (l) => fail('Should be right'),
-        (r) {
+        expect(result.isRight(), isTrue);
+        result.fold((l) => fail('Should be right'), (r) {
           expect(r, tResult);
-        },
-      );
-      verify(() => mockGeneratorService.generate(
+        });
+        verify(
+          () => mockGeneratorService.generate(
             divisionId: 'div-1',
             participantIds: tParams.participantIds,
             winnersBracketId: any(named: 'winnersBracketId'),
             losersBracketId: any(named: 'losersBracketId'),
             includeResetMatch: true,
-          )).called(1);
-      verify(() => mockBracketRepository.createBracket(any())).called(2);
-      verify(() => mockMatchRepository.createMatches(tMatches)).called(1);
-    });
+          ),
+        ).called(1);
+        verify(() => mockBracketRepository.createBracket(any())).called(2);
+        verify(() => mockMatchRepository.createMatches(tMatches)).called(1);
+      },
+    );
 
     test('should return failure when first bracket creation fails', () async {
       stubSuccessful();
-      when(() => mockBracketRepository.createBracket(any())).thenAnswer(
-        (_) async => const Left(LocalCacheWriteFailure()),
-      );
+      when(
+        () => mockBracketRepository.createBracket(any()),
+      ).thenAnswer((_) async => const Left(LocalCacheWriteFailure()));
 
       final result = await useCase(tParams);
 
       expect(
         result,
         const Left<Failure, DoubleEliminationBracketGenerationResult>(
-            LocalCacheWriteFailure()),
+          LocalCacheWriteFailure(),
+        ),
       );
       verify(() => mockBracketRepository.createBracket(any())).called(1);
       verifyNever(() => mockMatchRepository.createMatches(any()));
@@ -204,7 +212,9 @@ void main() {
       stubSuccessful();
       // Succeed first call, fail second
       var callCount = 0;
-      when(() => mockBracketRepository.createBracket(any())).thenAnswer((_) async {
+      when(() => mockBracketRepository.createBracket(any())).thenAnswer((
+        _,
+      ) async {
         callCount++;
         if (callCount == 1) return Right(tWinnersBracket);
         return const Left(LocalCacheWriteFailure());
@@ -215,7 +225,8 @@ void main() {
       expect(
         result,
         const Left<Failure, DoubleEliminationBracketGenerationResult>(
-            LocalCacheWriteFailure()),
+          LocalCacheWriteFailure(),
+        ),
       );
       verify(() => mockBracketRepository.createBracket(any())).called(2);
       verifyNever(() => mockMatchRepository.createMatches(any()));
@@ -223,16 +234,17 @@ void main() {
 
     test('should return failure when match creation fails', () async {
       stubSuccessful();
-      when(() => mockMatchRepository.createMatches(any())).thenAnswer(
-        (_) async => const Left(LocalCacheWriteFailure()),
-      );
+      when(
+        () => mockMatchRepository.createMatches(any()),
+      ).thenAnswer((_) async => const Left(LocalCacheWriteFailure()));
 
       final result = await useCase(tParams);
 
       expect(
         result,
         const Left<Failure, DoubleEliminationBracketGenerationResult>(
-            LocalCacheWriteFailure()),
+          LocalCacheWriteFailure(),
+        ),
       );
       verify(() => mockBracketRepository.createBracket(any())).called(2);
       verify(() => mockMatchRepository.createMatches(any())).called(1);

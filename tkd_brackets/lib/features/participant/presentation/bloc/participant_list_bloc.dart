@@ -57,8 +57,7 @@ class ParticipantListBloc
   Future<void> _loadParticipants(Emitter<ParticipantListState> emit) async {
     if (_currentDivisionId == null) return;
 
-    final result =
-        await _getDivisionParticipantsUseCase(_currentDivisionId!);
+    final result = await _getDivisionParticipantsUseCase(_currentDivisionId!);
 
     result.fold(
       (failure) => emit(
@@ -103,15 +102,17 @@ class ParticipantListBloc
     final currentState = state;
     if (currentState is! ParticipantListLoadSuccess) return;
 
-    emit(currentState.copyWith(
-      searchQuery: event.query,
-      filteredParticipants: _processParticipants(
-        currentState.view.participants,
-        event.query,
-        currentState.currentFilter,
-        currentState.currentSort,
+    emit(
+      currentState.copyWith(
+        searchQuery: event.query,
+        filteredParticipants: _processParticipants(
+          currentState.view.participants,
+          event.query,
+          currentState.currentFilter,
+          currentState.currentSort,
+        ),
       ),
-    ));
+    );
   }
 
   void _onFilterChanged(
@@ -121,15 +122,17 @@ class ParticipantListBloc
     final currentState = state;
     if (currentState is! ParticipantListLoadSuccess) return;
 
-    emit(currentState.copyWith(
-      currentFilter: event.filter,
-      filteredParticipants: _processParticipants(
-        currentState.view.participants,
-        currentState.searchQuery,
-        event.filter,
-        currentState.currentSort,
+    emit(
+      currentState.copyWith(
+        currentFilter: event.filter,
+        filteredParticipants: _processParticipants(
+          currentState.view.participants,
+          currentState.searchQuery,
+          event.filter,
+          currentState.currentSort,
+        ),
       ),
-    ));
+    );
   }
 
   void _onSortChanged(
@@ -139,15 +142,17 @@ class ParticipantListBloc
     final currentState = state;
     if (currentState is! ParticipantListLoadSuccess) return;
 
-    emit(currentState.copyWith(
-      currentSort: event.sort,
-      filteredParticipants: _processParticipants(
-        currentState.view.participants,
-        currentState.searchQuery,
-        currentState.currentFilter,
-        event.sort,
+    emit(
+      currentState.copyWith(
+        currentSort: event.sort,
+        filteredParticipants: _processParticipants(
+          currentState.view.participants,
+          currentState.searchQuery,
+          currentState.currentFilter,
+          event.sort,
+        ),
       ),
-    ));
+    );
   }
 
   Future<void> _onCreateRequested(
@@ -162,15 +167,19 @@ class ParticipantListBloc
     final result = await _createParticipantUseCase(event.params);
 
     result.fold(
-      (failure) => emit(currentState.copyWith(
-        actionStatus: ActionStatus.failure,
-        actionMessage: failure.userFriendlyMessage,
-      )),
+      (failure) => emit(
+        currentState.copyWith(
+          actionStatus: ActionStatus.failure,
+          actionMessage: failure.userFriendlyMessage,
+        ),
+      ),
       (_) {
-        emit(currentState.copyWith(
-          actionStatus: ActionStatus.success,
-          actionMessage: 'Participant added successfully',
-        ));
+        emit(
+          currentState.copyWith(
+            actionStatus: ActionStatus.success,
+            actionMessage: 'Participant added successfully',
+          ),
+        );
         add(const ParticipantListRefreshRequested());
       },
     );
@@ -188,15 +197,19 @@ class ParticipantListBloc
     final result = await _updateParticipantUseCase(event.params);
 
     result.fold(
-      (failure) => emit(currentState.copyWith(
-        actionStatus: ActionStatus.failure,
-        actionMessage: failure.userFriendlyMessage,
-      )),
+      (failure) => emit(
+        currentState.copyWith(
+          actionStatus: ActionStatus.failure,
+          actionMessage: failure.userFriendlyMessage,
+        ),
+      ),
       (_) {
-        emit(currentState.copyWith(
-          actionStatus: ActionStatus.success,
-          actionMessage: 'Participant updated successfully',
-        ));
+        emit(
+          currentState.copyWith(
+            actionStatus: ActionStatus.success,
+            actionMessage: 'Participant updated successfully',
+          ),
+        );
         add(const ParticipantListRefreshRequested());
       },
     );
@@ -218,15 +231,19 @@ class ParticipantListBloc
     );
 
     result.fold(
-      (failure) => emit(currentState.copyWith(
-        actionStatus: ActionStatus.failure,
-        actionMessage: failure.userFriendlyMessage,
-      )),
+      (failure) => emit(
+        currentState.copyWith(
+          actionStatus: ActionStatus.failure,
+          actionMessage: failure.userFriendlyMessage,
+        ),
+      ),
       (_) {
-        emit(currentState.copyWith(
-          actionStatus: ActionStatus.success,
-          actionMessage: 'Status updated',
-        ));
+        emit(
+          currentState.copyWith(
+            actionStatus: ActionStatus.success,
+            actionMessage: 'Status updated',
+          ),
+        );
         add(const ParticipantListRefreshRequested());
       },
     );
@@ -244,15 +261,19 @@ class ParticipantListBloc
     final result = await _transferParticipantUseCase(event.params);
 
     result.fold(
-      (failure) => emit(currentState.copyWith(
-        actionStatus: ActionStatus.failure,
-        actionMessage: failure.userFriendlyMessage,
-      )),
+      (failure) => emit(
+        currentState.copyWith(
+          actionStatus: ActionStatus.failure,
+          actionMessage: failure.userFriendlyMessage,
+        ),
+      ),
       (_) {
-        emit(currentState.copyWith(
-          actionStatus: ActionStatus.success,
-          actionMessage: 'Participant transferred successfully',
-        ));
+        emit(
+          currentState.copyWith(
+            actionStatus: ActionStatus.success,
+            actionMessage: 'Participant transferred successfully',
+          ),
+        );
         add(const ParticipantListRefreshRequested());
       },
     );
@@ -270,15 +291,19 @@ class ParticipantListBloc
     final result = await _deleteParticipantUseCase(event.participantId);
 
     result.fold(
-      (failure) => emit(currentState.copyWith(
-        actionStatus: ActionStatus.failure,
-        actionMessage: failure.userFriendlyMessage,
-      )),
+      (failure) => emit(
+        currentState.copyWith(
+          actionStatus: ActionStatus.failure,
+          actionMessage: failure.userFriendlyMessage,
+        ),
+      ),
       (_) {
-        emit(currentState.copyWith(
-          actionStatus: ActionStatus.success,
-          actionMessage: 'Participant removed',
-        ));
+        emit(
+          currentState.copyWith(
+            actionStatus: ActionStatus.success,
+            actionMessage: 'Participant removed',
+          ),
+        );
         add(const ParticipantListRefreshRequested());
       },
     );
@@ -296,8 +321,9 @@ class ParticipantListBloc
     filtered = filtered.where((p) {
       return switch (filter) {
         ParticipantFilter.all => true,
-        ParticipantFilter.active => p.checkInStatus == ParticipantStatus.pending ||
-            p.checkInStatus == ParticipantStatus.checkedIn,
+        ParticipantFilter.active =>
+          p.checkInStatus == ParticipantStatus.pending ||
+              p.checkInStatus == ParticipantStatus.checkedIn,
         ParticipantFilter.noShow => p.checkInStatus == ParticipantStatus.noShow,
         ParticipantFilter.disqualified =>
           p.checkInStatus == ParticipantStatus.disqualified,
@@ -320,14 +346,21 @@ class ParticipantListBloc
     // 3. Sort
     filtered.sort((a, b) {
       return switch (sort) {
-        ParticipantSort.nameAsc =>
-          '${a.lastName} ${a.firstName}'.compareTo('${b.lastName} ${b.firstName}'),
-        ParticipantSort.nameDesc =>
-          '${b.lastName} ${b.firstName}'.compareTo('${a.lastName} ${a.firstName}'),
-        ParticipantSort.dojangAsc =>
-          (a.schoolOrDojangName ?? '').compareTo(b.schoolOrDojangName ?? ''),
-        ParticipantSort.beltAsc => (a.beltRank ?? '').compareTo(b.beltRank ?? ''),
-        ParticipantSort.seedAsc => (a.seedNumber ?? 999).compareTo(b.seedNumber ?? 999),
+        ParticipantSort.nameAsc => '${a.lastName} ${a.firstName}'.compareTo(
+          '${b.lastName} ${b.firstName}',
+        ),
+        ParticipantSort.nameDesc => '${b.lastName} ${b.firstName}'.compareTo(
+          '${a.lastName} ${a.firstName}',
+        ),
+        ParticipantSort.dojangAsc => (a.schoolOrDojangName ?? '').compareTo(
+          b.schoolOrDojangName ?? '',
+        ),
+        ParticipantSort.beltAsc => (a.beltRank ?? '').compareTo(
+          b.beltRank ?? '',
+        ),
+        ParticipantSort.seedAsc => (a.seedNumber ?? 999).compareTo(
+          b.seedNumber ?? 999,
+        ),
       };
     });
 

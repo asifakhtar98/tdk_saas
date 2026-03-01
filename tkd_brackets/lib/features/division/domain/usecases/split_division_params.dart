@@ -7,7 +7,6 @@ enum SplitDistributionMethod { random, alphabetical }
 
 @freezed
 class SplitDivisionParams with _$SplitDivisionParams {
-
   const factory SplitDivisionParams({
     required String divisionId,
     required SplitDistributionMethod distributionMethod,

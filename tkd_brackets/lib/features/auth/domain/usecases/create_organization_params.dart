@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:tkd_brackets/features/auth/auth.dart' show CreateOrganizationUseCase;
-import 'package:tkd_brackets/features/auth/domain/usecases/create_organization_use_case.dart' show CreateOrganizationUseCase;
+import 'package:tkd_brackets/features/auth/auth.dart'
+    show CreateOrganizationUseCase;
+import 'package:tkd_brackets/features/auth/domain/usecases/create_organization_use_case.dart'
+    show CreateOrganizationUseCase;
 
 part 'create_organization_params.freezed.dart';
 

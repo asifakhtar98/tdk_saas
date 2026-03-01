@@ -13,21 +13,17 @@ class ParticipantSearchBar extends StatefulWidget {
   final String initialQuery;
 
   @override
-  State<ParticipantSearchBar> createState() =>
-      _ParticipantSearchBarState();
+  State<ParticipantSearchBar> createState() => _ParticipantSearchBarState();
 }
 
-class _ParticipantSearchBarState
-    extends State<ParticipantSearchBar> {
+class _ParticipantSearchBarState extends State<ParticipantSearchBar> {
   late final TextEditingController _controller;
   Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(
-      text: widget.initialQuery,
-    );
+    _controller = TextEditingController(text: widget.initialQuery);
   }
 
   @override
@@ -51,10 +47,7 @@ class _ParticipantSearchBarState
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: SearchBar(
         controller: _controller,
         hintText: 'Search participants...',
@@ -62,8 +55,7 @@ class _ParticipantSearchBarState
         onChanged: _onChanged,
         elevation: WidgetStateProperty.all(0),
         backgroundColor: WidgetStateProperty.all(
-          colorScheme.surfaceContainerHighest
-              .withValues(alpha: 0.5),
+          colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         ),
         trailing: [
           if (_controller.text.isNotEmpty)

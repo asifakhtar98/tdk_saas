@@ -382,32 +382,34 @@ class DemoMigrationServiceImpl implements DemoMigrationService {
     String newId,
     String newDivisionId,
   ) async {
-    await _db.into(_db.participants).insert(
-      ParticipantsCompanion(
-        id: Value(newId),
-        divisionId: Value(newDivisionId),
-        firstName: Value(participant.firstName),
-        lastName: Value(participant.lastName),
-        dateOfBirth: Value(participant.dateOfBirth),
-        gender: Value(participant.gender),
-        weightKg: Value(participant.weightKg),
-        schoolOrDojangName: Value(participant.schoolOrDojangName),
-        beltRank: Value(participant.beltRank),
-        seedNumber: Value(participant.seedNumber),
-        registrationNumber: Value(participant.registrationNumber),
-        isBye: Value(participant.isBye),
-        checkInStatus: Value(participant.checkInStatus),
-        checkInAtTimestamp: Value(participant.checkInAtTimestamp),
-        photoUrl: Value(participant.photoUrl),
-        notes: Value(participant.notes),
-        isDemoData: const Value(false),
-        syncVersion: Value(participant.syncVersion + 1),
-        isDeleted: Value(participant.isDeleted),
-        deletedAtTimestamp: Value(participant.deletedAtTimestamp),
-        createdAtTimestamp: Value(participant.createdAtTimestamp),
-        updatedAtTimestamp: Value(DateTime.now()),
-      ),
-    );
+    await _db
+        .into(_db.participants)
+        .insert(
+          ParticipantsCompanion(
+            id: Value(newId),
+            divisionId: Value(newDivisionId),
+            firstName: Value(participant.firstName),
+            lastName: Value(participant.lastName),
+            dateOfBirth: Value(participant.dateOfBirth),
+            gender: Value(participant.gender),
+            weightKg: Value(participant.weightKg),
+            schoolOrDojangName: Value(participant.schoolOrDojangName),
+            beltRank: Value(participant.beltRank),
+            seedNumber: Value(participant.seedNumber),
+            registrationNumber: Value(participant.registrationNumber),
+            isBye: Value(participant.isBye),
+            checkInStatus: Value(participant.checkInStatus),
+            checkInAtTimestamp: Value(participant.checkInAtTimestamp),
+            photoUrl: Value(participant.photoUrl),
+            notes: Value(participant.notes),
+            isDemoData: const Value(false),
+            syncVersion: Value(participant.syncVersion + 1),
+            isDeleted: Value(participant.isDeleted),
+            deletedAtTimestamp: Value(participant.deletedAtTimestamp),
+            createdAtTimestamp: Value(participant.createdAtTimestamp),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        );
   }
 
   /// Inserts migrated invitation with new IDs and flags.
@@ -416,24 +418,26 @@ class DemoMigrationServiceImpl implements DemoMigrationService {
     String newId,
     String newOrganizationId,
   ) async {
-    await _db.into(_db.invitations).insert(
-      InvitationsCompanion(
-        id: Value(newId),
-        organizationId: Value(newOrganizationId),
-        email: Value(invitation.email),
-        role: Value(invitation.role),
-        invitedBy: Value(invitation.invitedBy),
-        status: Value(invitation.status),
-        token: Value(invitation.token),
-        expiresAt: Value(invitation.expiresAt),
-        isDemoData: const Value(false),
-        syncVersion: Value(invitation.syncVersion + 1),
-        isDeleted: Value(invitation.isDeleted),
-        deletedAtTimestamp: Value(invitation.deletedAtTimestamp),
-        createdAtTimestamp: Value(invitation.createdAtTimestamp),
-        updatedAtTimestamp: Value(DateTime.now()),
-      ),
-    );
+    await _db
+        .into(_db.invitations)
+        .insert(
+          InvitationsCompanion(
+            id: Value(newId),
+            organizationId: Value(newOrganizationId),
+            email: Value(invitation.email),
+            role: Value(invitation.role),
+            invitedBy: Value(invitation.invitedBy),
+            status: Value(invitation.status),
+            token: Value(invitation.token),
+            expiresAt: Value(invitation.expiresAt),
+            isDemoData: const Value(false),
+            syncVersion: Value(invitation.syncVersion + 1),
+            isDeleted: Value(invitation.isDeleted),
+            deletedAtTimestamp: Value(invitation.deletedAtTimestamp),
+            createdAtTimestamp: Value(invitation.createdAtTimestamp),
+            updatedAtTimestamp: Value(DateTime.now()),
+          ),
+        );
   }
 
   /// Inserts migrated user with new IDs, flags, and inactive status.

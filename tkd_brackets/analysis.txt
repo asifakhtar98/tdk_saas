@@ -1,0 +1,14 @@
+Analyzing tkd_brackets...
+
+   info - lib/core/algorithms/seeding/constraint_satisfying_seeding_engine.dart:324:9 - Invalid assignment to the parameter 'constraintViolationCount'. Try using a local variable in place of the parameter. - parameter_assignments
+   info - lib/core/algorithms/seeding/constraint_satisfying_seeding_engine.dart:399:11 - Don't use adjacent strings in a list literal. Try adding a comma between the strings. - no_adjacent_strings_in_list
+   info - test/core/algorithms/seeding/constraint_satisfying_seeding_engine_test.dart:70:53 - Don't throw instances of classes that don't extend either 'Exception' or 'Error'. Try throwing a different class of object. - only_throw_errors
+   info - test/core/algorithms/seeding/constraint_satisfying_seeding_engine_test.dart:98:53 - Don't throw instances of classes that don't extend either 'Exception' or 'Error'. Try throwing a different class of object. - only_throw_errors
+   info - test/core/algorithms/seeding/constraint_satisfying_seeding_engine_test.dart:126:55 - Don't throw instances of classes that don't extend either 'Exception' or 'Error'. Try throwing a different class of object. - only_throw_errors
+   info - test/core/algorithms/seeding/constraint_satisfying_seeding_engine_test.dart:156:55 - Don't throw instances of classes that don't extend either 'Exception' or 'Error'. Try throwing a different class of object. - only_throw_errors
+   info - test/core/algorithms/seeding/constraint_satisfying_seeding_engine_test.dart:201:53 - Don't throw instances of classes that don't extend either 'Exception' or 'Error'. Try throwing a different class of object. - only_throw_errors
+   info - test/core/algorithms/seeding/constraint_satisfying_seeding_engine_test.dart:224:55 - Don't throw instances of classes that don't extend either 'Exception' or 'Error'. Try throwing a different class of object. - only_throw_errors
+   info - test/core/algorithms/seeding/constraint_satisfying_seeding_engine_test.dart:243:53 - Don't throw instances of classes that don't extend either 'Exception' or 'Error'. Try throwing a different class of object. - only_throw_errors
+   info - test/core/algorithms/seeding/constraint_satisfying_seeding_engine_test.dart:265:53 - Don't throw instances of classes that don't extend either 'Exception' or 'Error'. Try throwing a different class of object. - only_throw_errors
+
+10 issues found.

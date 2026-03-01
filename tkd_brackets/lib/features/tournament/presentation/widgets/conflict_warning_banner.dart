@@ -3,7 +3,8 @@ import 'package:tkd_brackets/features/division/domain/entities/conflict_warning.
 
 class ConflictWarningBanner extends StatelessWidget {
   const ConflictWarningBanner({
-    required this.conflicts, super.key,
+    required this.conflicts,
+    super.key,
     this.onDismiss,
   });
 

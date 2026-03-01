@@ -1,4 +1,5 @@
-import 'package:tkd_brackets/features/auth/auth.dart' show RbacPermissionService, UserRole;
+import 'package:tkd_brackets/features/auth/auth.dart'
+    show RbacPermissionService, UserRole;
 
 /// Granular permissions for RBAC enforcement.
 ///

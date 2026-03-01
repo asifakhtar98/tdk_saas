@@ -151,11 +151,11 @@ class TransferParticipantUseCase {
         sourceDivision.status != DivisionStatus.ready) {
       return const Left(
         InputValidationFailure(
-          userFriendlyMessage: 'Cannot transfer from a '
+          userFriendlyMessage:
+              'Cannot transfer from a '
               'division that is in progress or completed',
           fieldErrors: {
-            'sourceDivision':
-                'Source division is not accepting modifications',
+            'sourceDivision': 'Source division is not accepting modifications',
           },
         ),
       );

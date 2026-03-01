@@ -578,11 +578,7 @@ void main() {
         dateOfBirth: dateAtAge(10),
         weightKg: 35,
       );
-      final division = createTestDivision(
-        id: 'd1',
-        ageMin: 8,
-        weightMinKg: 30,
-      );
+      final division = createTestDivision(id: 'd1', ageMin: 8, weightMinKg: 30);
 
       final match = service.evaluateMatch(participant, division);
 
