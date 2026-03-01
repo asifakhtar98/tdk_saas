@@ -15,6 +15,24 @@ class DojangSeparationConstraint extends SeedingConstraint {
   /// Default: 2 (cannot meet in Round 1 or Round 2).
   final int minimumRoundsSeparation;
 
+  // Caching maps for performance during backtracking
+  List<SeedingParticipant>? _cachedParticipants;
+  Map<String, String>? _cachedDojangMap;
+
+  Map<String, String> _getDojangMap(List<SeedingParticipant> participants) {
+    if (identical(_cachedParticipants, participants) &&
+        _cachedDojangMap != null) {
+      return _cachedDojangMap!;
+    }
+    final map = <String, String>{};
+    for (final p in participants) {
+      map[p.id] = p.dojangName.toLowerCase().trim();
+    }
+    _cachedParticipants = participants;
+    _cachedDojangMap = map;
+    return map;
+  }
+
   @override
   String get name => 'dojang_separation';
 
@@ -28,12 +46,42 @@ class DojangSeparationConstraint extends SeedingConstraint {
     required List<SeedingParticipant> participants,
     required int bracketSize,
   }) {
-    return countViolations(
-          placements: placements,
-          participants: participants,
-          bracketSize: bracketSize,
-        ) ==
-        0;
+    if (placements.isEmpty) return true;
+
+    // Use cached map for performance during backtracking
+    final dojangMap = _getDojangMap(participants);
+
+    // Since backtracking adds one placement at a time, we only need to check
+    // the most recently added placement against all previously validated ones.
+    // This reduces backtracking check complexity from O(N^2) to O(N).
+    final last = placements.last;
+    final lastDojang = dojangMap[last.participantId];
+
+    final totalRounds = bracketSize <= 1 ? 0 : (bracketSize - 1).bitLength;
+
+    // Check last vs all others
+    for (var i = 0; i < placements.length - 1; i++) {
+      final other = placements[i];
+      if (dojangMap[other.participantId] == lastDojang) {
+        final meetingRound = earliestMeetingRound(
+          last.seedPosition,
+          other.seedPosition,
+          bracketSize,
+          totalRounds,
+        );
+
+        var effectiveSeparation = minimumRoundsSeparation;
+        if (totalRounds > 0 && effectiveSeparation >= totalRounds) {
+          effectiveSeparation = totalRounds - 1;
+        }
+
+        if (meetingRound <= effectiveSeparation && meetingRound > 0) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 
   @override
@@ -44,11 +92,8 @@ class DojangSeparationConstraint extends SeedingConstraint {
   }) {
     if (placements.isEmpty) return 0;
 
-    // Build a map from participantId to dojang name for fast lookup
-    final dojangMap = <String, String>{};
-    for (final p in participants) {
-      dojangMap[p.id] = p.dojangName.toLowerCase().trim();
-    }
+    // Use cached map for performance during backtracking
+    final dojangMap = _getDojangMap(participants);
 
     var violations = 0;
     // Use bitLength for integer-precise totalRounds calculation.
@@ -113,8 +158,9 @@ class DojangSeparationConstraint extends SeedingConstraint {
     final b = seedB - 1;
 
     final xor = a ^ b;
-    // int.bitLength gives position of the highest set bit
-    final msb = xor.bitLength;
-    return totalRounds - msb + 1;
+    // int.bitLength gives the position of the highest set bit (1-indexed).
+    // In a linear binary tree (leaves 0..N-1), this is exactly the round
+    // where they meet (1 = first round, totalRounds = total depth).
+    return xor.bitLength;
   }
 }

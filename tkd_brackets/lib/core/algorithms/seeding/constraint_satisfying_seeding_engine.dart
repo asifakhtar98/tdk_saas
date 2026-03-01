@@ -88,6 +88,7 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
       context: _BacktrackContext(
         iterations: iterations,
         maxIterations: _maxIterations,
+        rng: rng,
       ),
     );
 
@@ -196,10 +197,9 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
     for (var i = 1; i <= bracketSize; i++) {
       if (!usedSeeds.contains(i)) availableSeeds.add(i);
     }
-    // Note: To keep it deterministic with randomSeed, we should avoid extra shuffle here
-    // or use the same rng. The story says "random placement with constraint satisfaction".
-    // I'll keep them in order for simplicity and predictability in backtracking,
-    // but the `ordered` list is already shuffled per dojang.
+    // Shuffle available seeds to explore diverse paths and avoid deterministic dead-ends.
+    // Uses the provided RNG to maintain reproducibility if a seed was given.
+    availableSeeds.shuffle(context.rng);
 
     for (final seed in availableSeeds) {
       // Temporary placement to check constraints
@@ -410,7 +410,12 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
 
 /// Mutable context for tracking backtracking iteration count.
 class _BacktrackContext {
-  _BacktrackContext({required this.iterations, required this.maxIterations});
+  _BacktrackContext({
+    required this.iterations,
+    required this.maxIterations,
+    required this.rng,
+  });
   int iterations;
   final int maxIterations;
+  final Random rng;
 }
