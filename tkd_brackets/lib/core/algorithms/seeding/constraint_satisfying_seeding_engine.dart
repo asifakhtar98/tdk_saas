@@ -29,6 +29,7 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
     required List<SeedingConstraint> constraints,
     required BracketFormat bracketFormat,
     int? randomSeed,
+    Map<String, int>? pinnedSeeds,
   }) {
     final n = participants.length;
     if (n == 0) {
@@ -56,8 +57,8 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
         effectiveSeed,
         rng,
         constraints,
-        warning:
-            'All participants are from the same dojang. '
+        pinnedSeeds: pinnedSeeds,
+        warning: 'All participants are from the same dojang. '
             'Random seeding applied — separation not possible.',
       );
     }
@@ -68,25 +69,53 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
     // 4. Flatten groups into placement order (largest dojang first)
     final ordered = _flattenGroupsLargestFirst(groups, rng);
 
-    // 5. Attempt backtracking placement
-    final positions = List<int?>.filled(
-      n,
-      null,
-    ); // positions[i] = seed for participant i
-    final usedSeeds =
-        <int>{}; // track which seed positions (1..bracketSize) are used
-    const iterations = 0;
+    // 4b. Pre-place pinned participants and move them to front of ordering.
+    // This ensures they are validated early and unpinned participants
+    // are checked against them.
+    final positions = List<int?>.filled(n, null);
+    final usedSeeds = <int>{};
+    final pinnedIndices = <int>{};
+    
+    if (pinnedSeeds != null && pinnedSeeds.isNotEmpty) {
+      for (final entry in pinnedSeeds.entries) {
+        final idx = ordered.indexWhere((p) => p.id == entry.key);
+        if (idx >= 0 && entry.value >= 1 && entry.value <= bracketSize) {
+          positions[idx] = entry.value;
+          usedSeeds.add(entry.value);
+          pinnedIndices.add(idx);
+        }
+      }
+    }
+
+    // Move pinned participants to the front while preserving relative order
+    final pinned = <SeedingParticipant>[];
+    final unpinned = <SeedingParticipant>[];
+    for (var i = 0; i < ordered.length; i++) {
+      if (pinnedIndices.contains(i)) {
+        pinned.add(ordered[i]);
+      } else {
+        unpinned.add(ordered[i]);
+      }
+    }
+    
+    final newOrdered = [...pinned, ...unpinned];
+    // Re-map positions to new ordered list
+    final newPositions = List<int?>.filled(n, null);
+    final effectivePinnedSeeds = pinnedSeeds ?? const <String, int>{};
+    for (var i = 0; i < pinned.length; i++) {
+      newPositions[i] = effectivePinnedSeeds[pinned[i].id];
+    }
 
     final success = _backtrack(
       participantIndex: 0,
-      ordered: ordered,
-      positions: positions,
+      ordered: newOrdered,
+      positions: newPositions,
       usedSeeds: usedSeeds,
       constraints: constraints,
       allParticipants: participants,
       bracketSize: bracketSize,
       context: _BacktrackContext(
-        iterations: iterations,
+        iterations: 0,
         maxIterations: _maxIterations,
         rng: rng,
       ),
@@ -95,8 +124,8 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
     // 6. If backtracking succeeded → build result
     if (success) {
       return _buildResult(
-        ordered: ordered,
-        positions: positions,
+        ordered: newOrdered,
+        positions: newPositions,
         effectiveSeed: effectiveSeed,
         constraints: constraints,
         participants: participants,
@@ -112,6 +141,7 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
       bracketSize: bracketSize,
       effectiveSeed: effectiveSeed,
       rng: rng,
+      pinnedSeeds: pinnedSeeds,
     );
   }
 
@@ -191,6 +221,26 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
     if (context.iterations >= context.maxIterations) return false;
     context.iterations++;
 
+    // Skip pinned participants — already pre-placed
+    if (positions[participantIndex] != null) {
+      // Even if pinned, we must ensure it satisfies constraints with previously
+      // placed participants (including other pinned ones).
+      if (!_checkConstraints(participantIndex, ordered, positions, constraints, allParticipants, bracketSize)) {
+        return false;
+      }
+
+      return _backtrack(
+        participantIndex: participantIndex + 1,
+        ordered: ordered,
+        positions: positions,
+        usedSeeds: usedSeeds,
+        constraints: constraints,
+        allParticipants: allParticipants,
+        bracketSize: bracketSize,
+        context: context,
+      );
+    }
+
     // Try all possible seed positions (1..bracketSize)
     // To make it feel "random", we shuffle the available seeds
     final availableSeeds = <int>[];
@@ -205,31 +255,14 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
       // Temporary placement to check constraints
       positions[participantIndex] = seed;
 
-      // Check partial constraints
-      final currentPlacements = <ParticipantPlacement>[];
-      for (var i = 0; i <= participantIndex; i++) {
-        currentPlacements.add(
-          ParticipantPlacement(
-            participantId: ordered[i].id,
-            seedPosition: positions[i]!,
-            bracketSlot: positions[i],
-          ),
-        );
-      }
-
-      var satisfied = true;
-      for (final constraint in constraints) {
-        if (!constraint.isSatisfied(
-          placements: currentPlacements,
-          participants: allParticipants,
-          bracketSize: bracketSize,
-        )) {
-          satisfied = false;
-          break;
-        }
-      }
-
-      if (satisfied) {
+      if (_checkConstraints(
+        participantIndex,
+        ordered,
+        positions,
+        constraints,
+        allParticipants,
+        bracketSize,
+      )) {
         usedSeeds.add(seed);
         if (_backtrack(
           participantIndex: participantIndex + 1,
@@ -252,22 +285,79 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
     return false;
   }
 
+  bool _checkConstraints(
+    int participantIndex,
+    List<SeedingParticipant> ordered,
+    List<int?> positions,
+    List<SeedingConstraint> constraints,
+    List<SeedingParticipant> allParticipants,
+    int bracketSize,
+  ) {
+    final currentPlacements = <ParticipantPlacement>[];
+    for (var i = 0; i <= participantIndex; i++) {
+      currentPlacements.add(
+        ParticipantPlacement(
+          participantId: ordered[i].id,
+          seedPosition: positions[i]!,
+          bracketSlot: positions[i],
+        ),
+      );
+    }
+
+    for (final constraint in constraints) {
+      if (!constraint.isSatisfied(
+        placements: currentPlacements,
+        participants: allParticipants,
+        bracketSize: bracketSize,
+      )) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   Either<Failure, SeedingResult> _buildRandomResult(
     List<SeedingParticipant> participants,
     int bracketSize,
     int effectiveSeed,
     Random rng,
     List<SeedingConstraint> constraints, {
-    required String warning,
+    required String warning, Map<String, int>? pinnedSeeds,
   }) {
-    final shuffled = List<SeedingParticipant>.from(participants)..shuffle(rng);
     final placements = <ParticipantPlacement>[];
-    for (var i = 0; i < shuffled.length; i++) {
+    final usedSeeds = <int>{};
+
+    // 1. Place pinned participants first
+    if (pinnedSeeds != null) {
+      for (final entry in pinnedSeeds.entries) {
+        placements.add(
+          ParticipantPlacement(
+            participantId: entry.key,
+            seedPosition: entry.value,
+            bracketSlot: entry.value,
+          ),
+        );
+        usedSeeds.add(entry.value);
+      }
+    }
+
+    // 2. Shuffle unpinned participants into remaining slots
+    final unpinned = participants
+        .where((p) => pinnedSeeds == null || !pinnedSeeds.containsKey(p.id))
+        .toList()
+      ..shuffle(rng);
+
+    final availableSeeds = <int>[];
+    for (var i = 1; i <= participants.length; i++) {
+      if (!usedSeeds.contains(i)) availableSeeds.add(i);
+    }
+
+    for (var i = 0; i < unpinned.length; i++) {
       placements.add(
         ParticipantPlacement(
-          participantId: shuffled[i].id,
-          seedPosition: i + 1,
-          bracketSlot: i + 1,
+          participantId: unpinned[i].id,
+          seedPosition: availableSeeds[i],
+          bracketSlot: availableSeeds[i],
         ),
       );
     }
@@ -321,8 +411,8 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
     placements.sort((a, b) => a.seedPosition.compareTo(b.seedPosition));
 
     var totalViolations = constraintViolationCount;
-    if (totalViolations == 0 && !isFullySatisfied) {
-      // Re-calculate violations if not passed
+    if (totalViolations == 0) {
+      // Re-calculate violations to ensure accuracy (especially for pinned seeds)
       for (final constraint in constraints) {
         totalViolations += constraint.countViolations(
           placements: placements,
@@ -358,21 +448,47 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
     required int bracketSize,
     required int effectiveSeed,
     required Random rng,
+    Map<String, int>? pinnedSeeds,
   }) {
     // Try 100 random permutations and pick the best one
     List<ParticipantPlacement>? bestPlacements;
     var minViolations = double.maxFinite.toInt();
 
+    // Identify pinned vs unpinned participants
+    final pinnedIds = pinnedSeeds?.keys.toSet() ?? <String>{};
+    final unpinned =
+        participants.where((p) => !pinnedIds.contains(p.id)).toList();
+    final pinnedPlacements = <ParticipantPlacement>[];
+    final usedByPinned = <int>{};
+
+    if (pinnedSeeds != null) {
+      for (final entry in pinnedSeeds.entries) {
+        pinnedPlacements.add(
+          ParticipantPlacement(
+            participantId: entry.key,
+            seedPosition: entry.value,
+            bracketSlot: entry.value,
+          ),
+        );
+        usedByPinned.add(entry.value);
+      }
+    }
+
+    final availableSeeds = <int>[
+      for (var i = 1; i <= bracketSize; i++)
+        if (!usedByPinned.contains(i)) i,
+    ];
+
     for (var i = 0; i < 100; i++) {
-      final shuffled = List<SeedingParticipant>.from(participants)
-        ..shuffle(rng);
-      final currentPlacements = <ParticipantPlacement>[];
+      final shuffled = List<SeedingParticipant>.from(unpinned)..shuffle(rng);
+      final currentPlacements =
+          List<ParticipantPlacement>.from(pinnedPlacements);
       for (var j = 0; j < shuffled.length; j++) {
         currentPlacements.add(
           ParticipantPlacement(
             participantId: shuffled[j].id,
-            seedPosition: j + 1,
-            bracketSlot: j + 1,
+            seedPosition: availableSeeds[j],
+            bracketSlot: availableSeeds[j],
           ),
         );
       }

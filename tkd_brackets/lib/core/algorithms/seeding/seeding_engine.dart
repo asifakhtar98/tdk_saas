@@ -23,6 +23,7 @@ abstract class SeedingEngine {
     required List<SeedingConstraint> constraints,
     required BracketFormat bracketFormat,
     int? randomSeed,
+    Map<String, int>? pinnedSeeds,
   });
 
   /// Validates that a proposed seeding satisfies all constraints.

@@ -140,7 +140,7 @@ development_status:
   5-6-round-robin-bracket-generator: done
   5-7-dojang-separation-seeding-algorithm: done
   5-8-regional-separation-seeding: done
-  5-9-manual-seed-override: backlog
+  5-9-manual-seed-override: done
   5-10-bye-assignment-algorithm: backlog
   5-11-bracket-regeneration: backlog
   5-12-bracket-lock-and-unlock: backlog
