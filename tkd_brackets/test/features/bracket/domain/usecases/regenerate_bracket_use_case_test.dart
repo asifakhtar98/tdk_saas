@@ -367,7 +367,8 @@ void main() {
           () => mockBracketRepo.deleteBracket(any()),
         ).thenAnswer((_) async => const Right(unit));
         when(() => mockSingleElimUC(any())).thenAnswer(
-          (_) async => Right(BracketGenerationResult(bracket: b1, matches: const [])),
+          (_) async =>
+              Right(BracketGenerationResult(bracket: b1, matches: const [])),
         );
 
         final result = await useCase(validParams);
@@ -457,8 +458,9 @@ void main() {
         setupEmptyDivision();
         final bracket = makeBracket();
         when(() => mockSingleElimUC(any())).thenAnswer(
-          (_) async =>
-              Right(BracketGenerationResult(bracket: bracket, matches: const [])),
+          (_) async => Right(
+            BracketGenerationResult(bracket: bracket, matches: const []),
+          ),
         );
 
         final result = await useCase(validParams);

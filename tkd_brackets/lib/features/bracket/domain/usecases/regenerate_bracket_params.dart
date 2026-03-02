@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:tkd_brackets/core/algorithms/seeding/bracket_format.dart';
-import 'package:tkd_brackets/features/bracket/bracket.dart' show RegenerateBracketUseCase;
-import 'package:tkd_brackets/features/bracket/domain/usecases/regenerate_bracket_use_case.dart' show RegenerateBracketUseCase;
+import 'package:tkd_brackets/features/bracket/bracket.dart'
+    show RegenerateBracketUseCase;
+import 'package:tkd_brackets/features/bracket/domain/usecases/regenerate_bracket_use_case.dart'
+    show RegenerateBracketUseCase;
 
 /// Parameters for [RegenerateBracketUseCase].
 @immutable

@@ -373,6 +373,7 @@ This document provides the complete epic and story breakdown for TKD Brackets, d
 - Demo-to-production data migration service
 - Session management
 - Logout flow
+- Auth and Organization UI pages
 
 **NFRs Addressed:** NFR12 (Supabase Auth), NFR14 (session timeout), NFR15 (server-side RBAC)
 
@@ -478,6 +479,7 @@ This document provides the complete epic and story breakdown for TKD Brackets, d
 - Bracket generation algorithms (single/double/round robin/pool)
 - Bracket layout engine (position calculation)
 - Manual seed override service
+- Bracket generation UI integration
 
 **NFRs Addressed:** NFR2 (bracket generation < 500ms)
 
@@ -1116,7 +1118,28 @@ lib/features/auth/
 
 ---
 
-**Epic 2 Complete: 10 stories created**
+### Story 2.11: Auth & Organization UI
+
+**As a** user,
+**I want** a UI to sign up, log in with a magic link, and manage my organization,
+**So that** I change authentication states and configure my Dojang.
+
+**Acceptance Criteria:**
+
+**Given** the auth and organization domain logic is complete
+**When** I build the presentation layer
+**Then** the following pages exist:
+  - Auth Page (Login/Signup via Email)
+  - Magic Link Return handler
+  - Organization Setup/Dashboard
+  - User Settings & Invitations management
+**And** `AuthBloc` state dictates navigation (e.g., redirect to login if unauthenticated)
+**And** Material Design 3 theming is applied
+**And** UI renders correctly in Chrome
+
+---
+
+**Epic 2 Complete: 11 stories created**
 
 ---
 
@@ -1658,7 +1681,24 @@ lib/features/participant/
 
 ---
 
-**Epic 4 Complete: 12 stories created**
+### Story 4.13: Paste from Spreadsheet
+
+**As an** organizer,
+**I want** to paste tabular data directly from a spreadsheet,
+**So that** I bypass file selection and mapping steps when adding participants (FR15).
+
+**Acceptance Criteria:**
+
+**Given** the CSV import mechanism is complete
+**When** I paste tabular data on the Participant List page
+**Then** `ClipboardInputService` parses the raw spreadsheet data (tab-separated columns)
+**And** maps it to the same `BulkImportUseCase` as CSV imports
+**And** the Bulk Import Validation UI renders the preview correctly
+**And** unit tests verify parsing tab-delimited paste buffers
+
+---
+
+**Epic 4 Complete: 13 stories created**
 
 ---
 
@@ -1928,7 +1968,26 @@ lib/features/bracket/
 
 ---
 
-**Epic 5 Complete: 13 stories created**
+### Story 5.14: Bracket Generation UI Integration
+
+**As an** organizer,
+**I want** a UI to generate, regenerate, and manage bracket seeding,
+**So that** I can apply the bracket algorithms to my divisions (FR23-FR31).
+
+**Acceptance Criteria:**
+
+**Given** the generation algorithms and bracket entities are complete
+**When** I view a division in the Tournament UI
+**Then** I can trigger Bracket Generation
+**And** I can select the Bracket Type (Single Elim, Double Elim, Round Robin) via a bottom sheet or dialog
+**And** I can apply manual seed overrides before locking the bracket
+**And** I can regenerate a bracket after modifying participants
+**And** I can lock and unlock the bracket
+**And** all actions dispatch the correct events to the `BracketBloc` or `DivisionBloc`
+
+---
+
+**Epic 5 Complete: 14 stories created**
 
 ---
 
@@ -2450,7 +2509,23 @@ lib/features/export/
 
 ---
 
-**Epic 7 Complete: 9 stories created**
+### Story 7.10: Bracket PNG Export
+
+**As an** organizer,
+**I want** to export a bracket view directly to a PNG image,
+**So that** I can share high-quality snapshots of tournament progression on social media or group chats (FR46).
+
+**Acceptance Criteria:**
+
+**Given** the bracket visualization widget is complete
+**When** I choose "Export to PNG" on a generated bracket
+**Then** `ImageExportService` captures the rendered widget
+**And** saves it as a high-resolution PNG locally
+**And** unit tests (widget tests) verify image capture works correctly
+
+---
+
+**Epic 7 Complete: 10 stories created**
 
 ---
 

@@ -43,7 +43,8 @@ void main() {
   }
 
   MockBracketEntity makeBracket({
-    required int totalRounds, String id = 'b1',
+    required int totalRounds,
+    String id = 'b1',
     BracketType type = BracketType.winners,
   }) {
     final bracket = MockBracketEntity();

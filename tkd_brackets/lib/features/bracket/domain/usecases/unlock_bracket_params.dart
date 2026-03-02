@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart' show immutable;
-import 'package:tkd_brackets/features/bracket/bracket.dart' show UnlockBracketUseCase;
-import 'package:tkd_brackets/features/bracket/domain/usecases/unlock_bracket_use_case.dart' show UnlockBracketUseCase;
+import 'package:tkd_brackets/features/bracket/bracket.dart'
+    show UnlockBracketUseCase;
+import 'package:tkd_brackets/features/bracket/domain/usecases/unlock_bracket_use_case.dart'
+    show UnlockBracketUseCase;
 
 /// Parameters for [UnlockBracketUseCase].
 @immutable
