@@ -1,8 +1,10 @@
-Validate story using [@checklist.md](file:///Users/asak/Documents/dev/proj/personal/taekwondo_fix/_bmad/bmm/workflows/4-implementation/create-story/checklist.md), also enhance, refine, make it verbose  to prevent implementation mistakes. Then Fix All, in small multiple shots automatically without asking user
+Validate story using [@checklist.md](file:///Users/asak/Documents/dev/proj/personal/taekwondo_fix/_bmad/bmm/workflows/4-implementation/create-story/checklist.md), also enhance, refine, make it verbose  to prevent implementation mistakes. Then Fix All, in small multiple shots automatically without asking user,, dont overcommunicate
 
 Fix All, in small multiple shots, dont overcommunicate
 Continue, do in small multiple shots, dont overcommunicate
 
-build for web , ref [@README.md](file:///Users/asak/Documents/dev/proj/personal/taekwondo_fix/tkd_brackets/README.md)
+build for web , ref [@README.md](file:///Users/asak/Documents/dev/proj/personal/taekwondo_fix/tkd_brackets/README.md), dont overcommunicate
 
-are we 100% done implementing the story, fresh cross check code with the story. if not, complete it.
+are we 100% done implementing the story, fresh cross check code with the story. if not, complete it, dont overcommunicate
+
+(dont overcommunicate unless explicitly mentioned)
