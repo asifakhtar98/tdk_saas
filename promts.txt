@@ -9,9 +9,19 @@ Continue, do in small multiple shots, dont overcommunicate
 
 (- dont overcommunicate unless explicitly mentioned)
 
-- (dont overcommunicate unless explicitly mentioned) Write comprehensive Playwright tests covering all user-facing features and critical workflows. Execute the tests and capture runtime logs, traces, and screenshots for each scenario. Analyze failures using visual evidence and logs to identify functional defects, UX breakdowns, state inconsistencies, and architectural misalignments. Based on these findings, refactor and enhance the code while strictly adhering to the Product Requirements Document (PRD) and the architectural principles defined in /folder/architec.md.
+- (dont overcommunicate unless explicitly mentioned)Write comprehensive Playwright tests covering all user-facing features and critical workflows within the completed 5 epics. Execute the tests and capture runtime logs, traces, and screenshots for each scenario. Analyze failures using visual evidence and logs to identify functional defects, usability gaps, incomplete flows, and architectural inconsistencies.
 
-Repeat this cycle continuously — test → observe → diagnose → improve → re-test — until the application reaches a stable, usable state where core workflows execute successfully, UX friction is minimized, and no critical failures remain.
+Refactor and enhance the code based on these findings while strictly aligning with the PRD and the architectural principles defined in ./_bmad-output.
 
-At each iteration:
-Ensure improvements enhance reliability, clarity, and maintainability without violating PRD intent or architectural boundaries.
+Repeat this cycle continuously — test → observe → diagnose → improve → re-test — until every completed epic reaches a usable, stable state where:
+
+All intended features are accessible and functional
+End-to-end workflows can be executed by both developers and testers without manual intervention or workarounds
+Core journeys do not break across environments
+UX blockers and critical defects are eliminated
+
+Feature parity with the PRD must be preserved at all times. No feature may be removed, downgraded, bypassed, or disabled as a means of achieving stability. Fixes must resolve root causes rather than masking behavior.
+
+Ensure each iteration improves reliability, clarity, completeness, and architectural correctness without reducing scope or violating design intent.
+
+The loop stops only when all completed epics are fully usable and testable in real workflows with their full intended functionality intact.

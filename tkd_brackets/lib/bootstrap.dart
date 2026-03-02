@@ -1,11 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:tkd_brackets/app/app.dart';
 import 'package:tkd_brackets/core/config/supabase_config.dart';
 import 'package:tkd_brackets/core/demo/demo_data_service.dart';
 import 'package:tkd_brackets/core/di/injection.dart';
+import 'package:tkd_brackets/core/monitoring/bloc_observer.dart';
 import 'package:tkd_brackets/core/monitoring/sentry_service.dart';
+import 'package:tkd_brackets/core/services/logger_service.dart';
 
 /// Shared initialization for all flavors.
 /// This function configures services before launching the app.
@@ -42,6 +45,9 @@ Future<void> bootstrap({
     appRunner: () async {
       // Initialize DI container (can now inject SupabaseClient)
       configureDependencies(environment);
+
+      // Initialize Bloc Observer for logging
+      Bloc.observer = AppBlocObserver(getIt<LoggerService>());
 
       // Seed demo data on first launch (after DI, before UI)
       final demoService = getIt<DemoDataService>();
