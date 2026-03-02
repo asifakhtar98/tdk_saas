@@ -910,7 +910,31 @@ lib/
 
 ---
 
-**Epic 1 Complete: 12 stories created**
+### Story 1.13: Code Review & Fix — Foundation & Demo Mode
+
+**As a** tech lead,
+**I want** a thorough code review and fix of all Epic 1 implementation,
+**So that** the foundation layer is clean, correct, and production-ready before launch.
+
+**Acceptance Criteria:**
+
+**Given** all Epic 1 stories are `done`
+**When** I run the code review
+**Then** the following checks pass:
+  - `dart analyze tkd_brackets/` reports zero warnings or errors
+  - All files follow Clean Architecture layer rules (no domain importing data, no data importing presentation)
+  - DI container (`injection.dart`) correctly registers all Epic 1 services
+  - Router (`app_router.dart`) has no dead routes and all guards are tested
+  - `SyncService`, `AutosaveService`, `ConnectivityService` have ≥ 80% unit test coverage
+  - Demo mode seeding creates exactly the expected records and all `is_demo_data = true`
+  - Drift migrations run without errors on a clean database
+  - Sentry is disabled in development builds and enabled in production
+**And** all identified issues are fixed and verified
+**And** `dart analyze` is clean after all fixes
+
+---
+
+**Epic 1 Complete: 13 stories created**
 
 ---
 
@@ -1139,7 +1163,33 @@ lib/features/auth/
 
 ---
 
-**Epic 2 Complete: 11 stories created**
+### Story 2.12: Code Review & Fix — Authentication & Organization
+
+**As a** tech lead,
+**I want** a thorough code review and fix of all Epic 2 implementation,
+**So that** authentication and organization flows are secure and production-ready.
+
+**Acceptance Criteria:**
+
+**Given** all Epic 2 stories are `done`
+**When** I run the code review
+**Then** the following checks pass:
+  - Magic link sign-up and sign-in flows work end-to-end in Chrome
+  - `AuthBloc` state transitions are complete: `initial → loading → authenticated/unauthenticated/error`
+  - Session persists across app restarts (no logout on refresh)
+  - RBAC permission matrix is correctly enforced — Scorer cannot access Owner actions
+  - Invitation flow: invite → email sent → accept link → user joins org with correct role
+  - `DemoMigrationService` remaps UUIDs correctly without data loss
+  - All auth routes are protected with `AuthGuard` redirect
+  - Organization slug auto-generation is collision-safe
+  - Auth & Organization UI (Story 2.11) renders without overflow or layout issues
+  - No Supabase API keys are hardcoded in source files
+**And** all identified issues are fixed and verified
+**And** `dart analyze` is clean after all fixes
+
+---
+
+**Epic 2 Complete: 12 stories created**
 
 ---
 
@@ -1431,7 +1481,32 @@ lib/features/tournament/
 
 ---
 
-**Epic 3 Complete: 14 stories created**
+### Story 3.15: Code Review & Fix — Tournament & Division Management
+
+**As a** tech lead,
+**I want** a thorough code review and fix of all Epic 3 implementation,
+**So that** tournament and division management is robust and production-ready.
+
+**Acceptance Criteria:**
+
+**Given** all Epic 3 stories are `done`
+**When** I run the code review
+**Then** the following checks pass:
+  - Create, edit, archive, delete tournament all work with correct RLS enforcement
+  - Smart Division Builder produces correct age/belt/weight/gender divisions for WT, ITF, ATA templates
+  - Division merge creates a new merged division and soft-deletes source divisions
+  - Division split into pool A/B correctly divides participants proportionally
+  - Ring assignment prevents double-booking the same ring for concurrent divisions
+  - Scheduling conflict detection correctly flags athletes assigned to overlapping time slots
+  - Duplicate tournament copies all settings and divisions but NOT participants or brackets
+  - All use cases return `Either<Failure, T>` — no raw exceptions escape
+  - Tournament Management UI (Story 3.14) is fully functional without dead-end navigation
+**And** all identified issues are fixed and verified
+**And** `dart analyze` is clean after all fixes
+
+---
+
+**Epic 3 Complete: 15 stories created**
 
 ---
 
@@ -1698,7 +1773,33 @@ lib/features/participant/
 
 ---
 
-**Epic 4 Complete: 13 stories created**
+### Story 4.14: Code Review & Fix — Participant Management
+
+**As a** tech lead,
+**I want** a thorough code review and fix of all Epic 4 implementation,
+**So that** participant management is correct, performant, and production-ready.
+
+**Acceptance Criteria:**
+
+**Given** all Epic 4 stories are `done`
+**When** I run the code review
+**Then** the following checks pass:
+  - Manual participant entry validates all required fields before saving
+  - CSV import handles all supported date formats and belt normalizations without crashing
+  - Duplicate detection correctly identifies exact and fuzzy matches (Levenshtein ≤ 2)
+  - Bulk import shows correct row-level validation (green/yellow/red) before commit
+  - Paste from spreadsheet (Story 4.13) correctly parses tab-delimited clipboard data
+  - Auto-assignment correctly matches all criteria (age, belt, weight, gender)
+  - Participant transfer is blocked if the target bracket is `in_progress`
+  - No-show and DQ status changes correctly forfeit matches in the bracket
+  - Participant Management UI (Story 4.12) renders large lists (500+ rows) without jank
+  - All participant search filters (name, dojang, belt) apply correctly
+**And** all identified issues are fixed and verified
+**And** `dart analyze` is clean after all fixes
+
+---
+
+**Epic 4 Complete: 14 stories created**
 
 ---
 
@@ -1987,7 +2088,94 @@ lib/features/bracket/
 
 ---
 
-**Epic 5 Complete: 14 stories created**
+### Story 5.15: Pool Play → Elimination Hybrid Generator
+
+**As an** organizer,
+**I want** the system to generate a pool play followed by elimination bracket,
+**So that** I can run group-stage competition before knockout rounds (FR23).
+
+**Acceptance Criteria:**
+
+**Given** a division has N participants split into pools
+**When** I generate a pool play → elimination hybrid bracket
+**Then** `HybridBracketGenerator` creates:
+  - Pool stage: Round Robin pools (Pool A, Pool B)
+  - Top N qualifiers from each pool advance to elimination stage
+  - Single elimination bracket built from pool qualifiers
+  - Pool standings determine seeding for elimination
+**And** the number of qualifiers per pool is configurable
+**And** unit tests verify pool-to-elimination transition for various pool sizes
+
+---
+
+### Story 5.16: Random Seeding Algorithm (Cryptographic Fairness)
+
+**As an** organizer,
+**I want** to apply a cryptographically fair random seeding to a bracket,
+**So that** seeding is unbiased and verifiably fair (FR27).
+
+**Acceptance Criteria:**
+
+**Given** a division has participants to seed
+**When** I apply random seeding
+**Then** `RandomSeedingService` uses Dart's `dart:math` `Random.secure()` for seed generation
+**And** generates a verifiable seed string stored in `seed_data.random_seed`
+**And** the same seed reproducibly generates the same bracket
+**And** unit tests verify that SecureRandom is used and reproducibility works
+
+---
+
+### Story 5.17: Ranked Seeding Import from Federation Data
+
+**As an** organizer,
+**I want** to import ranked seeding data from a file or URL,
+**So that** official federation rankings determine bracket seeding (FR28).
+
+**Acceptance Criteria:**
+
+**Given** a federation provides a ranked athlete list (CSV or JSON)
+**When** I import the ranked data
+**Then** `RankedSeedingImportService`:
+  - Parses the ranking file (CSV columns: Name, Club, Rank; or JSON equivalent)
+  - Matches ranked athletes against division participants by name/dojang fuzzy match
+  - Assigns `seed_position` based on rank (Rank 1 = seed 1)
+**And** unmatched ranked athletes are flagged for manual review
+**And** unit tests verify import parsing and athlete matching
+
+---
+
+### Story 5.18: Code Review & Fix — Bracket Generation & Seeding
+
+**As a** tech lead,
+**I want** a thorough code review and fix of all Epic 5 implementation,
+**So that** bracket generation is correct, fair, and production-ready.
+
+**Acceptance Criteria:**
+
+**Given** all Epic 5 stories are `done`
+**When** I run the code review
+**Then** the following checks pass:
+  - Single elimination generates correct bracket for 2, 4, 8, 16, 32, 64 participants
+  - Double elimination correctly routes losers to the consolation bracket
+  - Round robin produces complete schedule (every participant vs every other)
+  - Pool play → elimination hybrid correctly qualifies top N from each pool
+  - Dojang separation algorithm ensures same-dojang athletes don't meet before the configured round
+  - Regional separation correctly combines with dojang separation (dojang takes priority)
+  - Random seeding uses `Random.secure()` and the seed is stored for reproducibility
+  - Ranked seeding import correctly matches federation-ranked athletes by fuzzy name match
+  - Bye placement gives byes to top seeds (position 1, 2, ...)
+  - Bracket lock blocks participant changes and seeding edits
+  - Bracket unlock restores editable state with a warning
+  - Bracket regeneration soft-deletes old bracket and creates clean new one
+  - Bracket Visualization renders correctly for all bracket types (single, double, round robin)
+  - Bracket Generation UI (Story 5.14) correctly triggers all generator use cases
+  - Generation performance: ≤ 500ms for 64 participants (NFR2)
+**And** all identified issues are fixed and verified
+**And** `dart analyze` is clean after all fixes
+
+---
+
+**Epic 5 Complete: 18 stories created**
 
 ---
 
@@ -2301,7 +2489,35 @@ lib/features/scoring/
 
 ---
 
-**Epic 6 Complete: 15 stories created**
+### Story 6.16: Code Review & Fix — Live Scoring & Match Management
+
+**As a** tech lead,
+**I want** a thorough code review and fix of all Epic 6 implementation,
+**So that** live scoring is reliable, fast, and production-ready for competition day.
+
+**Acceptance Criteria:**
+
+**Given** all Epic 6 stories are `done`
+**When** I run the code review
+**Then** the following checks pass:
+  - Score entry validates non-negative scores and federation-specific rules before saving
+  - Winner determination is correct for all cases: sparring (high score wins), forms (total wins), ties
+  - Bracket progression correctly advances winner to `next_match_slot` of `next_match_id`
+  - Undo score correctly reverses bracket progression and restores previous match status
+  - Score audit trail records every change with old/new data and scorer identity
+  - Score correction after completion recalculates all affected downstream matches
+  - Supabase Realtime delivers score updates to other clients within 500ms (NFR3)
+  - Realtime reconnects gracefully after network loss without missing updates
+  - Keyboard shortcuts (Tab/Enter/Arrow) all work correctly in the scoring UI
+  - Multi-ring venue display correctly shows current match per ring
+  - Match timer logic (pause, resume, round end alert) works correctly
+  - Live Scoring UI (Story 6.15) is responsive on tablet-sized screens
+**And** all identified issues are fixed and verified
+**And** `dart analyze` is clean after all fixes
+
+---
+
+**Epic 6 Complete: 16 stories created**
 
 ---
 
@@ -2525,7 +2741,53 @@ lib/features/export/
 
 ---
 
-**Epic 7 Complete: 10 stories created**
+### Story 7.11: CSV/JSON Tournament Data Export
+
+**As an** organizer,
+**I want** to export tournament data as CSV or JSON,
+**So that** I can archive results or import them into other systems (FR47).
+
+**Acceptance Criteria:**
+
+**Given** a tournament exists with participants and results
+**When** I choose "Export Data"
+**Then** `ExportDataUseCase` provides:
+  - CSV format: Participants (name, dojang, belt, division, placement)
+  - CSV format: Match results (participant1, participant2, winner, scores, round)
+  - JSON format: Full tournament structure with nested divisions, brackets, and scores
+**And** the file is downloaded via browser in Chrome
+**And** unit tests verify CSV/JSON serialization correctness
+
+---
+
+### Story 7.12: Code Review & Fix — Export, Sharing & Public View
+
+**As a** tech lead,
+**I want** a thorough code review and fix of all Epic 7 implementation,
+**So that** all export and sharing features work correctly in production.
+
+**Acceptance Criteria:**
+
+**Given** all Epic 7 stories are `done`
+**When** I run the code review
+**Then** the following checks pass:
+  - Bracket PDF export produces a correctly formatted, print-ready PDF for all bracket types
+  - Results PDF export contains correct final placements for all division types
+  - CSV/JSON export contains correct, complete tournament data
+  - PNG export captures the bracket widget at high resolution without clipping
+  - Public link generation creates a unique, non-guessable token
+  - Public bracket viewer shows live scores via Realtime without requiring login
+  - Expired or invalid public links show a user-friendly error (not a crash)
+  - Embeddable widget iframe URL renders correctly with CORS headers set
+  - Athlete certificate generation includes org logo if uploaded
+  - Export UI (Story 7.9) download triggers work correctly in Chrome
+  - PDF generation completes in < 3 seconds for 64 participants (NFR4)
+**And** all identified issues are fixed and verified
+**And** `dart analyze` is clean after all fixes
+
+---
+
+**Epic 7 Complete: 12 stories created**
 
 ---
 
@@ -2726,7 +2988,98 @@ lib/features/billing/
 
 ---
 
-**Epic 8 Complete: 9 stories created**
+### Story 8.10: External Integration Service
+
+**As an** organizer,
+**I want** to import participant data from external dojang management systems,
+**So that** I eliminate manual data entry for my regular students (FR70-FR73).
+
+**Acceptance Criteria:**
+
+**Given** user has an account with Kicksite, Zen Planner, or Ember
+**When** they connect their account and trigger import
+**Then** `ExternalIntegrationService` handles:
+  - OAuth or API-key authentication per provider
+  - Fetches student roster from the connected system
+  - Maps provider-specific fields to `ParticipantEntity` fields
+  - Runs through `DuplicateDetectionService` before import
+**And** `FederationSyncService` syncs ranking points via federation APIs (WT, ITF, ATA)
+**And** unit tests verify data mapping per provider (mocked API responses)
+
+---
+
+### Story 8.11: Webhook & Zapier Notification Service
+
+**As an** organizer or system integrator,
+**I want** the system to send webhook notifications on key bracket events,
+**So that** I can automate workflows or connect with Zapier (FR74, FR75).
+
+**Acceptance Criteria:**
+
+**Given** a webhook endpoint is configured
+**When** a bracket event occurs (bracket generated, match completed, bracket finalized)
+**Then** `WebhookNotificationService` sends an HTTP POST to the configured URL
+**And** payload contains: event type, tournament ID, division ID, timestamp, relevant data
+**And** delivery is retried up to 3 times on failure (NFR33: 99% reliability)
+**And** `webhook_endpoints` table stores configured endpoints per organization
+**And** Zapier trigger URL format is supported out-of-the-box
+**And** unit tests verify payload structure and retry logic
+
+---
+
+### Story 8.12: Analytics Dashboard & Post-Event Reports
+
+**As an** organizer,
+**I want** a tournament analytics dashboard and post-event reports,
+**So that** I can measure event success and track athlete progress over time (FR76-FR78).
+
+**Acceptance Criteria:**
+
+**Given** a tournament has been completed
+**When** I view the Analytics Dashboard
+**Then** `AnalyticsService` aggregates and displays:
+  - Tournament summary (divisions run, participants, matches played, duration)
+  - Participation counts per division and belt rank
+  - Match outcome statistics (average score, most-entered forms, DQ rates)
+**And** when I view an athlete's profile across tournaments
+**Then** `AthleteProfileService` shows:
+  - Tournament history (placements, divisions entered)
+  - Win/loss record over time
+**And** when I generate a post-event report
+**Then** `PostEventReportUseCase` produces a PDF containing the analytics summary
+**And** unit tests verify aggregation correctness
+
+---
+
+### Story 8.13: Code Review & Fix — Subscription & Billing
+
+**As a** tech lead,
+**I want** a thorough code review and fix of all Epic 8 implementation,
+**So that** billing and integrations are secure, reliable, and production-ready.
+
+**Acceptance Criteria:**
+
+**Given** all Epic 8 stories are `done`
+**When** I run the code review
+**Then** the following checks pass:
+  - Stripe Checkout session creates correctly with the right price ID for the selected plan
+  - Stripe webhook handler verifies signature before processing any event
+  - Webhook idempotency keys prevent duplicate subscription activations
+  - Free tier limits correctly block: > 1 active tournament, > 50 participants, custom branding
+  - Grace period (7 days) activates correctly on payment failure without disrupting active tournaments
+  - Subscription status is cached locally for offline access and invalidated on change
+  - Billing Portal session creates correctly and returns user to app on close
+  - No Stripe API keys or payment data are stored in local Drift database (NFR16)
+  - External integrations (Kicksite, Zen Planner) correctly map provider fields to `ParticipantEntity`
+  - Webhook delivery retries up to 3 times on failure (NFR33)
+  - Analytics dashboard correctly aggregates tournament stats
+  - Billing UI (Story 8.9) upgrade flow feels trustworthy and renders without issues
+**And** all identified issues are fixed and verified
+**And** `dart analyze` is clean after all fixes
+
+---
+
+**Epic 8 Complete: 13 stories created**
 
 ---
 
@@ -2734,24 +3087,25 @@ lib/features/billing/
 
 ## Completion Status
 
-| Epic  | Title                            | Stories | FRs Covered   | Status     |
-| ----- | -------------------------------- | ------- | ------------- | ---------- |
-| **1** | Foundation & Demo Mode           | 12      | Setup, NFR1-9 | ✅ Complete |
-| **2** | Authentication & Organization    | 10      | FR61-66       | ✅ Complete |
-| **3** | Tournament & Division Management | 14      | FR1-FR12      | ✅ Complete |
-| **4** | Participant Management           | 12      | FR13-FR22     | ✅ Complete |
-| **5** | Bracket Generation & Seeding     | 13      | FR23-FR32     | ✅ Complete |
-| **6** | Live Scoring & Match Management  | 15      | FR33-FR44     | ✅ Complete |
-| **7** | Export, Sharing & Public View    | 9       | FR45-FR50     | ✅ Complete |
-| **8** | Subscription & Billing           | 9       | FR51-FR56     | ✅ Complete |
+| Epic  | Title                                      | Stories | FRs Covered   | Status        |
+| ----- | ------------------------------------------ | ------- | ------------- | ------------- |
+| **1** | Foundation & Demo Mode                     | 12      | Setup, NFR1-9 | ✅ Complete    |
+| **2** | Authentication & Organization              | 11      | FR51-FR58     | 🔄 In Progress |
+| **3** | Tournament & Division Management           | 14      | FR1-FR12      | ✅ Complete    |
+| **4** | Participant Management                     | 13      | FR13-FR19     | 🔄 In Progress |
+| **5** | Bracket Generation & Seeding               | 17      | FR20-FR31     | 🔄 In Progress |
+| **6** | Live Scoring & Match Management            | 15      | FR32-FR44     | 📋 Backlog     |
+| **7** | Export, Sharing & Public View              | 11      | FR45-FR50     | 📋 Backlog     |
+| **8** | Subscription & Billing                     | 12      | FR59-FR78     | 📋 Backlog     |
+| **9** | Code Quality & Implementation Verification | 8       | All FRs       | 📋 Backlog     |
 
 ## Total Metrics
 
 | Metric                                    | Count        |
 | ----------------------------------------- | ------------ |
 | **Total Epics**                           | 8            |
-| **Total Stories**                         | 94           |
-| **Functional Requirements Covered**       | 56/56 (100%) |
+| **Total Stories**                         | 113          |
+| **Functional Requirements Covered**       | 78/78 (100%) |
 | **Non-Functional Requirements Addressed** | 11/11 (100%) |
 
 ## Supabase Database Schema
@@ -2792,6 +3146,7 @@ All **17 tables** have been created in the Supabase project `tdk_fixer`:
 3. **Development**: Begin implementation following the story sequence
 
 ---
+
 
 **🎉 All epics and stories have been successfully generated!**
 
