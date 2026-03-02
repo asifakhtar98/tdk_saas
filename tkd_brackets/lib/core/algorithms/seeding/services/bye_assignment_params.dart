@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart' show immutable, listEquals;
 
-
 /// Parameters for the bye assignment algorithm.
 @immutable
 class ByeAssignmentParams {
@@ -8,10 +7,7 @@ class ByeAssignmentParams {
   ///
   /// [participantCount] must be >= 2.
   /// [seedOrder] if provided, must have length == [participantCount].
-  const ByeAssignmentParams({
-    required this.participantCount,
-    this.seedOrder,
-  });
+  const ByeAssignmentParams({required this.participantCount, this.seedOrder});
 
   /// Total number of actual participants.
   final int participantCount;
@@ -31,9 +27,9 @@ class ByeAssignmentParams {
 
   @override
   int get hashCode => Object.hash(
-        participantCount,
-        seedOrder == null ? null : Object.hashAll(seedOrder!),
-      );
+    participantCount,
+    seedOrder == null ? null : Object.hashAll(seedOrder!),
+  );
 
   @override
   String toString() =>

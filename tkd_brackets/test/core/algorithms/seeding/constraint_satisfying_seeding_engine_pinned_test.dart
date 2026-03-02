@@ -32,10 +32,10 @@ void main() {
       );
 
       final seeding = result.getOrElse((_) => throw Exception('Failed'));
-      
+
       final p1 = seeding.placements.firstWhere((p) => p.participantId == '1');
       final p2 = seeding.placements.firstWhere((p) => p.participantId == '2');
-      
+
       expect(p1.seedPosition, 4);
       expect(p2.seedPosition, 1);
     });
@@ -44,7 +44,10 @@ void main() {
       final participants = [
         const SeedingParticipant(id: '1', dojangName: 'Dojang A'),
         const SeedingParticipant(id: '2', dojangName: 'Dojang B'),
-        const SeedingParticipant(id: '3', dojangName: 'Dojang A'), // Conflict with 1
+        const SeedingParticipant(
+          id: '3',
+          dojangName: 'Dojang A',
+        ), // Conflict with 1
         const SeedingParticipant(id: '4', dojangName: 'Dojang B'),
       ];
 
@@ -62,8 +65,18 @@ void main() {
       final seeding = result.getOrElse((_) => throw Exception('Failed'));
 
       // Check pins
-      expect(seeding.placements.firstWhere((p) => p.participantId == '1').seedPosition, 1);
-      expect(seeding.placements.firstWhere((p) => p.participantId == '2').seedPosition, 3);
+      expect(
+        seeding.placements
+            .firstWhere((p) => p.participantId == '1')
+            .seedPosition,
+        1,
+      );
+      expect(
+        seeding.placements
+            .firstWhere((p) => p.participantId == '2')
+            .seedPosition,
+        3,
+      );
 
       // 1 (A) is at 1. Neighbor is 2 (B) at 2?
       // Pairings: (1, 2) and (3, 4)
@@ -72,10 +85,10 @@ void main() {
       // So 4 (B) must be at 2.
       // 3 (A) must be at 3 or 4.
       // If 2 is pinned to 3, then 3 must be at 4.
-      
+
       final p3 = seeding.placements.firstWhere((p) => p.participantId == '3');
       final p4 = seeding.placements.firstWhere((p) => p.participantId == '4');
-      
+
       // Slot 1: P1(A). Slot 2 must be P4(B).
       // Slot 3: P2(B). Slot 4 must be P3(A).
       expect(p3.seedPosition, 4);
@@ -104,7 +117,7 @@ void main() {
       );
 
       final seeding = result.getOrElse((_) => throw Exception('Failed'));
-      
+
       expect(seeding.constraintViolationCount, 2);
     });
 
@@ -165,8 +178,10 @@ void main() {
       );
 
       final seeding = result.getOrElse((_) => throw Exception('Failed'));
-      
-      final free = seeding.placements.firstWhere((p) => p.participantId == 'FREE');
+
+      final free = seeding.placements.firstWhere(
+        (p) => p.participantId == 'FREE',
+      );
       expect(free.seedPosition, 2);
     });
     test('all same dojang with pins respects pins in random result', () {
@@ -186,8 +201,13 @@ void main() {
       );
 
       final seeding = result.getOrElse((_) => throw Exception('Failed'));
-      expect(seeding.warnings.any((w) => w.contains('All participants are from the same dojang')), true);
-      
+      expect(
+        seeding.warnings.any(
+          (w) => w.contains('All participants are from the same dojang'),
+        ),
+        true,
+      );
+
       final p1 = seeding.placements.firstWhere((p) => p.participantId == '1');
       expect(p1.seedPosition, 3);
     });

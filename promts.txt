@@ -1,10 +1,17 @@
-Validate story using [@checklist.md](file:///Users/asak/Documents/dev/proj/personal/taekwondo_fix/_bmad/bmm/workflows/4-implementation/create-story/checklist.md), also enhance, refine, make it verbose  to prevent implementation mistakes. Then Fix All, in small multiple shots automatically without asking user,, dont overcommunicate
+Validate story using [@checklist.md](file:///Users/asak/Documents/dev/proj/personal/taekwondo_fix/_bmad/bmm/workflows/4-implementation/create-story/checklist.md), also enhance, refine, make it verbose  to prevent implementation mistakes. Then Fix All, in small multiple shots automatically without asking user, dont overcommunicate
 
-Fix All, in small multiple shots, dont overcommunicate
+- Fix All, in small multiple shots, dont overcommunicate
 Continue, do in small multiple shots, dont overcommunicate
 
-build for web , ref [@README.md](file:///Users/asak/Documents/dev/proj/personal/taekwondo_fix/tkd_brackets/README.md), dont overcommunicate
+- build for web , ref [@README.md](file:///Users/asak/Documents/dev/proj/personal/taekwondo_fix/tkd_brackets/README.md), dont overcommunicate
 
-are we 100% done implementing the story, fresh cross check code with the story. if not, complete it, dont overcommunicate
+- are we 100% done implementing the story, fresh cross check code with the story. if not, complete it, dont overcommunicate
 
-(dont overcommunicate unless explicitly mentioned)
+(- dont overcommunicate unless explicitly mentioned)
+
+- (dont overcommunicate unless explicitly mentioned) Write comprehensive Playwright tests covering all user-facing features and critical workflows. Execute the tests and capture runtime logs, traces, and screenshots for each scenario. Analyze failures using visual evidence and logs to identify functional defects, UX breakdowns, state inconsistencies, and architectural misalignments. Based on these findings, refactor and enhance the code while strictly adhering to the Product Requirements Document (PRD) and the architectural principles defined in /folder/architec.md.
+
+Repeat this cycle continuously — test → observe → diagnose → improve → re-test — until the application reaches a stable, usable state where core workflows execute successfully, UX friction is minimized, and no critical failures remain.
+
+At each iteration:
+Ensure improvements enhance reliability, clarity, and maintainability without violating PRD intent or architectural boundaries.

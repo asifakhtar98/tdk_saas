@@ -119,8 +119,7 @@ class RegenerateBracketUseCase
         final bracketDeleteResult = await _bracketRepository.deleteBracket(
           bracket.id,
         );
-        final bracketFailure =
-            bracketDeleteResult.fold((f) => f, (_) => null);
+        final bracketFailure = bracketDeleteResult.fold((f) => f, (_) => null);
         if (bracketFailure != null) return Left(bracketFailure);
       }
 

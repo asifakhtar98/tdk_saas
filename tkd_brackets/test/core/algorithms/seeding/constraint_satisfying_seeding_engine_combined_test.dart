@@ -140,10 +140,26 @@ void main() {
       // Use unique IDs — the use case validates duplicate IDs, but engine does not.
       // Unique IDs make this a realistic fixture.
       final participants = [
-        const SeedingParticipant(id: 'p1', dojangName: 'Tiger', regionName: 'North'),
-        const SeedingParticipant(id: 'p2', dojangName: 'Tiger', regionName: 'South'),
-        const SeedingParticipant(id: 'p3', dojangName: 'Tiger', regionName: 'North'),
-        const SeedingParticipant(id: 'p4', dojangName: 'Tiger', regionName: 'South'),
+        const SeedingParticipant(
+          id: 'p1',
+          dojangName: 'Tiger',
+          regionName: 'North',
+        ),
+        const SeedingParticipant(
+          id: 'p2',
+          dojangName: 'Tiger',
+          regionName: 'South',
+        ),
+        const SeedingParticipant(
+          id: 'p3',
+          dojangName: 'Tiger',
+          regionName: 'North',
+        ),
+        const SeedingParticipant(
+          id: 'p4',
+          dojangName: 'Tiger',
+          regionName: 'South',
+        ),
       ];
 
       final result = engine.generateSeeding(
@@ -166,33 +182,47 @@ void main() {
       );
     });
 
-    test('isSatisfied detects violations in complete list even when last participant has no region', () {
-      // Regression test for H3: isSatisfied must scan all pairs, not just the last participant.
-      // p1(North):seed1, p2(North):seed2 would violate in a 4-person bracket (meet round 1).
-      // p3 has no region — it is placed last. Without a full scan, isSatisfied would return
-      // true (last participant has no region), silently missing the p1/p2 violation.
-      final constraint = RegionalSeparationConstraint(minimumRoundsSeparation: 1);
-      final placements = [
-        const ParticipantPlacement(participantId: 'p1', seedPosition: 1),
-        const ParticipantPlacement(participantId: 'p2', seedPosition: 2),
-        const ParticipantPlacement(participantId: 'p3', seedPosition: 3),
-      ];
-      final participants = [
-        const SeedingParticipant(id: 'p1', dojangName: 'A', regionName: 'North'),
-        const SeedingParticipant(id: 'p2', dojangName: 'B', regionName: 'North'),
-        const SeedingParticipant(id: 'p3', dojangName: 'C'), // no region
-      ];
-      // p1 & p2 share 'North' and meet in round 1 of a 4-person bracket → violation
-      expect(
-        constraint.isSatisfied(
-          placements: placements,
-          participants: participants,
-          bracketSize: 4,
-        ),
-        isFalse,
-        reason: 'p1 and p2 both North and meet in round 1; isSatisfied must catch this even though last participant (p3) has no region',
-      );
-    });
+    test(
+      'isSatisfied detects violations in complete list even when last participant has no region',
+      () {
+        // Regression test for H3: isSatisfied must scan all pairs, not just the last participant.
+        // p1(North):seed1, p2(North):seed2 would violate in a 4-person bracket (meet round 1).
+        // p3 has no region — it is placed last. Without a full scan, isSatisfied would return
+        // true (last participant has no region), silently missing the p1/p2 violation.
+        final constraint = RegionalSeparationConstraint(
+          minimumRoundsSeparation: 1,
+        );
+        final placements = [
+          const ParticipantPlacement(participantId: 'p1', seedPosition: 1),
+          const ParticipantPlacement(participantId: 'p2', seedPosition: 2),
+          const ParticipantPlacement(participantId: 'p3', seedPosition: 3),
+        ];
+        final participants = [
+          const SeedingParticipant(
+            id: 'p1',
+            dojangName: 'A',
+            regionName: 'North',
+          ),
+          const SeedingParticipant(
+            id: 'p2',
+            dojangName: 'B',
+            regionName: 'North',
+          ),
+          const SeedingParticipant(id: 'p3', dojangName: 'C'), // no region
+        ];
+        // p1 & p2 share 'North' and meet in round 1 of a 4-person bracket → violation
+        expect(
+          constraint.isSatisfied(
+            placements: placements,
+            participants: participants,
+            bracketSize: 4,
+          ),
+          isFalse,
+          reason:
+              'p1 and p2 both North and meet in round 1; isSatisfied must catch this even though last participant (p3) has no region',
+        );
+      },
+    );
 
     test('performance — 64 participants with combined constraints', () {
       final participants = List.generate(

@@ -42,12 +42,12 @@ class ByeAssignmentResult {
 
   @override
   int get hashCode => Object.hash(
-        byeCount,
-        bracketSize,
-        totalRounds,
-        Object.hashAll(byePlacements),
-        Object.hashAll(byeSlots),
-      );
+    byeCount,
+    bracketSize,
+    totalRounds,
+    Object.hashAll(byePlacements),
+    Object.hashAll(byeSlots),
+  );
 
   @override
   String toString() =>

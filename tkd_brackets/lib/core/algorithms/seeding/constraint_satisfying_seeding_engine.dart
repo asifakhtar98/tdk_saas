@@ -58,7 +58,8 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
         rng,
         constraints,
         pinnedSeeds: pinnedSeeds,
-        warning: 'All participants are from the same dojang. '
+        warning:
+            'All participants are from the same dojang. '
             'Random seeding applied — separation not possible.',
       );
     }
@@ -75,7 +76,7 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
     final positions = List<int?>.filled(n, null);
     final usedSeeds = <int>{};
     final pinnedIndices = <int>{};
-    
+
     if (pinnedSeeds != null && pinnedSeeds.isNotEmpty) {
       for (final entry in pinnedSeeds.entries) {
         final idx = ordered.indexWhere((p) => p.id == entry.key);
@@ -97,7 +98,7 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
         unpinned.add(ordered[i]);
       }
     }
-    
+
     final newOrdered = [...pinned, ...unpinned];
     // Re-map positions to new ordered list
     final newPositions = List<int?>.filled(n, null);
@@ -225,7 +226,14 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
     if (positions[participantIndex] != null) {
       // Even if pinned, we must ensure it satisfies constraints with previously
       // placed participants (including other pinned ones).
-      if (!_checkConstraints(participantIndex, ordered, positions, constraints, allParticipants, bracketSize)) {
+      if (!_checkConstraints(
+        participantIndex,
+        ordered,
+        positions,
+        constraints,
+        allParticipants,
+        bracketSize,
+      )) {
         return false;
       }
 
@@ -322,7 +330,8 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
     int effectiveSeed,
     Random rng,
     List<SeedingConstraint> constraints, {
-    required String warning, Map<String, int>? pinnedSeeds,
+    required String warning,
+    Map<String, int>? pinnedSeeds,
   }) {
     final placements = <ParticipantPlacement>[];
     final usedSeeds = <int>{};
@@ -342,10 +351,11 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
     }
 
     // 2. Shuffle unpinned participants into remaining slots
-    final unpinned = participants
-        .where((p) => pinnedSeeds == null || !pinnedSeeds.containsKey(p.id))
-        .toList()
-      ..shuffle(rng);
+    final unpinned =
+        participants
+            .where((p) => pinnedSeeds == null || !pinnedSeeds.containsKey(p.id))
+            .toList()
+          ..shuffle(rng);
 
     final availableSeeds = <int>[];
     for (var i = 1; i <= participants.length; i++) {
@@ -456,8 +466,9 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
 
     // Identify pinned vs unpinned participants
     final pinnedIds = pinnedSeeds?.keys.toSet() ?? <String>{};
-    final unpinned =
-        participants.where((p) => !pinnedIds.contains(p.id)).toList();
+    final unpinned = participants
+        .where((p) => !pinnedIds.contains(p.id))
+        .toList();
     final pinnedPlacements = <ParticipantPlacement>[];
     final usedByPinned = <int>{};
 
@@ -481,8 +492,9 @@ class ConstraintSatisfyingSeedingEngine implements SeedingEngine {
 
     for (var i = 0; i < 100; i++) {
       final shuffled = List<SeedingParticipant>.from(unpinned)..shuffle(rng);
-      final currentPlacements =
-          List<ParticipantPlacement>.from(pinnedPlacements);
+      final currentPlacements = List<ParticipantPlacement>.from(
+        pinnedPlacements,
+      );
       for (var j = 0; j < shuffled.length; j++) {
         currentPlacements.add(
           ParticipantPlacement(

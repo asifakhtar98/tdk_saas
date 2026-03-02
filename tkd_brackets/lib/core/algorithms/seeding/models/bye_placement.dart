@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart' show immutable;
 
-
 /// Represents a single bye assignment: which participant gets a bye
 /// and at which bracket position.
 @immutable

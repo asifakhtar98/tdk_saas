@@ -13,9 +13,7 @@ class LockBracketUseCase extends UseCase<BracketEntity, LockBracketParams> {
   final BracketRepository _bracketRepository;
 
   @override
-  Future<Either<Failure, BracketEntity>> call(
-    LockBracketParams params,
-  ) async {
+  Future<Either<Failure, BracketEntity>> call(LockBracketParams params) async {
     // 1. Validate bracketId
     if (params.bracketId.trim().isEmpty) {
       return const Left(

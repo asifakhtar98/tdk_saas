@@ -32,8 +32,16 @@ void main() {
 
     const currentResult = SeedingResult(
       placements: [
-        ParticipantPlacement(participantId: '1', seedPosition: 1, bracketSlot: 1),
-        ParticipantPlacement(participantId: '2', seedPosition: 2, bracketSlot: 2),
+        ParticipantPlacement(
+          participantId: '1',
+          seedPosition: 1,
+          bracketSlot: 1,
+        ),
+        ParticipantPlacement(
+          participantId: '2',
+          seedPosition: 2,
+          bracketSlot: 2,
+        ),
       ],
       appliedConstraints: ['dojang'],
       randomSeed: 123,
@@ -52,10 +60,10 @@ void main() {
         );
 
         final updated = result.getOrElse((_) => throw Exception('Failed'));
-        
+
         final p1 = updated.placements.firstWhere((p) => p.participantId == '1');
         final p2 = updated.placements.firstWhere((p) => p.participantId == '2');
-        
+
         expect(p1.seedPosition, 2);
         expect(p2.seedPosition, 1);
         expect(updated.isFullySatisfied, true);
@@ -90,7 +98,7 @@ void main() {
 
         expect(result.isLeft(), true);
       });
-      
+
       test('constraint violations produce warnings but not error', () {
         final participantsViolent = [
           const SeedingParticipant(id: '1', dojangName: 'Dojang A'),
@@ -100,10 +108,26 @@ void main() {
         ];
         const currentRes = SeedingResult(
           placements: [
-            ParticipantPlacement(participantId: '1', seedPosition: 1, bracketSlot: 1),
-            ParticipantPlacement(participantId: '2', seedPosition: 3, bracketSlot: 3),
-            ParticipantPlacement(participantId: '3', seedPosition: 2, bracketSlot: 2),
-            ParticipantPlacement(participantId: '4', seedPosition: 4, bracketSlot: 4),
+            ParticipantPlacement(
+              participantId: '1',
+              seedPosition: 1,
+              bracketSlot: 1,
+            ),
+            ParticipantPlacement(
+              participantId: '2',
+              seedPosition: 3,
+              bracketSlot: 3,
+            ),
+            ParticipantPlacement(
+              participantId: '3',
+              seedPosition: 2,
+              bracketSlot: 2,
+            ),
+            ParticipantPlacement(
+              participantId: '4',
+              seedPosition: 4,
+              bracketSlot: 4,
+            ),
           ],
           appliedConstraints: [],
           randomSeed: 0,
@@ -120,7 +144,7 @@ void main() {
           constraints: [DojangSeparationConstraint(minimumRoundsSeparation: 1)],
           bracketSize: 4,
         );
-        
+
         final updated = res.getOrElse((_) => throw Exception());
         expect(updated.isFullySatisfied, false);
         expect(updated.constraintViolationCount, 1);
@@ -199,25 +223,29 @@ void main() {
           pinnedSeeds: const {'1': 1},
         );
 
-        when(() => mockSeedingEngine.generateSeeding(
-              participants: any(named: 'participants'),
-              strategy: SeedingStrategy.manual,
-              constraints: any(named: 'constraints'),
-              bracketFormat: any(named: 'bracketFormat'),
-              randomSeed: any(named: 'randomSeed'),
-              pinnedSeeds: any(named: 'pinnedSeeds'),
-            )).thenReturn(const Right(currentResult));
+        when(
+          () => mockSeedingEngine.generateSeeding(
+            participants: any(named: 'participants'),
+            strategy: SeedingStrategy.manual,
+            constraints: any(named: 'constraints'),
+            bracketFormat: any(named: 'bracketFormat'),
+            randomSeed: any(named: 'randomSeed'),
+            pinnedSeeds: any(named: 'pinnedSeeds'),
+          ),
+        ).thenReturn(const Right(currentResult));
 
         service.reseedAroundPins(params);
 
-        verify(() => mockSeedingEngine.generateSeeding(
-              participants: participants,
-              strategy: SeedingStrategy.manual,
-              constraints: [],
-              bracketFormat: BracketFormat.singleElimination,
-              randomSeed: any(named: 'randomSeed'),
-              pinnedSeeds: {'1': 1},
-            )).called(1);
+        verify(
+          () => mockSeedingEngine.generateSeeding(
+            participants: participants,
+            strategy: SeedingStrategy.manual,
+            constraints: [],
+            bracketFormat: BracketFormat.singleElimination,
+            randomSeed: any(named: 'randomSeed'),
+            pinnedSeeds: {'1': 1},
+          ),
+        ).called(1);
       });
 
       test('all pinned returns as-is without engine invocation', () {
@@ -228,7 +256,7 @@ void main() {
         );
 
         final result = service.reseedAroundPins(params);
-        
+
         verifyZeroInteractions(mockSeedingEngine);
         expect(result.isRight(), true);
         final val = result.getOrElse((l) => throw Exception());
@@ -240,7 +268,7 @@ void main() {
           64,
           (i) => SeedingParticipant(id: '$i', dojangName: 'Dojang ${i % 8}'),
         );
-        
+
         final pinnedSeeds = <String, int>{};
         for (var i = 0; i < 8; i++) {
           pinnedSeeds['$i'] = i + 1;
@@ -272,26 +300,30 @@ void main() {
           randomSeed: 42,
         );
 
-        when(() => mockSeedingEngine.generateSeeding(
-              participants: any(named: 'participants'),
-              strategy: SeedingStrategy.manual,
-              constraints: any(named: 'constraints'),
-              bracketFormat: any(named: 'bracketFormat'),
-              randomSeed: any(named: 'randomSeed'),
-              pinnedSeeds: any(named: 'pinnedSeeds'),
-            )).thenReturn(const Right(currentResult));
+        when(
+          () => mockSeedingEngine.generateSeeding(
+            participants: any(named: 'participants'),
+            strategy: SeedingStrategy.manual,
+            constraints: any(named: 'constraints'),
+            bracketFormat: any(named: 'bracketFormat'),
+            randomSeed: any(named: 'randomSeed'),
+            pinnedSeeds: any(named: 'pinnedSeeds'),
+          ),
+        ).thenReturn(const Right(currentResult));
 
         final result = service.reseedAroundPins(params);
 
         expect(result.isRight(), true);
-        verify(() => mockSeedingEngine.generateSeeding(
-              participants: participants,
-              strategy: SeedingStrategy.manual,
-              constraints: [],
-              bracketFormat: BracketFormat.singleElimination,
-              randomSeed: 42,
-              pinnedSeeds: {},
-            )).called(1);
+        verify(
+          () => mockSeedingEngine.generateSeeding(
+            participants: participants,
+            strategy: SeedingStrategy.manual,
+            constraints: [],
+            bracketFormat: BracketFormat.singleElimination,
+            randomSeed: 42,
+            pinnedSeeds: {},
+          ),
+        ).called(1);
       });
 
       test('constraint violations produce warnings not errors', () {
