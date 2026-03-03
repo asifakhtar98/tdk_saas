@@ -60,7 +60,7 @@ development_status:
   1-10-sync-service-foundation: done
   1-11-demo-mode-data-seeding: done
   1-12-foundation-ui-shell: done
-  1-13-code-review-and-fix-foundation: in-progress
+  1-13-code-review-and-fix-foundation: done
   epic-1-retrospective: done
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -80,7 +80,7 @@ development_status:
   2-8-invitation-entity-and-send-invite: done
   2-9-rbac-permission-service: done
   2-10-demo-to-production-migration: done
-  2-11-auth-and-organization-ui: backlog
+  2-11-auth-and-organization-ui: done
   2-12-code-review-and-fix-authentication: backlog
   epic-2-retrospective: backlog
 

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/core/error/error_reporting_service.dart';
@@ -218,7 +217,6 @@ class CreateOrganizationUseCase
   /// - Trim leading/trailing hyphens
   ///
   /// Example: "Dragon Martial Arts!" → "dragon-martial-arts"
-  @visibleForTesting
   static String generateSlug(String name) {
     return name
         .toLowerCase()

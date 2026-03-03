@@ -142,7 +142,7 @@ void main() {
         await tester.pump();
 
         final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-        expect(rail.selectedIndex, equals(2)); // Settings is index 2
+        expect(rail.selectedIndex, equals(3)); // Settings is index 3
       });
 
       testWidgets('defaults to dashboard for unknown location', (tester) async {
@@ -284,8 +284,8 @@ void main() {
   });
 
   group('kNavItems', () {
-    test('contains 3 navigation items', () {
-      expect(kNavItems.length, equals(3));
+    test('contains 4 navigation items', () {
+      expect(kNavItems.length, equals(4));
     });
 
     test('first item is Dashboard', () {
@@ -298,9 +298,14 @@ void main() {
       expect(kNavItems[1].label, equals('Tournaments'));
     });
 
-    test('third item is Settings', () {
-      expect(kNavItems[2].path, equals('/settings'));
-      expect(kNavItems[2].label, equals('Settings'));
+    test('third item is Organization', () {
+      expect(kNavItems[2].path, equals('/organization'));
+      expect(kNavItems[2].label, equals('Organization'));
+    });
+
+    test('fourth item is Settings', () {
+      expect(kNavItems[3].path, equals('/settings'));
+      expect(kNavItems[3].label, equals('Settings'));
     });
   });
 }

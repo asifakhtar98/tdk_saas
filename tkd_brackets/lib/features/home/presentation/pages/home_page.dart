@@ -44,14 +44,7 @@ class HomePage extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    // TODO(story-2.4): Navigate to sign in
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Sign in available in Story 2.4'),
-                      ),
-                    );
-                  },
+                  onPressed: () => const AuthRoute().go(context),
                   icon: const Icon(Icons.login),
                   label: const Text('Sign In'),
                 ),

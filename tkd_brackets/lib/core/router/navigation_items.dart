@@ -44,6 +44,12 @@ const kNavItems = [
     selectedIcon: Icons.emoji_events,
   ),
   NavItem(
+    path: '/organization',
+    label: 'Organization',
+    icon: Icons.business_outlined,
+    selectedIcon: Icons.business,
+  ),
+  NavItem(
     path: '/settings',
     label: 'Settings',
     icon: Icons.settings_outlined,

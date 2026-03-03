@@ -9,18 +9,36 @@ import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_bloc.dart';
 import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_state.dart';
 
+import 'package:bloc_test/bloc_test.dart';
 import '../../mocks/mock_authentication_bloc.dart';
 import '../../mocks/mock_sync_service.dart';
+import 'package:tkd_brackets/features/auth/presentation/bloc/sign_in_bloc.dart';
+import 'package:tkd_brackets/features/auth/presentation/bloc/sign_in_event.dart';
+import 'package:tkd_brackets/features/auth/presentation/bloc/sign_in_state.dart';
+
+class MockSignInBloc extends MockBloc<SignInEvent, SignInState>
+    implements SignInBloc {}
 
 void main() {
   late MockAuthenticationBloc mockAuthBloc;
+  late MockSignInBloc mockSignInBloc;
 
   setUp(() {
     mockAuthBloc = createMockAuthenticationBloc();
+    mockSignInBloc = MockSignInBloc();
+    
+    whenListen(
+      mockSignInBloc,
+      Stream.fromIterable([const SignInState.initial()]),
+      initialState: const SignInState.initial(),
+    );
+
     GetIt.instance.registerSingleton<AuthenticationBloc>(mockAuthBloc);
+    GetIt.instance.registerSingleton<SignInBloc>(mockSignInBloc);
   });
 
   tearDown(() async {
+    await mockSignInBloc.close();
     await GetIt.instance.reset();
   });
 
@@ -207,7 +225,7 @@ void main() {
     });
 
     testWidgets('redirects unauthenticated user from '
-        'protected route to /', (tester) async {
+        'protected route to /auth', (tester) async {
       mockAuthBloc.emitState(const AuthenticationState.unauthenticated());
 
       final router = AppRouter();
@@ -220,7 +238,7 @@ void main() {
 
       expect(
         router.router.routerDelegate.currentConfiguration.fullPath,
-        equals('/'),
+        equals('/auth'),
       );
     });
 

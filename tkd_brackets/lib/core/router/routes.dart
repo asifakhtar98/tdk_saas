@@ -9,6 +9,11 @@ import 'package:tkd_brackets/features/settings/settings.dart';
 import 'package:tkd_brackets/features/tournament/presentation/pages/division_builder_wizard.dart';
 import 'package:tkd_brackets/features/tournament/presentation/pages/tournament_detail_page.dart';
 import 'package:tkd_brackets/features/tournament/presentation/pages/tournament_list_page.dart';
+import 'package:tkd_brackets/features/auth/presentation/pages/auth_page.dart';
+import 'package:tkd_brackets/features/auth/presentation/pages/magic_link_callback_page.dart';
+import 'package:tkd_brackets/features/auth/presentation/pages/organization_setup_page.dart';
+import 'package:tkd_brackets/features/auth/presentation/pages/organization_dashboard_page.dart';
+import 'package:tkd_brackets/features/auth/presentation/pages/user_settings_page.dart';
 
 part 'routes.g.dart';
 
@@ -32,6 +37,40 @@ class DemoRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) => const DemoPage();
+}
+
+/// Auth route - sign in or sign up.
+@TypedGoRoute<AuthRoute>(path: '/auth')
+class AuthRoute extends GoRouteData {
+  const AuthRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const AuthPage();
+}
+
+/// Auth callback route - magic link verification.
+@TypedGoRoute<AuthCallbackRoute>(path: '/auth/callback')
+class AuthCallbackRoute extends GoRouteData {
+  const AuthCallbackRoute({this.email, this.token});
+  final String? email;
+  final String? token;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      MagicLinkCallbackPage(
+        email: email ?? '',
+        token: token ?? '',
+      );
+}
+
+/// Organization setup route - for new users without organization.
+@TypedGoRoute<OrganizationSetupRoute>(path: '/organization/setup')
+class OrganizationSetupRoute extends GoRouteData {
+  const OrganizationSetupRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const OrganizationSetupPage();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -125,4 +164,24 @@ class CsvImportRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       CSVImportPage(tournamentId: tournamentId, divisionId: divisionId);
+}
+
+/// Organization dashboard route.
+@TypedGoRoute<OrganizationDashboardRoute>(path: '/organization')
+class OrganizationDashboardRoute extends GoRouteData {
+  const OrganizationDashboardRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const OrganizationDashboardPage();
+}
+
+/// User settings route.
+@TypedGoRoute<UserSettingsRoute>(path: '/user/settings')
+class UserSettingsRoute extends GoRouteData {
+  const UserSettingsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const UserSettingsPage();
 }

@@ -64,6 +64,9 @@ class AppRouter {
       // Public routes (no shell)
       $homeRoute,
       $demoRoute,
+      $authRoute,
+      $authCallbackRoute,
+      $organizationSetupRoute,
       // Authenticated routes (with shell)
       createAppShellRoute(
         shellNavigatorKey: _shellNavigatorKey,
@@ -74,6 +77,8 @@ class AppRouter {
           $tournamentDivisionsRoute,
           $participantListRoute,
           $csvImportRoute,
+          $organizationDashboardRoute,
+          $userSettingsRoute,
           $settingsRoute,
         ],
       ),
@@ -102,7 +107,7 @@ class AppRouter {
     // Routes that are always accessible (no auth required).
     // These include the landing pages and demo-accessible routes
     // so users can explore tournaments without creating an account.
-    const publicRoutes = ['/', '/demo'];
+    const publicRoutes = ['/', '/demo', '/auth', '/auth/callback'];
 
     // Demo-accessible route prefixes — these allow unauthenticated
     // users in demo mode to browse tournaments, divisions, and
@@ -117,12 +122,30 @@ class AppRouter {
 
     final isAuthenticated = authState is AuthenticationAuthenticated;
 
-    // If authenticated and on public route, go to
-    // dashboard
-    if (isAuthenticated && isPublicRoute) {
-      return '/dashboard';
+    // 1. Handle authenticated redirections
+    if (authState is AuthenticationAuthenticated) {
+      final user = authState.user;
+
+      // If on public route (like /auth or /), go to dashboard
+      // UNLESS we need to setup the organization
+      if (isPublicRoute && user.organizationId.isNotEmpty) {
+        return '/dashboard';
+      }
+
+      // If no organization, must go to setup (unless already there or on callback)
+      if (user.organizationId.isEmpty &&
+          location != '/organization/setup' &&
+          location != '/auth/callback') {
+        return '/organization/setup';
+      }
+
+      // If has organization, don't allow going back to setup
+      if (user.organizationId.isNotEmpty && location == '/organization/setup') {
+        return '/dashboard';
+      }
     }
 
+    // 2. Handle unauthenticated redirections
     // If not authenticated and on protected route,
     // go home. Don't redirect during initial check.
     // Allow demo-accessible routes without auth.
@@ -131,7 +154,7 @@ class AppRouter {
         !isDemoAccessible &&
         authState is! AuthenticationCheckInProgress &&
         authState is! AuthenticationInitial) {
-      return '/';
+      return '/auth';
     }
 
     return null;
