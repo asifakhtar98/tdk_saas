@@ -21,6 +21,19 @@ void main() {
       expect(database.schemaVersion, 7);
     });
 
+    test('fresh database should have all 10 tables', () {
+      expect(database.organizations, isNotNull);
+      expect(database.users, isNotNull);
+      expect(database.syncQueueTable, isNotNull);
+      expect(database.tournaments, isNotNull);
+      expect(database.divisions, isNotNull);
+      expect(database.participants, isNotNull);
+      expect(database.invitations, isNotNull);
+      expect(database.divisionTemplates, isNotNull);
+      expect(database.brackets, isNotNull);
+      expect(database.matches, isNotNull);
+    });
+
     test('should have organizations table', () {
       expect(database.organizations, isNotNull);
     });

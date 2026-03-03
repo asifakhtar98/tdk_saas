@@ -250,6 +250,18 @@ class SyncServiceImplementation implements SyncService {
           if (_shouldRetry(item.attemptCount)) {
             await _syncQueue.markFailed(item.id, e.toString());
             failedCount++;
+          } else {
+            // Exhausted all retry attempts — mark as permanently failed
+            // so it doesn't stay in the queue indefinitely.
+            await _syncQueue.markFailed(
+              item.id,
+              'Exhausted $_maxRetryAttempts retry attempts: $e',
+            );
+            failedCount++;
+            _errorReportingService.reportError(
+              'Sync item ${item.id} exhausted retries for ${item.tableName_}',
+              error: e,
+            );
           }
         }
 

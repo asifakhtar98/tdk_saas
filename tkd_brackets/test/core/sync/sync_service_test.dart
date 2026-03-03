@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tkd_brackets/core/database/app_database.dart';
 import 'package:tkd_brackets/core/error/error_reporting_service.dart';
@@ -25,6 +28,32 @@ class MockErrorReportingService extends Mock implements ErrorReportingService {}
 
 class MockSyncNotificationService extends Mock
     implements SyncNotificationService {}
+
+class MockSupabaseQueryBuilder extends Mock implements SupabaseQueryBuilder {}
+
+/// A fake builder to handle the fluent Supabase API which is hard to mock with mocktail.
+class FakePostgrestBuilder<T> extends Fake implements PostgrestFilterBuilder<T> {
+  final T _data;
+  FakePostgrestBuilder(this._data);
+
+  @override
+  Future<R> then<R>(FutureOr<R> Function(T) onValue, {Function? onError}) async {
+    return onValue(_data);
+  }
+
+  @override
+  PostgrestFilterBuilder<T> gt(String column, Object value) => this;
+
+  @override
+  PostgrestFilterBuilder<T> order(String column,
+          {bool ascending = true,
+          bool nullsFirst = false,
+          String? referencedTable}) =>
+      this;
+
+  @override
+  PostgrestFilterBuilder<T> eq(String column, Object value) => this;
+}
 
 void main() {
   // Required for SharedPreferences in pull()
@@ -363,11 +392,429 @@ void main() {
 
   group('Conflict Resolution (LWW)', () {
     test('SyncService uses sync_version for conflict resolution', () {
-      // The LWW logic is implemented in _shouldApplyRemoteChange
-      // which compares remote and local sync_version values.
-      // This test verifies the service initializes correctly with LWW support.
       expect(syncService.currentStatus, isNotNull);
       expect(syncService.currentError, isNull);
+    });
+  });
+
+  group('push with pending items', () {
+    SyncQueueEntry makeSyncEntry({
+      int id = 1,
+      String tableName = 'organizations',
+      String recordId = 'org-1',
+      String operation = 'insert',
+      int attemptCount = 0,
+    }) {
+      return SyncQueueEntry(
+        id: id,
+        tableName_: tableName,
+        recordId: recordId,
+        operation: operation,
+        payloadJson: '{}',
+        createdAtTimestamp: DateTime.now().toIso8601String(),
+        attemptCount: attemptCount,
+        isSynced: false,
+      );
+    }
+
+    test(
+      'push marks items as failed with retry message when _shouldRetry is true',
+      () async {
+        final entry = makeSyncEntry(attemptCount: 2);
+        when(() => mockSyncQueue.getPending()).thenAnswer(
+          (_) async => [entry],
+        );
+        when(() => mockSyncQueue.pendingCount).thenAnswer((_) async => 1);
+        when(() => mockSyncQueue.markFailed(any(), any())).thenAnswer(
+          (_) async {},
+        );
+
+        when(
+          () => mockSupabaseClient.from(any()),
+        ).thenThrow(Exception('Network error'));
+
+        await testDatabase.insertOrganization(
+          OrganizationsCompanion.insert(
+            id: 'org-1',
+            name: 'Test Org',
+            slug: 'test-org',
+          ),
+        );
+
+        await syncService.push();
+
+        verify(
+          () => mockSyncQueue.markFailed(
+            entry.id,
+            any(that: contains('Network error')),
+          ),
+        ).called(1);
+      },
+    );
+
+    test(
+      'push marks items as permanently failed when _shouldRetry is false (exhausted retries)',
+      () async {
+        final entry = makeSyncEntry(attemptCount: 5);
+        when(() => mockSyncQueue.getPending()).thenAnswer(
+          (_) async => [entry],
+        );
+        when(() => mockSyncQueue.pendingCount).thenAnswer((_) async => 1);
+        when(() => mockSyncQueue.markFailed(any(), any())).thenAnswer(
+          (_) async {},
+        );
+        when(
+          () => mockErrorReportingService.reportError(
+            any(),
+            error: any(named: 'error'),
+            stackTrace: any(named: 'stackTrace'),
+          ),
+        ).thenReturn(null);
+
+        when(
+          () => mockSupabaseClient.from(any()),
+        ).thenThrow(Exception('Network error'));
+
+        await testDatabase.insertOrganization(
+          OrganizationsCompanion.insert(
+            id: 'org-1',
+            name: 'Test Org',
+            slug: 'test-org',
+          ),
+        );
+
+        await syncService.push();
+
+        verify(
+          () => mockSyncQueue.markFailed(
+            entry.id,
+            any(that: contains('Exhausted 5 retry attempts')),
+          ),
+        ).called(1);
+
+        verify(
+          () => mockErrorReportingService.reportError(
+            any(that: contains('exhausted retries')),
+            error: any(named: 'error'),
+          ),
+        ).called(1);
+      },
+    );
+
+    test('push sets error status when items fail', () async {
+      final entry = makeSyncEntry(attemptCount: 2);
+      when(() => mockSyncQueue.getPending()).thenAnswer(
+        (_) async => [entry],
+      );
+      when(() => mockSyncQueue.pendingCount).thenAnswer((_) async => 0);
+      when(() => mockSyncQueue.markFailed(any(), any())).thenAnswer(
+        (_) async {},
+      );
+
+      when(
+        () => mockSupabaseClient.from(any()),
+      ).thenThrow(Exception('Network error'));
+
+      await testDatabase.insertOrganization(
+        OrganizationsCompanion.insert(
+          id: 'org-1',
+          name: 'Test Org',
+          slug: 'test-org',
+        ),
+      );
+
+      final statuses = <SyncStatus>[];
+      syncService.statusStream.listen(statuses.add);
+
+      await syncService.push();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      expect(statuses, contains(SyncStatus.error));
+      expect(syncService.currentError, isNotNull);
+      expect(
+        syncService.currentError!.message,
+        'Some changes failed to sync',
+      );
+    });
+  });
+
+  group('_shouldRetry boundary tests', () {
+    test(
+      'getRetryDelay returns 5 minutes cap for high attempt count',
+      () {
+        final delay = syncService.getRetryDelay(8);
+        expect(delay, const Duration(seconds: 300));
+      },
+    );
+
+    test('getRetryDelay returns correct value at attempt 5', () {
+      final delay = syncService.getRetryDelay(5);
+      expect(delay, const Duration(seconds: 300));
+    });
+  });
+
+  group('Data Syncing', () {
+    group('push', () {
+      test('successfully pushes organization change', () async {
+        final mockQueryBuilder = MockSupabaseQueryBuilder();
+        when(() => mockSupabaseClient.from(any()))
+            .thenAnswer((_) => mockQueryBuilder);
+
+        const orgId = 'org-1';
+        await testDatabase.insertOrganization(
+          OrganizationsCompanion.insert(
+            id: orgId,
+            name: 'Local Name',
+            slug: 'local-slug',
+          ),
+        );
+
+        final item = SyncQueueEntry(
+          id: 1,
+          tableName_: 'organizations',
+          recordId: orgId,
+          operation: 'update',
+          createdAtTimestamp: DateTime.now().toIso8601String(),
+          payloadJson: '{}',
+          isSynced: false,
+          attemptCount: 0,
+        );
+
+        when(() => mockSyncQueue.getPending()).thenAnswer((_) async => [item]);
+        when(() => mockQueryBuilder.upsert(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+        when(
+          () => mockSyncQueue.markSynced(any()),
+        ).thenAnswer((_) async => {});
+
+        await syncService.push();
+
+        verify(() => mockQueryBuilder.upsert(any(that: isA<List<Map<String, dynamic>>>()))).called(1);
+        verify(() => mockSyncQueue.markSynced(1)).called(1);
+      });
+
+      test('successfully pushes user change', () async {
+        final mockQueryBuilder = MockSupabaseQueryBuilder();
+        when(() => mockSupabaseClient.from(any()))
+            .thenAnswer((_) => mockQueryBuilder);
+
+        const userId = 'user-1';
+        await testDatabase.insertOrganization(
+          OrganizationsCompanion.insert(
+            id: 'org-1',
+            name: 'Org 1',
+            slug: 'org-1',
+          ),
+        );
+        await testDatabase.insertUser(
+          UsersCompanion.insert(
+            id: userId,
+            organizationId: 'org-1',
+            email: 'test@example.com',
+            displayName: 'Local User',
+          ),
+        );
+
+        final item = SyncQueueEntry(
+          id: 2,
+          tableName_: 'users',
+          recordId: userId,
+          operation: 'update',
+          createdAtTimestamp: DateTime.now().toIso8601String(),
+          payloadJson: '{}',
+          isSynced: false,
+          attemptCount: 0,
+        );
+
+        when(() => mockSyncQueue.getPending()).thenAnswer((_) async => [item]);
+        when(() => mockQueryBuilder.upsert(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+        when(
+          () => mockSyncQueue.markSynced(any()),
+        ).thenAnswer((_) async => {});
+
+        await syncService.push();
+
+        verify(() => mockQueryBuilder.upsert(any(that: isA<List<Map<String, dynamic>>>()))).called(1);
+        verify(() => mockSyncQueue.markSynced(2)).called(1);
+      });
+
+      test('handles missing local record during push by skipping', () async {
+        final mockQueryBuilder = MockSupabaseQueryBuilder();
+        when(() => mockSupabaseClient.from(any()))
+            .thenAnswer((_) => mockQueryBuilder);
+
+        final item = SyncQueueEntry(
+          id: 3,
+          tableName_: 'organizations',
+          recordId: 'non-existent',
+          operation: 'update',
+          createdAtTimestamp: DateTime.now().toIso8601String(),
+          payloadJson: '{}',
+          isSynced: false,
+          attemptCount: 0,
+        );
+
+        when(() => mockSyncQueue.getPending()).thenAnswer((_) async => [item]);
+        when(
+          () => mockSyncQueue.markSynced(any()),
+        ).thenAnswer((_) async => {});
+
+        await syncService.push();
+
+        verifyNever(() => mockQueryBuilder.upsert(any()));
+      });
+    });
+
+    group('pull', () {
+      setUp(() {
+        SharedPreferences.setMockInitialValues({});
+      });
+
+      test('successfully pulls and applies organization update', () async {
+        final mockOrgQuery = MockSupabaseQueryBuilder();
+        final mockUserQuery = MockSupabaseQueryBuilder();
+        when(() => mockSupabaseClient.from('organizations')).thenAnswer((_) => mockOrgQuery);
+        when(() => mockSupabaseClient.from('users')).thenAnswer((_) => mockUserQuery);
+
+        const orgId = 'org-1';
+        await testDatabase.insertOrganization(
+          OrganizationsCompanion.insert(
+            id: orgId,
+            name: 'Old Name',
+            slug: 'old-slug',
+            syncVersion: const Value(1),
+          ),
+        );
+
+        final remoteData = {
+          'id': orgId,
+          'name': 'New Name',
+          'slug': 'new-slug',
+          'sync_version': 2,
+          'updated_at_timestamp': DateTime.now().toIso8601String(),
+          'created_at_timestamp': DateTime.now().toIso8601String(),
+        };
+
+        when(() => mockOrgQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([remoteData]));
+        when(() => mockUserQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+
+        await syncService.pull();
+
+        final local = await testDatabase.getOrganizationById(orgId);
+        expect(local!.name, 'New Name');
+        expect(local.syncVersion, 2);
+      });
+
+      test('ignores remote update if local version is newer', () async {
+        final mockOrgQuery = MockSupabaseQueryBuilder();
+        final mockUserQuery = MockSupabaseQueryBuilder();
+        when(() => mockSupabaseClient.from('organizations')).thenAnswer((_) => mockOrgQuery);
+        when(() => mockSupabaseClient.from('users')).thenAnswer((_) => mockUserQuery);
+
+        const orgId = 'org-1';
+        await testDatabase.insertOrganization(
+          OrganizationsCompanion.insert(
+            id: orgId,
+            name: 'Local New',
+            slug: 'local-new',
+            syncVersion: const Value(5),
+          ),
+        );
+
+        final remoteData = {
+          'id': orgId,
+          'name': 'Remote Old',
+          'slug': 'remote-old',
+          'sync_version': 3,
+          'updated_at_timestamp': DateTime.now().toIso8601String(),
+          'created_at_timestamp': DateTime.now().toIso8601String(),
+        };
+
+        when(() => mockOrgQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([remoteData]));
+        when(() => mockUserQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+
+        await syncService.pull();
+
+        final local = await testDatabase.getOrganizationById(orgId);
+        expect(local!.name, 'Local New'); // Unchanged
+        expect(local.syncVersion, 5);
+      });
+
+      test('successfully pulls and applies new user (insert)', () async {
+        final mockOrgQuery = MockSupabaseQueryBuilder();
+        final mockUserQuery = MockSupabaseQueryBuilder();
+        when(() => mockSupabaseClient.from('organizations')).thenAnswer((_) => mockOrgQuery);
+        when(() => mockSupabaseClient.from('users')).thenAnswer((_) => mockUserQuery);
+
+        final remoteUser = {
+          'id': 'user-new',
+          'organization_id': 'org-1',
+          'email': 'new@example.com',
+          'display_name': 'New User',
+          'role': 'viewer',
+          'is_active': true,
+          'sync_version': 1,
+          'created_at_timestamp': DateTime.now().toIso8601String(),
+          'updated_at_timestamp': DateTime.now().toIso8601String(),
+        };
+
+        when(() => mockOrgQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+        when(() => mockUserQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([remoteUser]));
+
+        await testDatabase.insertOrganization(
+          OrganizationsCompanion.insert(
+            id: 'org-1',
+            name: 'Org 1',
+            slug: 'org-1',
+          ),
+        );
+
+        await syncService.pull();
+
+        final local = await testDatabase.getUserById('user-new');
+        expect(local!.displayName, 'New User');
+        expect(local.email, 'new@example.com');
+      });
+    });
+  });
+
+  group('Sync Error Handling extra', () {
+    test('handles temporary failure with retry', () async {
+      final item = SyncQueueEntry(
+        id: 1,
+        tableName_: 'organizations',
+        recordId: 'org-1',
+        operation: 'update',
+        createdAtTimestamp: DateTime.now().toIso8601String(),
+        payloadJson: '{}',
+        isSynced: false,
+        attemptCount: 0,
+      );
+
+      await testDatabase.insertOrganization(
+        OrganizationsCompanion.insert(
+          id: 'org-1',
+          name: 'Org 1',
+          slug: 'org-1',
+        ),
+      );
+
+      when(() => mockSyncQueue.getPending()).thenAnswer((_) async => [item]);
+      when(() => mockSupabaseClient.from(any()))
+          .thenThrow(const SocketException('No internet'));
+      when(() => mockSyncQueue.markFailed(any(), any()))
+          .thenAnswer((_) async => {});
+
+      await syncService.push();
+
+      verify(() => mockSyncQueue.markFailed(1, any())).called(1);
     });
   });
 }

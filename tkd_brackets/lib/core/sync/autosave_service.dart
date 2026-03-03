@@ -169,8 +169,8 @@ class AutosaveServiceImplementation
 
       // Only attempt cloud sync if online
       if (_connectivityService.currentStatus == ConnectivityStatus.online) {
-        // Queue for sync (implementation in future Story 1.10)
-        // For now, just log that we would sync
+        // SyncService (Story 1.10) handles cloud sync separately.
+        // Log breadcrumb for autosave audit trail.
         _errorReportingService.addBreadcrumb(
           message:
               'Autosave: $dirtyEntityCount entities saved locally, '
