@@ -4,6 +4,7 @@ import 'package:tkd_brackets/core/database/app_database.dart'
     show ParticipantEntry;
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/usecases/use_case.dart';
+import 'package:tkd_brackets/features/division/domain/entities/belt_rank.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
 import 'package:tkd_brackets/features/division/domain/usecases/merge_divisions_params.dart';
@@ -260,20 +261,7 @@ class MergeDivisionsUseCase
   }
 
   int _beltOrdinal(String belt) {
-    const belts = [
-      'white',
-      'yellow',
-      'orange',
-      'green',
-      'blue',
-      'purple',
-      'brown',
-      'red',
-      'black',
-    ];
-    final normalizedBelt = belt.toLowerCase().split(' ').first;
-    final idx = belts.indexOf(normalizedBelt);
-    return idx >= 0 ? idx : 0;
+    return BeltRank.fromString(belt)?.order ?? 0;
   }
 
   DivisionGender _resolveGender(DivisionGender a, DivisionGender b) {

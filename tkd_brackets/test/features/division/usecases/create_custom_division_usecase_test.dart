@@ -6,8 +6,11 @@ import 'package:tkd_brackets/features/division/domain/entities/division_entity.d
 import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
 import 'package:tkd_brackets/features/division/domain/usecases/create_custom_division_params.dart';
 import 'package:tkd_brackets/features/division/domain/usecases/create_custom_division_usecase.dart';
+import 'package:uuid/uuid.dart';
 
 class MockDivisionRepository extends Mock implements DivisionRepository {}
+
+class MockUuid extends Mock implements Uuid {}
 
 class FakeDivisionEntity extends Fake implements DivisionEntity {}
 
@@ -18,10 +21,14 @@ void main() {
 
   late CreateCustomDivisionUseCase useCase;
   late MockDivisionRepository mockRepository;
+  late MockUuid mockUuid;
 
   setUp(() {
     mockRepository = MockDivisionRepository();
-    useCase = CreateCustomDivisionUseCase(mockRepository);
+    mockUuid = MockUuid();
+    useCase = CreateCustomDivisionUseCase(mockRepository, mockUuid);
+
+    when(() => mockUuid.v4()).thenReturn('1');
 
     when(
       () => mockRepository.getDivisionsForTournament(any()),

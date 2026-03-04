@@ -276,6 +276,13 @@ class AppDatabase extends _$AppDatabase {
         .then((rows) => rows > 0);
   }
 
+  /// Hard delete a tournament (permanent removal).
+  Future<bool> hardDeleteTournament(String id) {
+    return (delete(tournaments)..where((t) => t.id.equals(id)))
+        .go()
+        .then((rows) => rows > 0);
+  }
+
   // ─────────────────────────────────────────────────────────────────────────
   // Divisions CRUD
   // ─────────────────────────────────────────────────────────────────────────

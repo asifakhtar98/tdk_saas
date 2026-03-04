@@ -133,7 +133,7 @@ class TournamentModel with _$TournamentModel {
       isTemplate: Value(isTemplate),
       templateId: Value(templateId),
       numberOfRings: Value(numberOfRings),
-      settingsJson: Value(settingsJson.toString()),
+      settingsJson: Value(jsonEncode(settingsJson)),
       syncVersion: Value(syncVersion),
       isDeleted: Value(isDeleted),
       isDemoData: Value(isDemoData),

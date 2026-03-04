@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/core/database/app_database.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/network/connectivity_service.dart';
+import 'package:tkd_brackets/core/sync/sync_service.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/tournament/data/datasources/tournament_local_datasource.dart';
 import 'package:tkd_brackets/features/tournament/data/datasources/tournament_remote_datasource.dart';
@@ -23,12 +24,14 @@ class TournamentRepositoryImplementation implements TournamentRepository {
     this._remoteDatasource,
     this._connectivityService,
     this._database,
+    this._syncService,
   );
 
   final TournamentLocalDatasource _localDatasource;
   final TournamentRemoteDatasource _remoteDatasource;
   final ConnectivityService _connectivityService;
   final AppDatabase _database;
+  final SyncService _syncService;
 
   @override
   Future<Either<Failure, List<TournamentEntity>>> getTournamentsForOrganization(
@@ -108,8 +111,10 @@ class TournamentRepositoryImplementation implements TournamentRepository {
         try {
           await _remoteDatasource.insertTournament(model);
         } on Exception catch (_) {
-          // Queued for sync
+          _queueTournamentSync(tournament.id, 'insert');
         }
+      } else {
+        _queueTournamentSync(tournament.id, 'insert');
       }
 
       return Right(tournament);
@@ -139,11 +144,13 @@ class TournamentRepositoryImplementation implements TournamentRepository {
         try {
           await _remoteDatasource.updateTournament(model);
         } on Exception catch (_) {
-          // Queued for sync
+          _queueTournamentSync(tournament.id, 'update');
         }
+      } else {
+        _queueTournamentSync(tournament.id, 'update');
       }
 
-      return Right(tournament);
+      return Right(model.convertToEntity());
     } on Exception catch (e) {
       return Left(LocalCacheWriteFailure(technicalDetails: e.toString()));
     }
@@ -158,8 +165,10 @@ class TournamentRepositoryImplementation implements TournamentRepository {
         try {
           await _remoteDatasource.deleteTournament(id);
         } on Exception catch (_) {
-          // Queued for sync
+          _queueTournamentSync(id, 'delete');
         }
+      } else {
+        _queueTournamentSync(id, 'delete');
       }
 
       return const Right(unit);
@@ -173,7 +182,7 @@ class TournamentRepositoryImplementation implements TournamentRepository {
     String tournamentId,
   ) async {
     try {
-      await _database.softDeleteTournament(tournamentId);
+      await _localDatasource.hardDeleteTournament(tournamentId);
       return const Right(unit);
     } on Exception catch (e) {
       return Left(LocalCacheWriteFailure(technicalDetails: e.toString()));
@@ -244,6 +253,14 @@ class TournamentRepositoryImplementation implements TournamentRepository {
       createdAtTimestamp: entry.createdAtTimestamp,
       updatedAtTimestamp: entry.updatedAtTimestamp,
       syncVersion: entry.syncVersion,
+    );
+  }
+
+  void _queueTournamentSync(String id, String operation) {
+    _syncService.queueForSync(
+      tableName: 'tournaments',
+      recordId: id,
+      operation: operation,
     );
   }
 }

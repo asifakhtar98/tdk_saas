@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/core/database/app_database.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/usecases/use_case.dart';
+import 'package:tkd_brackets/features/division/domain/entities/belt_rank.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
 import 'package:tkd_brackets/features/division/domain/usecases/smart_division_builder_params.dart';
@@ -327,29 +328,11 @@ class SmartDivisionBuilderUseCase
   }
 
   String? _getBeltRankMin(BeltGroupConfig beltGroup) {
-    switch (beltGroup.minOrder) {
-      case 1:
-        return 'white';
-      case 4:
-        return 'green';
-      case 6:
-        return 'red';
-      default:
-        return 'white';
-    }
+    return BeltRank.fromOrder(beltGroup.minOrder)?.name;
   }
 
   String? _getBeltRankMax(BeltGroupConfig beltGroup) {
-    switch (beltGroup.maxOrder) {
-      case 2:
-        return 'yellow';
-      case 5:
-        return 'blue';
-      case 7:
-        return 'black';
-      default:
-        return 'black';
-    }
+    return BeltRank.fromOrder(beltGroup.maxOrder)?.name;
   }
 
   DivisionCategory _mapCategoryType(DivisionCategoryType type) {

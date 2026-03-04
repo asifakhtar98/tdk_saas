@@ -22,6 +22,9 @@ abstract class TournamentLocalDatasource {
 
   /// Soft delete a tournament.
   Future<void> deleteTournament(String id);
+
+  /// Hard delete a tournament (permanent removal from local DB).
+  Future<void> hardDeleteTournament(String id);
 }
 
 @LazySingleton(as: TournamentLocalDatasource)
@@ -64,5 +67,10 @@ class TournamentLocalDatasourceImplementation
   @override
   Future<void> deleteTournament(String id) async {
     await _database.softDeleteTournament(id);
+  }
+
+  @override
+  Future<void> hardDeleteTournament(String id) async {
+    await _database.hardDeleteTournament(id);
   }
 }

@@ -111,7 +111,12 @@ class SyncServiceImplementation implements SyncService {
   static const int _maxRetryAttempts = 5;
 
   /// Tables that support syncing to Supabase.
-  static const List<String> _syncableTables = ['organizations', 'users'];
+  static const List<String> _syncableTables = [
+    'organizations',
+    'users',
+    'tournaments',
+    'divisions',
+  ];
 
   StreamSubscription<ConnectivityStatus>? _connectivitySubscription;
 
@@ -404,6 +409,16 @@ class SyncServiceImplementation implements SyncService {
           _appDatabase.users,
         )..where((u) => u.id.isIn(recordIds))).get();
         return users.map(_userToMap).toList();
+      case 'tournaments':
+        final ts = await (_appDatabase.select(_appDatabase.tournaments)
+              ..where((t) => t.id.isIn(recordIds)))
+            .get();
+        return ts.map(_tournamentToMap).toList();
+      case 'divisions':
+        final ds = await (_appDatabase.select(_appDatabase.divisions)
+              ..where((d) => d.id.isIn(recordIds)))
+            .get();
+        return ds.map(_divisionToMap).toList();
       default:
         return [];
     }
@@ -420,11 +435,12 @@ class SyncServiceImplementation implements SyncService {
         if (org != null) {
           return _organizationToMap(org);
         }
-      case 'users':
-        final user = await _appDatabase.getUserById(recordId);
-        if (user != null) {
-          return _userToMap(user);
-        }
+      case 'tournaments':
+        final t = await _appDatabase.getTournamentById(recordId);
+        if (t != null) return _tournamentToMap(t);
+      case 'divisions':
+        final d = await _appDatabase.getDivisionById(recordId);
+        if (d != null) return _divisionToMap(d);
     }
     return null;
   }
@@ -467,6 +483,10 @@ class SyncServiceImplementation implements SyncService {
         await _applyRemoteOrganization(remote);
       case 'users':
         await _applyRemoteUser(remote);
+      case 'tournaments':
+        await _applyRemoteTournament(remote);
+      case 'divisions':
+        await _applyRemoteDivision(remote);
     }
   }
 
@@ -495,8 +515,8 @@ class SyncServiceImplementation implements SyncService {
     if (existing == null) {
       // Insert new user
       await _appDatabase.insertUser(_mapToUsersCompanion(remote));
-    } else {
-      // Update existing
+    } else if ((remote['sync_version'] as int? ?? 0) > existing.syncVersion) {
+      // Update existing if remote is newer
       await (_appDatabase.update(
         _appDatabase.users,
       )..where((u) => u.id.equals(id))).write(_mapToUsersCompanion(remote));
@@ -607,6 +627,138 @@ class SyncServiceImplementation implements SyncService {
       updatedAtTimestamp: Value(
         _parseDateTime(map['updated_at_timestamp']) ?? DateTime.now(),
       ),
+    );
+  }
+
+  Future<void> _applyRemoteTournament(Map<String, dynamic> remote) async {
+    final id = remote['id'] as String;
+    final existing = await _appDatabase.getTournamentById(id);
+
+    if (existing == null) {
+      await _appDatabase.insertTournament(_mapToTournamentsCompanion(remote));
+    } else {
+      await (_appDatabase.update(_appDatabase.tournaments)
+            ..where((t) => t.id.equals(id)))
+          .write(_mapToTournamentsCompanion(remote));
+    }
+  }
+
+  Future<void> _applyRemoteDivision(Map<String, dynamic> remote) async {
+    final id = remote['id'] as String;
+    final existing = await _appDatabase.getDivisionById(id);
+
+    if (existing == null) {
+      await _appDatabase.insertDivision(_mapToDivisionsCompanion(remote));
+    } else {
+      await (_appDatabase.update(_appDatabase.divisions)
+            ..where((d) => d.id.equals(id)))
+          .write(_mapToDivisionsCompanion(remote));
+    }
+  }
+
+  /// Converts a TournamentEntry to a map for Supabase upsert.
+  Map<String, dynamic> _tournamentToMap(TournamentEntry tournament) {
+    return {
+      'id': tournament.id,
+      'organization_id': tournament.organizationId,
+      'name': tournament.name,
+      'description': tournament.description,
+      'scheduled_date': tournament.scheduledDate?.toIso8601String(),
+      'status': tournament.status,
+      'venue_name': tournament.venueName,
+      'venue_address': tournament.venueAddress,
+      'is_template': tournament.isTemplate,
+      'template_id': tournament.templateId,
+      'number_of_rings': tournament.numberOfRings,
+      'settings_json': tournament.settingsJson,
+      'sync_version': tournament.syncVersion,
+      'is_deleted': tournament.isDeleted,
+      'deleted_at_timestamp': tournament.deletedAtTimestamp?.toIso8601String(),
+      'is_demo_data': tournament.isDemoData,
+      'created_at_timestamp': tournament.createdAtTimestamp.toIso8601String(),
+      'updated_at_timestamp': tournament.updatedAtTimestamp.toIso8601String(),
+    };
+  }
+
+  /// Converts a DivisionEntry to a map for Supabase upsert.
+  Map<String, dynamic> _divisionToMap(DivisionEntry division) {
+    return {
+      'id': division.id,
+      'tournament_id': division.tournamentId,
+      'name': division.name,
+      'category': division.category,
+      'age_min': division.ageMin,
+      'age_max': division.ageMax,
+      'gender': division.gender,
+      'weight_min_kg': division.weightMinKg,
+      'weight_max_kg': division.weightMaxKg,
+      'belt_rank_min': division.beltRankMin,
+      'belt_rank_max': division.beltRankMax,
+      'bracket_format': division.bracketFormat,
+      'status': division.status,
+      'is_combined': division.isCombined,
+      'is_custom': division.isCustom,
+      'assigned_ring_number': division.assignedRingNumber,
+      'display_order': division.displayOrder,
+      'sync_version': division.syncVersion,
+      'is_deleted': division.isDeleted,
+      'deleted_at_timestamp': division.deletedAtTimestamp?.toIso8601String(),
+      'is_demo_data': division.isDemoData,
+      'created_at_timestamp': division.createdAtTimestamp.toIso8601String(),
+      'updated_at_timestamp': division.updatedAtTimestamp.toIso8601String(),
+    };
+  }
+
+  /// Converts a remote map to TournamentsCompanion.
+   TournamentsCompanion _mapToTournamentsCompanion(Map<String, dynamic> map) {
+    return TournamentsCompanion(
+      id: Value(map['id'] as String),
+      organizationId: Value(map['organization_id'] as String),
+      name: Value(map['name'] as String),
+      description: Value(map['description'] as String?),
+      scheduledDate: Value(_parseDateTime(map['scheduled_date']) ?? DateTime.now()),
+      status: Value(map['status'] as String? ?? 'draft'),
+      venueName: Value(map['venue_name'] as String?),
+      venueAddress: Value(map['venue_address'] as String?),
+      isTemplate: Value(map['is_template'] as bool? ?? false),
+      templateId: Value(map['template_id'] as String?),
+      numberOfRings: Value(map['number_of_rings'] as int? ?? 1),
+      settingsJson: Value(map['settings_json'] as String? ?? '{}'),
+      syncVersion: Value(map['sync_version'] as int? ?? 1),
+      isDeleted: Value(map['is_deleted'] as bool? ?? false),
+      deletedAtTimestamp: Value(_parseDateTime(map['deleted_at_timestamp'])),
+      isDemoData: Value(map['is_demo_data'] as bool? ?? false),
+      createdAtTimestamp: Value(_parseDateTime(map['created_at_timestamp']) ?? DateTime.now()),
+      updatedAtTimestamp: Value(_parseDateTime(map['updated_at_timestamp']) ?? DateTime.now()),
+    );
+  }
+
+  /// Converts a remote map to DivisionsCompanion.
+  DivisionsCompanion _mapToDivisionsCompanion(Map<String, dynamic> map) {
+    return DivisionsCompanion(
+      id: Value(map['id'] as String),
+      tournamentId: Value(map['tournament_id'] as String),
+      name: Value(map['name'] as String),
+      category: Value(map['category'] as String),
+      ageMin: Value(map['age_min'] as int?),
+      ageMax: Value(map['age_max'] as int?),
+      gender: Value(map['gender'] as String),
+      weightMinKg: Value(map['weight_min_kg'] != null ? (map['weight_min_kg'] as num).toDouble() : null),
+      weightMaxKg: Value(map['weight_max_kg'] != null ? (map['weight_max_kg'] as num).toDouble() : null),
+      beltRankMin: Value(map['belt_rank_min'] as String?),
+      beltRankMax: Value(map['belt_rank_max'] as String?),
+      bracketFormat: Value(map['bracket_format'] as String? ?? 'single_elimination'),
+      status: Value(map['status'] as String? ?? 'setup'),
+      isCombined: Value(map['is_combined'] as bool? ?? false),
+      isCustom: Value(map['is_custom'] as bool? ?? false),
+      assignedRingNumber: Value(map['assigned_ring_number'] as int?),
+      displayOrder: Value(map['display_order'] as int? ?? 0),
+      syncVersion: Value(map['sync_version'] as int? ?? 1),
+      isDeleted: Value(map['is_deleted'] as bool? ?? false),
+      deletedAtTimestamp: Value(_parseDateTime(map['deleted_at_timestamp'])),
+      isDemoData: Value(map['is_demo_data'] as bool? ?? false),
+      createdAtTimestamp: Value(_parseDateTime(map['created_at_timestamp']) ?? DateTime.now()),
+      updatedAtTimestamp: Value(_parseDateTime(map['updated_at_timestamp']) ?? DateTime.now()),
     );
   }
 

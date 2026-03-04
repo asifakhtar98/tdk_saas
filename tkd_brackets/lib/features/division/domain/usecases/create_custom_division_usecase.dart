@@ -6,13 +6,15 @@ import 'package:tkd_brackets/features/division/domain/entities/belt_rank.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
 import 'package:tkd_brackets/features/division/domain/usecases/create_custom_division_params.dart';
+import 'package:uuid/uuid.dart';
 
 @injectable
 class CreateCustomDivisionUseCase
     extends UseCase<DivisionEntity, CreateCustomDivisionParams> {
-  CreateCustomDivisionUseCase(this._divisionRepository);
+  CreateCustomDivisionUseCase(this._divisionRepository, this._uuid);
 
   final DivisionRepository _divisionRepository;
+  final Uuid _uuid;
 
   @override
   Future<Either<Failure, DivisionEntity>> call(
@@ -25,7 +27,7 @@ class CreateCustomDivisionUseCase
 
     final now = DateTime.now();
     final division = DivisionEntity(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: _uuid.v4(),
       tournamentId: params.tournamentId,
       name: params.name,
       category: params.category ?? DivisionCategory.sparring,

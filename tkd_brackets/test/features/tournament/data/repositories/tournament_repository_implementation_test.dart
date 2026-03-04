@@ -7,6 +7,7 @@ import 'package:tkd_brackets/features/tournament/data/datasources/tournament_loc
 import 'package:tkd_brackets/features/tournament/data/datasources/tournament_remote_datasource.dart';
 import 'package:tkd_brackets/features/tournament/data/models/tournament_model.dart';
 import 'package:tkd_brackets/features/tournament/data/repositories/tournament_repository_implementation.dart';
+import 'package:tkd_brackets/core/sync/sync_service.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 
 class MockTournamentLocalDatasource extends Mock
@@ -19,12 +20,15 @@ class MockConnectivityService extends Mock implements ConnectivityService {}
 
 class MockAppDatabase extends Mock implements AppDatabase {}
 
+class MockSyncService extends Mock implements SyncService {}
+
 void main() {
   late TournamentRepositoryImplementation repository;
   late MockTournamentLocalDatasource mockLocalDatasource;
   late MockTournamentRemoteDatasource mockRemoteDatasource;
   late MockConnectivityService mockConnectivityService;
   late MockAppDatabase mockAppDatabase;
+  late MockSyncService mockSyncService;
 
   final testDate = DateTime.now();
   final testEntity = TournamentEntity(
@@ -70,11 +74,13 @@ void main() {
     mockRemoteDatasource = MockTournamentRemoteDatasource();
     mockConnectivityService = MockConnectivityService();
     mockAppDatabase = MockAppDatabase();
+    mockSyncService = MockSyncService();
     repository = TournamentRepositoryImplementation(
       mockLocalDatasource,
       mockRemoteDatasource,
       mockConnectivityService,
       mockAppDatabase,
+      mockSyncService,
     );
   });
 
@@ -201,6 +207,24 @@ void main() {
       expect(result.isRight(), true);
       verify(() => mockRemoteDatasource.insertTournament(any())).called(1);
     });
+
+    test('should queue for sync when offline', () async {
+      // Arrange
+      when(() => mockLocalDatasource.insertTournament(any()))
+          .thenAnswer((_) async {});
+      when(() => mockConnectivityService.hasInternetConnection())
+          .thenAnswer((_) async => false);
+
+      // Act
+      await repository.createTournament(testEntity, 'org-id');
+
+      // Assert
+      verify(() => mockSyncService.queueForSync(
+            tableName: 'tournaments',
+            recordId: testEntity.id,
+            operation: 'insert',
+          )).called(1);
+    });
   });
 
   group('updateTournament', () {
@@ -222,6 +246,26 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       verify(() => mockLocalDatasource.updateTournament(any())).called(1);
+    });
+
+    test('should queue for sync when update fails or offline', () async {
+      // Arrange
+      when(() => mockLocalDatasource.getTournamentById(any()))
+          .thenAnswer((_) async => testModel);
+      when(() => mockLocalDatasource.updateTournament(any()))
+          .thenAnswer((_) async {});
+      when(() => mockConnectivityService.hasInternetConnection())
+          .thenAnswer((_) async => false);
+
+      // Act
+      await repository.updateTournament(testEntity);
+
+      // Assert
+      verify(() => mockSyncService.queueForSync(
+            tableName: 'tournaments',
+            recordId: testEntity.id,
+            operation: 'update',
+          )).called(1);
     });
   });
 
@@ -261,6 +305,24 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       verify(() => mockRemoteDatasource.deleteTournament(any())).called(1);
+    });
+
+    test('should queue for sync when delete fails or offline', () async {
+      // Arrange
+      when(() => mockLocalDatasource.deleteTournament(any()))
+          .thenAnswer((_) async {});
+      when(() => mockConnectivityService.hasInternetConnection())
+          .thenAnswer((_) async => false);
+
+      // Act
+      await repository.deleteTournament('test-id');
+
+      // Assert
+      verify(() => mockSyncService.queueForSync(
+            tableName: 'tournaments',
+            recordId: 'test-id',
+            operation: 'delete',
+          )).called(1);
     });
   });
 }

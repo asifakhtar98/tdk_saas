@@ -116,8 +116,8 @@ class DivisionLocalDatasourceImplementation implements DivisionLocalDatasource {
         participant.id,
         ParticipantsCompanion(
           divisionId: Value(participant.divisionId),
-          syncVersion: Value(participant.syncVersion + 1),
-          updatedAtTimestamp: Value(DateTime.now()),
+          syncVersion: Value(participant.syncVersion),
+          updatedAtTimestamp: Value(participant.updatedAtTimestamp),
         ),
       );
     }

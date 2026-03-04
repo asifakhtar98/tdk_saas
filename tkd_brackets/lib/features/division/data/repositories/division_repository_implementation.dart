@@ -4,7 +4,7 @@ import 'package:tkd_brackets/core/database/app_database.dart'
     show ParticipantEntry;
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/network/connectivity_service.dart';
-import 'package:tkd_brackets/core/sync/sync_queue.dart';
+import 'package:tkd_brackets/core/sync/sync_service.dart';
 import 'package:tkd_brackets/features/division/data/datasources/division_local_datasource.dart';
 import 'package:tkd_brackets/features/division/data/datasources/division_remote_datasource.dart';
 import 'package:tkd_brackets/features/division/data/models/division_model.dart';
@@ -19,13 +19,13 @@ class DivisionRepositoryImplementation implements DivisionRepository {
     this._localDatasource,
     this._remoteDatasource,
     this._connectivityService,
-    this._syncQueue,
+    this._syncService,
   );
 
   final DivisionLocalDatasource _localDatasource;
   final DivisionRemoteDatasource _remoteDatasource;
   final ConnectivityService _connectivityService;
-  final SyncQueue _syncQueue;
+  final SyncService _syncService;
 
   @override
   Future<Either<Failure, List<DivisionEntity>>> getDivisionsForTournament(
@@ -101,8 +101,10 @@ class DivisionRepositoryImplementation implements DivisionRepository {
         try {
           await _remoteDatasource.insertDivision(model);
         } on Exception catch (_) {
-          // Queued for sync
+          _queueDivisionSync(division.id, 'insert');
         }
+      } else {
+        _queueDivisionSync(division.id, 'insert');
       }
 
       return Right(division);
@@ -130,21 +132,13 @@ class DivisionRepositoryImplementation implements DivisionRepository {
         try {
           await _remoteDatasource.updateDivision(model);
         } on Exception catch (_) {
-          await _syncQueue.enqueue(
-            tableName: _divisionsTableName,
-            recordId: division.id,
-            operation: 'update',
-          );
+          _queueDivisionSync(division.id, 'update');
         }
       } else {
-        await _syncQueue.enqueue(
-          tableName: _divisionsTableName,
-          recordId: division.id,
-          operation: 'update',
-        );
+        _queueDivisionSync(division.id, 'update');
       }
 
-      return Right(division);
+      return Right(model.convertToEntity());
     } on Exception catch (e) {
       return Left(LocalCacheWriteFailure(technicalDetails: e.toString()));
     }
@@ -159,18 +153,10 @@ class DivisionRepositoryImplementation implements DivisionRepository {
         try {
           await _remoteDatasource.deleteDivision(id);
         } on Exception catch (_) {
-          await _syncQueue.enqueue(
-            tableName: _divisionsTableName,
-            recordId: id,
-            operation: 'delete',
-          );
+          _queueDivisionSync(id, 'delete');
         }
       } else {
-        await _syncQueue.enqueue(
-          tableName: _divisionsTableName,
-          recordId: id,
-          operation: 'delete',
-        );
+        _queueDivisionSync(id, 'delete');
       }
 
       return const Right(unit);
@@ -310,7 +296,10 @@ class DivisionRepositoryImplementation implements DivisionRepository {
             await _remoteDatasource.updateDivision(source);
           }
         } on Exception catch (_) {
-          // Queued for sync
+          _queueDivisionSync(mergedDivision.id, 'insert');
+          for (final source in sourceDivisions) {
+            _queueDivisionSync(source.id, 'update');
+          }
         }
       }
 
@@ -414,7 +403,9 @@ class DivisionRepositoryImplementation implements DivisionRepository {
           await _remoteDatasource.insertDivision(poolBModel);
           await _remoteDatasource.updateDivision(sourceModel);
         } on Exception catch (_) {
-          // Queued for sync
+          _queueDivisionSync(poolADivision.id, 'insert');
+          _queueDivisionSync(poolBDivision.id, 'insert');
+          _queueDivisionSync(sourceDivision.id, 'update');
         }
       }
 
@@ -422,5 +413,13 @@ class DivisionRepositoryImplementation implements DivisionRepository {
     } on Exception catch (e) {
       return Left(LocalCacheWriteFailure(technicalDetails: e.toString()));
     }
+  }
+
+  void _queueDivisionSync(String id, String operation) {
+    _syncService.queueForSync(
+      tableName: _divisionsTableName,
+      recordId: id,
+      operation: operation,
+    );
   }
 }

@@ -674,8 +674,12 @@ void main() {
       test('successfully pulls and applies organization update', () async {
         final mockOrgQuery = MockSupabaseQueryBuilder();
         final mockUserQuery = MockSupabaseQueryBuilder();
+        final mockTournamentQuery = MockSupabaseQueryBuilder();
+        final mockDivisionQuery = MockSupabaseQueryBuilder();
         when(() => mockSupabaseClient.from('organizations')).thenAnswer((_) => mockOrgQuery);
         when(() => mockSupabaseClient.from('users')).thenAnswer((_) => mockUserQuery);
+        when(() => mockSupabaseClient.from('tournaments')).thenAnswer((_) => mockTournamentQuery);
+        when(() => mockSupabaseClient.from('divisions')).thenAnswer((_) => mockDivisionQuery);
 
         const orgId = 'org-1';
         await testDatabase.insertOrganization(
@@ -700,6 +704,10 @@ void main() {
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([remoteData]));
         when(() => mockUserQuery.select(any()))
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+        when(() => mockTournamentQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+        when(() => mockDivisionQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
 
         await syncService.pull();
 
@@ -711,8 +719,12 @@ void main() {
       test('ignores remote update if local version is newer', () async {
         final mockOrgQuery = MockSupabaseQueryBuilder();
         final mockUserQuery = MockSupabaseQueryBuilder();
+        final mockTournamentQuery = MockSupabaseQueryBuilder();
+        final mockDivisionQuery = MockSupabaseQueryBuilder();
         when(() => mockSupabaseClient.from('organizations')).thenAnswer((_) => mockOrgQuery);
         when(() => mockSupabaseClient.from('users')).thenAnswer((_) => mockUserQuery);
+        when(() => mockSupabaseClient.from('tournaments')).thenAnswer((_) => mockTournamentQuery);
+        when(() => mockSupabaseClient.from('divisions')).thenAnswer((_) => mockDivisionQuery);
 
         const orgId = 'org-1';
         await testDatabase.insertOrganization(
@@ -737,6 +749,10 @@ void main() {
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([remoteData]));
         when(() => mockUserQuery.select(any()))
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+        when(() => mockTournamentQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+        when(() => mockDivisionQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
 
         await syncService.pull();
 
@@ -748,8 +764,12 @@ void main() {
       test('successfully pulls and applies new user (insert)', () async {
         final mockOrgQuery = MockSupabaseQueryBuilder();
         final mockUserQuery = MockSupabaseQueryBuilder();
+        final mockTournamentQuery = MockSupabaseQueryBuilder();
+        final mockDivisionQuery = MockSupabaseQueryBuilder();
         when(() => mockSupabaseClient.from('organizations')).thenAnswer((_) => mockOrgQuery);
         when(() => mockSupabaseClient.from('users')).thenAnswer((_) => mockUserQuery);
+        when(() => mockSupabaseClient.from('tournaments')).thenAnswer((_) => mockTournamentQuery);
+        when(() => mockSupabaseClient.from('divisions')).thenAnswer((_) => mockDivisionQuery);
 
         final remoteUser = {
           'id': 'user-new',
@@ -764,6 +784,10 @@ void main() {
         };
 
         when(() => mockOrgQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+        when(() => mockTournamentQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+        when(() => mockDivisionQuery.select(any()))
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
         when(() => mockUserQuery.select(any()))
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([remoteUser]));

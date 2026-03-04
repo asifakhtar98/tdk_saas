@@ -54,6 +54,7 @@ class TournamentBloc extends Bloc<TournamentEvent, TournamentState> {
       ),
       (tournaments) => emit(
         TournamentLoadSuccess(
+          allTournaments: tournaments,
           tournaments: _filterTournaments(tournaments, TournamentFilter.all),
           currentFilter: TournamentFilter.all,
         ),
@@ -94,6 +95,7 @@ class TournamentBloc extends Bloc<TournamentEvent, TournamentState> {
       ),
       (tournaments) => emit(
         TournamentLoadSuccess(
+          allTournaments: tournaments,
           tournaments: _filterTournaments(tournaments, currentFilter),
           currentFilter: currentFilter,
         ),
@@ -109,8 +111,9 @@ class TournamentBloc extends Bloc<TournamentEvent, TournamentState> {
       final currentState = state as TournamentLoadSuccess;
       emit(
         TournamentLoadSuccess(
+          allTournaments: currentState.allTournaments,
           tournaments: _filterTournaments(
-            currentState.tournaments,
+            currentState.allTournaments,
             event.filter,
           ),
           currentFilter: event.filter,

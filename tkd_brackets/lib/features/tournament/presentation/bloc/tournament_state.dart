@@ -9,6 +9,7 @@ class TournamentState with _$TournamentState {
   const factory TournamentState.initial() = TournamentInitial;
   const factory TournamentState.loadInProgress() = TournamentLoadInProgress;
   const factory TournamentState.loadSuccess({
+    required List<TournamentEntity> allTournaments,
     required List<TournamentEntity> tournaments,
     required TournamentFilter currentFilter,
   }) = TournamentLoadSuccess;

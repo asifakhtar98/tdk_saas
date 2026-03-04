@@ -4,8 +4,10 @@ enum BeltRank {
   orange(3),
   green(4),
   blue(5),
-  red(6),
-  black(7);
+  purple(6),
+  brown(7),
+  red(8),
+  black(9);
 
   const BeltRank(this.order);
 
@@ -29,17 +31,16 @@ enum BeltRank {
   static String _getGroupMapping(BeltRank rank) {
     switch (rank) {
       case BeltRank.white:
-        return 'white-yellow';
       case BeltRank.yellow:
         return 'white-yellow';
       case BeltRank.orange:
         return 'orange';
       case BeltRank.green:
-        return 'green-blue';
       case BeltRank.blue:
+      case BeltRank.purple:
         return 'green-blue';
+      case BeltRank.brown:
       case BeltRank.red:
-        return 'red-black';
       case BeltRank.black:
         return 'red-black';
     }
@@ -48,7 +49,7 @@ enum BeltRank {
   static String getGroupName(BeltRank rank) {
     if (rank.order <= 2) return 'white-yellow';
     if (rank.order == 3) return 'orange';
-    if (rank.order <= 5) return 'green-blue';
+    if (rank.order <= 6) return 'green-blue';
     return 'red-black';
   }
 

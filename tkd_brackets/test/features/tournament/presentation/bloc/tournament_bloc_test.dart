@@ -158,7 +158,7 @@ void main() {
           ).thenAnswer((_) async => Right(testTournaments));
           return buildBloc();
         },
-        seed: () => TournamentLoadSuccess(
+        seed: () => TournamentLoadSuccess(allTournaments: testTournaments, 
           tournaments: testTournaments,
           currentFilter: TournamentFilter.draft,
         ),
@@ -194,7 +194,7 @@ void main() {
       blocTest<TournamentBloc, TournamentState>(
         'filters tournaments by draft status',
         build: buildBloc,
-        seed: () => TournamentLoadSuccess(
+        seed: () => TournamentLoadSuccess(allTournaments: testTournaments, 
           tournaments: testTournaments,
           currentFilter: TournamentFilter.all,
         ),
@@ -210,7 +210,7 @@ void main() {
       blocTest<TournamentBloc, TournamentState>(
         'filters tournaments by active status',
         build: buildBloc,
-        seed: () => TournamentLoadSuccess(
+        seed: () => TournamentLoadSuccess(allTournaments: testTournaments, 
           tournaments: testTournaments,
           currentFilter: TournamentFilter.all,
         ),
@@ -226,7 +226,7 @@ void main() {
       blocTest<TournamentBloc, TournamentState>(
         'filters tournaments by archived status',
         build: buildBloc,
-        seed: () => TournamentLoadSuccess(
+        seed: () => TournamentLoadSuccess(allTournaments: testTournaments, 
           tournaments: testTournaments,
           currentFilter: TournamentFilter.all,
         ),
@@ -265,7 +265,7 @@ void main() {
           ).thenAnswer((_) async => Right([testTournaments.first]));
           return buildBloc();
         },
-        seed: () => TournamentLoadSuccess(
+        seed: () => TournamentLoadSuccess(allTournaments: testTournaments, 
           tournaments: testTournaments,
           currentFilter: TournamentFilter.all,
         ),
@@ -290,7 +290,7 @@ void main() {
           );
           return buildBloc();
         },
-        seed: () => TournamentLoadSuccess(
+        seed: () => TournamentLoadSuccess(allTournaments: testTournaments, 
           tournaments: testTournaments,
           currentFilter: TournamentFilter.all,
         ),
@@ -317,7 +317,7 @@ void main() {
           ).thenAnswer((_) async => Right([testTournaments.first]));
           return buildBloc();
         },
-        seed: () => TournamentLoadSuccess(
+        seed: () => TournamentLoadSuccess(allTournaments: testTournaments, 
           tournaments: testTournaments,
           currentFilter: TournamentFilter.all,
         ),
@@ -340,7 +340,7 @@ void main() {
           );
           return buildBloc();
         },
-        seed: () => TournamentLoadSuccess(
+        seed: () => TournamentLoadSuccess(allTournaments: testTournaments, 
           tournaments: testTournaments,
           currentFilter: TournamentFilter.all,
         ),
