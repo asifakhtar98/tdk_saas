@@ -49,7 +49,7 @@ class MemberManagementWidget extends StatelessWidget {
             rbac.canPerform(userRole, Permission.manageTeamMembers);
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -118,12 +118,59 @@ class MemberManagementWidget extends StatelessWidget {
                                                 authenticatedUserId,
                                           ),
                                         );
+                                  } else if (action.startsWith('role_')) {
+                                    final newRole = UserRole.values.firstWhere(
+                                      (r) => r.value == action.substring(5),
+                                      orElse: () => member.role,
+                                    );
+                                    if (newRole != member.role) {
+                                      context
+                                          .read<OrganizationManagementBloc>()
+                                          .add(
+                                            OrganizationManagementEvent
+                                                .memberRoleUpdateRequested(
+                                              targetUserId: member.id,
+                                              newRole: newRole,
+                                              requestingUserId:
+                                                  authenticatedUserId,
+                                            ),
+                                          );
+                                    }
                                   }
                                 },
                                 itemBuilder: (context) => [
+                                  PopupMenuItem(
+                                    enabled: false,
+                                    child: Text(
+                                      'Change Role',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall,
+                                    ),
+                                  ),
+                                  for (final role in [
+                                    UserRole.admin,
+                                    UserRole.scorer,
+                                    UserRole.viewer,
+                                  ])
+                                    PopupMenuItem(
+                                      value: 'role_${role.value}',
+                                      enabled: role != member.role,
+                                      child: Text(
+                                        role.value.toUpperCase(),
+                                        style: role == member.role
+                                            ? const TextStyle(
+                                                fontWeight: FontWeight.bold)
+                                            : null,
+                                      ),
+                                    ),
+                                  const PopupMenuDivider(),
                                   const PopupMenuItem(
                                     value: 'remove',
-                                    child: Text('Remove Member'),
+                                    child: Text(
+                                      'Remove Member',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
                                   ),
                                 ],
                               ),

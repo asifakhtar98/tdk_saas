@@ -78,7 +78,6 @@ class AppRouter {
           $participantListRoute,
           $csvImportRoute,
           $organizationDashboardRoute,
-          $userSettingsRoute,
           $settingsRoute,
         ],
       ),

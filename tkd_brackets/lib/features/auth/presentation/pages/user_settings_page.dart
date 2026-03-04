@@ -93,9 +93,10 @@ class UserSettingsPage extends StatelessWidget {
   }
 
   void _onSignOut(BuildContext context) {
+    final authBloc = context.read<AuthenticationBloc>();
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (_) => AlertDialog(
         title: const Text('Sign Out'),
         content: const Text('Are you sure you want to sign out?'),
         actions: [
@@ -106,9 +107,7 @@ class UserSettingsPage extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              context
-                  .read<AuthenticationBloc>()
-                  .add(const AuthenticationEvent.signOutRequested());
+              authBloc.add(const AuthenticationEvent.signOutRequested());
             },
             child: const Text('Sign Out', style: TextStyle(color: Colors.red)),
           ),

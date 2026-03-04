@@ -86,8 +86,8 @@ class _OrganizationDashboardPageState extends State<OrganizationDashboardPage> {
                         padding: const EdgeInsets.all(24),
                         child: Row(
                           children: [
-                            const Icon(Icons.business,
-                                size: 64, color: Colors.blue),
+                            Icon(Icons.business,
+                                size: 64, color: Theme.of(context).colorScheme.primary),
                             const SizedBox(width: 24),
                             Expanded(
                               child: Column(

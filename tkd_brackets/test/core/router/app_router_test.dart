@@ -158,17 +158,33 @@ void main() {
     });
 
     testWidgets('does not redirect normal shell routes', (tester) async {
+      // Use /dashboard as the test target since it doesn't
+      // require additional BlocProviders (unlike /settings
+      // which renders UserSettingsPage with AuthenticationBloc).
+      final authenticatedUser = UserEntity(
+        id: 'user-1',
+        email: 'test@example.com',
+        displayName: 'Test User',
+        organizationId: 'org-1',
+        role: UserRole.owner,
+        isActive: true,
+        createdAt: DateTime(2026),
+      );
+      mockAuthBloc.emitState(
+        AuthenticationState.authenticated(authenticatedUser),
+      );
+
       final router = AppRouter();
 
       await tester.pumpWidget(MaterialApp.router(routerConfig: router.router));
       await tester.pumpAndSettle();
 
-      router.router.go('/settings');
+      router.router.go('/dashboard');
       await tester.pumpAndSettle();
 
       expect(
         router.router.routerDelegate.currentConfiguration.fullPath,
-        equals('/settings'),
+        equals('/dashboard'),
       );
     });
   });

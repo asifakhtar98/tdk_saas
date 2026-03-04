@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tkd_brackets/core/di/injection.dart';
+import 'package:tkd_brackets/core/router/routes.dart';
 import 'package:tkd_brackets/features/auth/presentation/bloc/sign_in_bloc.dart';
 import 'package:tkd_brackets/features/auth/presentation/bloc/sign_in_event.dart';
 import 'package:tkd_brackets/features/auth/presentation/bloc/sign_in_state.dart';
@@ -54,8 +55,7 @@ class _MagicLinkCallbackPageState extends State<MagicLinkCallbackPage> {
                         const SizedBox(height: 24),
                         ElevatedButton(
                           onPressed: () {
-                            // In a real app, you'd navigate back to the auth page.
-                            // The router will handle the redirection if the state changes.
+                            const AuthRoute().go(context);
                           },
                           child: const Text('Back to Sign In'),
                         ),

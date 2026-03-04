@@ -65,6 +65,9 @@ export 'presentation/bloc/organization_management_state.dart';
 // Presentation - Pages
 export 'presentation/pages/auth_page.dart';
 export 'presentation/pages/magic_link_callback_page.dart';
-export 'presentation/pages/organization_setup_page.dart';
 export 'presentation/pages/organization_dashboard_page.dart';
+export 'presentation/pages/organization_setup_page.dart';
 export 'presentation/pages/user_settings_page.dart';
+// Presentation - Widgets
+export 'presentation/widgets/invite_member_dialog.dart';
+export 'presentation/widgets/member_management_widget.dart';
