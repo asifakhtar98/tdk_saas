@@ -3,7 +3,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/error_reporting_service.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
-import 'package:tkd_brackets/features/auth/data/services/demo_migration_service.dart';
+import 'package:tkd_brackets/features/auth/domain/services/demo_migration_service.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/migrate_demo_data_params.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/migrate_demo_data_use_case.dart';
 

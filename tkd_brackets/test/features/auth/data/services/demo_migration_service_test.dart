@@ -7,6 +7,7 @@ import 'package:tkd_brackets/core/demo/demo_data_constants.dart';
 import 'package:tkd_brackets/core/demo/demo_data_service.dart';
 import 'package:tkd_brackets/core/sync/sync_service.dart';
 import 'package:tkd_brackets/features/auth/data/services/demo_migration_service.dart';
+import 'package:tkd_brackets/features/auth/domain/services/demo_migration_service.dart';
 
 class MockSyncService extends Mock implements SyncService {}
 

@@ -81,7 +81,7 @@ development_status:
   2-9-rbac-permission-service: done
   2-10-demo-to-production-migration: done
   2-11-auth-and-organization-ui: done
-  2-12-code-review-and-fix-authentication: backlog
+  2-12-code-review-and-fix-authentication: done
   epic-2-retrospective: backlog
 
   # ═══════════════════════════════════════════════════════════════════════════

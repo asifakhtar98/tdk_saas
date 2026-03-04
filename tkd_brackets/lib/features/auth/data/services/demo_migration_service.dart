@@ -5,36 +5,7 @@ import 'package:tkd_brackets/core/demo/demo_data_service.dart';
 import 'package:tkd_brackets/core/sync/sync_service.dart';
 import 'package:uuid/uuid.dart';
 
-/// Service for migrating demo data to production.
-///
-/// Orchestrates the migration workflow when a user transitions from
-/// demo mode to authenticated production mode. Handles UUID remapping,
-/// referential integrity preservation, and atomic transaction safety.
-abstract class DemoMigrationService {
-  /// Returns true if demo data exists and can be migrated.
-  Future<bool> hasDemoData();
-
-  /// Migrates all demo data to production.
-  ///
-  /// [newOrganizationId] — The production organization ID that will
-  /// replace the demo organization ID.
-  ///
-  /// Returns the count of entities migrated.
-  /// Throws [DemoMigrationException] on failure.
-  Future<int> migrateDemoData(String newOrganizationId);
-}
-
-/// Exception thrown when demo migration fails.
-class DemoMigrationException implements Exception {
-  DemoMigrationException(this.message, {this.cause});
-
-  final String message;
-  final Object? cause;
-
-  @override
-  String toString() =>
-      'DemoMigrationException: $message${cause != null ? ' (caused by: $cause)' : ''}';
-}
+import 'package:tkd_brackets/features/auth/domain/services/demo_migration_service.dart';
 
 /// Implementation of [DemoMigrationService] using Drift database.
 @LazySingleton(as: DemoMigrationService)
@@ -70,16 +41,23 @@ class DemoMigrationServiceImpl implements DemoMigrationService {
     return _db.transaction(() async {
       var migratedCount = 0;
 
-      // 1. Build UUID mapping for all demo entities
-      final uuidMapping = await _buildUuidMapping();
-
-      // 2. Get all demo entities
+      // 1. Get all demo entities (single fetch — reused for mapping + migration)
       final demoOrgs = await _getDemoOrganizations();
       final demoTournaments = await _getDemoTournaments();
       final demoDivisions = await _getDemoDivisions();
       final demoParticipants = await _getDemoParticipants();
       final demoInvitations = await _getDemoInvitations();
       final demoUsers = await _getDemoUsers();
+
+      // 2. Build UUID mapping from fetched entities
+      final uuidMapping = _buildUuidMappingFromEntities(
+        organizations: demoOrgs,
+        tournaments: demoTournaments,
+        divisions: demoDivisions,
+        participants: demoParticipants,
+        invitations: demoInvitations,
+        users: demoUsers,
+      );
 
       // 3. DELETE in reverse dependency order (children first)
       // This avoids FK constraint violations during deletion
@@ -184,42 +162,33 @@ class DemoMigrationServiceImpl implements DemoMigrationService {
     return prodOrgs.isNotEmpty;
   }
 
-  /// Builds a mapping from old demo UUIDs to new production UUIDs.
-  Future<Map<String, String>> _buildUuidMapping() async {
+  /// Builds a mapping from old demo UUIDs to new production UUIDs
+  /// using pre-fetched entity lists (avoids duplicate queries).
+  Map<String, String> _buildUuidMappingFromEntities({
+    required List<OrganizationEntry> organizations,
+    required List<TournamentEntry> tournaments,
+    required List<DivisionEntry> divisions,
+    required List<ParticipantEntry> participants,
+    required List<InvitationEntry> invitations,
+    required List<UserEntry> users,
+  }) {
     final mapping = <String, String>{};
 
-    // Map organizations
-    final orgs = await _getDemoOrganizations();
-    for (final org in orgs) {
+    for (final org in organizations) {
       mapping[org.id] = _uuid.v4();
     }
-
-    // Map tournaments
-    final tournaments = await _getDemoTournaments();
     for (final tournament in tournaments) {
       mapping[tournament.id] = _uuid.v4();
     }
-
-    // Map divisions
-    final divisions = await _getDemoDivisions();
     for (final division in divisions) {
       mapping[division.id] = _uuid.v4();
     }
-
-    // Map participants
-    final participants = await _getDemoParticipants();
     for (final participant in participants) {
       mapping[participant.id] = _uuid.v4();
     }
-
-    // Map invitations
-    final invitations = await _getDemoInvitations();
     for (final invitation in invitations) {
       mapping[invitation.id] = _uuid.v4();
     }
-
-    // Map users
-    final users = await _getDemoUsers();
     for (final user in users) {
       mapping[user.id] = _uuid.v4();
     }
@@ -447,9 +416,6 @@ class DemoMigrationServiceImpl implements DemoMigrationService {
     String newOrganizationId, {
     bool? isActive,
   }) async {
-    // Must delete first due to UNIQUE constraint on email
-    await (_db.delete(_db.users)..where((u) => u.id.equals(user.id))).go();
-
     await _db.insertUser(
       UsersCompanion(
         id: Value(newId),

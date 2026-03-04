@@ -101,8 +101,30 @@ class CreateOrganizationUseCase
       );
     }
 
-    // 2. Generate slug from name
-    final slug = generateSlug(trimmedName);
+    // 2. Generate slug from name and handle collisions
+    var slug = generateSlug(trimmedName);
+    if (slug.isEmpty) {
+      return const Left(
+        InputValidationFailure(
+          userFriendlyMessage:
+              'Organization name must contain alphanumeric characters.',
+          fieldErrors: {'name': 'Name must contain at least one alphanumeric character.'},
+        ),
+      );
+    }
+
+    var slugExists = true;
+    var retryCount = 0;
+    while (slugExists && retryCount < 3) {
+      final existingOrg =
+          await _organizationRepository.getOrganizationBySlug(slug);
+      slugExists = existingOrg.isRight();
+      if (slugExists) {
+        slug = '${generateSlug(trimmedName)}-${_uuid.v4().substring(0, 4)}';
+        retryCount++;
+      }
+    }
+
     if (slug.isEmpty) {
       return const Left(
         InputValidationFailure(
@@ -110,6 +132,15 @@ class CreateOrganizationUseCase
               'Organization name must contain at least '
               'one letter or number.',
           fieldErrors: {'name': 'Name must contain alphanumeric characters'},
+        ),
+      );
+    }
+
+    if (slugExists) {
+      return const Left(
+        LocalCacheWriteFailure(
+          userFriendlyMessage: 'Failed to generate a unique slug.',
+          technicalDetails: 'Slug collision after retries',
         ),
       );
     }

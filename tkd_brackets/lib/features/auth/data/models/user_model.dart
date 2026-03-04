@@ -64,7 +64,6 @@ class UserModel with _$UserModel {
     UserEntity entity, {
     int syncVersion = 1,
     bool isDeleted = false,
-    bool isDemoData = false,
     DateTime? updatedAtTimestamp,
   }) {
     final now = DateTime.now();
@@ -81,7 +80,7 @@ class UserModel with _$UserModel {
       updatedAtTimestamp: updatedAtTimestamp ?? now,
       syncVersion: syncVersion,
       isDeleted: isDeleted,
-      isDemoData: isDemoData,
+      isDemoData: entity.isDemoData,
     );
   }
 
@@ -112,6 +111,7 @@ class UserModel with _$UserModel {
       role: UserRole.fromString(role),
       avatarUrl: avatarUrl,
       isActive: isActive,
+      isDemoData: isDemoData,
       lastSignInAt: lastSignInAtTimestamp,
       createdAt: createdAtTimestamp,
     );

@@ -3,7 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/core/error/error_reporting_service.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/usecases/use_case.dart';
-import 'package:tkd_brackets/features/auth/data/services/demo_migration_service.dart';
+import 'package:tkd_brackets/features/auth/domain/services/demo_migration_service.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/migrate_demo_data_params.dart';
 
 /// Use case to migrate demo data to production when a user

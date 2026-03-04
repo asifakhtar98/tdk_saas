@@ -2,6 +2,8 @@ import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/usecases/use_case.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/permission.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/rbac_permission_service.dart';
 import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/user_repository.dart';
@@ -9,10 +11,15 @@ import 'package:tkd_brackets/features/auth/domain/usecases/update_user_role_para
 
 @injectable
 class UpdateUserRoleUseCase extends UseCase<UserEntity, UpdateUserRoleParams> {
-  UpdateUserRoleUseCase(this._userRepository, this._authRepository);
+  UpdateUserRoleUseCase(
+    this._userRepository,
+    this._authRepository,
+    this._rbac,
+  );
 
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
+  final RbacPermissionService _rbac;
 
   @override
   Future<Either<Failure, UserEntity>> call(UpdateUserRoleParams params) async {
@@ -29,18 +36,19 @@ class UpdateUserRoleUseCase extends UseCase<UserEntity, UpdateUserRoleParams> {
         );
       }
 
-      // 2. Verify requesting user is Owner
+      // 2. Verify requesting user has permission
       final requesterResult = await _userRepository.getUserById(
         params.requestingUserId,
       );
       return requesterResult.fold(Left.new, (requester) async {
-        if (requester.role != UserRole.owner) {
-          return const Left(
-            AuthorizationPermissionDeniedFailure(
-              userFriendlyMessage:
-                  'Only organization owners can change user roles.',
-              technicalDetails: 'Non-owner attempted to change user role',
-            ),
+        final permissionResult = _rbac.assertPermission(
+          requester.role,
+          Permission.changeUserRoles,
+        );
+
+        if (permissionResult.isLeft()) {
+          return Left(
+            permissionResult.fold((f) => f, (_) => throw Exception('unreachable')),
           );
         }
 

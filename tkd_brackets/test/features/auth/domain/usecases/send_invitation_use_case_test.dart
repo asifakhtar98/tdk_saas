@@ -3,6 +3,8 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/features/auth/domain/entities/invitation_entity.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/permission.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/rbac_permission_service.dart';
 import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/invitation_repository.dart';
@@ -16,6 +18,8 @@ class MockUserRepository extends Mock implements UserRepository {}
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
+class MockRbacPermissionService extends Mock implements RbacPermissionService {}
+
 class FakeInvitationEntity extends Fake implements InvitationEntity {}
 
 void main() {
@@ -23,6 +27,8 @@ void main() {
   late MockInvitationRepository mockInvitationRepository;
   late MockUserRepository mockUserRepository;
   late MockAuthRepository mockAuthRepository;
+
+  late MockRbacPermissionService mockRbac;
 
   final testOwner = UserEntity(
     id: 'owner-123',
@@ -36,12 +42,15 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(FakeInvitationEntity());
+    registerFallbackValue(UserRole.viewer);
+    registerFallbackValue(Permission.viewData);
   });
 
   setUp(() {
     mockInvitationRepository = MockInvitationRepository();
     mockUserRepository = MockUserRepository();
     mockAuthRepository = MockAuthRepository();
+    mockRbac = MockRbacPermissionService();
 
     when(
       () => mockAuthRepository.getCurrentAuthenticatedUser(),
@@ -49,11 +58,15 @@ void main() {
     when(
       () => mockUserRepository.getUserById('owner-123'),
     ).thenAnswer((_) async => Right(testOwner));
+    when(
+      () => mockRbac.assertPermission(any(), any()),
+    ).thenReturn(const Right(unit));
 
     useCase = SendInvitationUseCase(
       mockInvitationRepository,
       mockUserRepository,
       mockAuthRepository,
+      mockRbac,
     );
   });
 
@@ -82,12 +95,27 @@ void main() {
       });
 
       test(
-        'returns AuthorizationFailure when non-owner tries to invite',
+        'returns AuthorizationFailure when user lacks sendInvitations permission',
         () async {
           final scorer = testOwner.copyWith(role: UserRole.scorer);
           when(
             () => mockUserRepository.getUserById('owner-123'),
           ).thenAnswer((_) async => Right(scorer));
+          when(
+            () => mockRbac.assertPermission(
+              UserRole.scorer,
+              Permission.sendInvitations,
+            ),
+          ).thenReturn(
+            const Left(
+              AuthorizationPermissionDeniedFailure(
+                userFriendlyMessage:
+                    'You do not have permission to perform this action.',
+                technicalDetails:
+                    'Role scorer lacks send_invitations permission',
+              ),
+            ),
+          );
 
           final result = await useCase(
             const SendInvitationParams(

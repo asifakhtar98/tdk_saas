@@ -30,6 +30,9 @@ class UserEntity with _$UserEntity {
     /// When the user was created.
     required DateTime createdAt,
 
+    /// Whether this is demo data.
+    @Default(false) bool isDemoData,
+
     /// Optional avatar URL.
     String? avatarUrl,
 

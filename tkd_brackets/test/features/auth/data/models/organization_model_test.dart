@@ -208,12 +208,11 @@ void main() {
       });
 
       test('respects optional parameters', () {
-        final entity = testModel.convertToEntity();
+        final entity = testModel.convertToEntity().copyWith(isDemoData: true);
         final model = OrganizationModel.convertFromEntity(
           entity,
           syncVersion: 5,
           isDeleted: true,
-          isDemoData: true,
         );
 
         expect(model.syncVersion, 5);

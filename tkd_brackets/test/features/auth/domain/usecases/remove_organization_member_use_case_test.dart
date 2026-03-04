@@ -8,9 +8,14 @@ import 'package:tkd_brackets/features/auth/domain/repositories/user_repository.d
 import 'package:tkd_brackets/features/auth/domain/usecases/remove_organization_member_params.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/remove_organization_member_use_case.dart';
 
+import 'package:tkd_brackets/features/auth/domain/entities/permission.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/rbac_permission_service.dart';
+
 class MockUserRepository extends Mock implements UserRepository {}
 
 class MockAuthRepository extends Mock implements AuthRepository {}
+
+class MockRbacPermissionService extends Mock implements RbacPermissionService {}
 
 class FakeUserEntity extends Fake implements UserEntity {}
 
@@ -18,18 +23,27 @@ void main() {
   late RemoveOrganizationMemberUseCase useCase;
   late MockUserRepository mockUserRepository;
   late MockAuthRepository mockAuthRepository;
+  late MockRbacPermissionService mockRbac;
 
   setUpAll(() {
     registerFallbackValue(FakeUserEntity());
+    registerFallbackValue(UserRole.viewer);
+    registerFallbackValue(Permission.manageTeamMembers);
   });
 
   setUp(() {
     mockUserRepository = MockUserRepository();
     mockAuthRepository = MockAuthRepository();
+    mockRbac = MockRbacPermissionService();
     useCase = RemoveOrganizationMemberUseCase(
       mockUserRepository,
       mockAuthRepository,
+      mockRbac,
     );
+
+    // Default RBAC mock to avoid null errors
+    when(() => mockRbac.assertPermission(any(), any()))
+        .thenReturn(const Right(unit));
   });
 
   // Fixtures
@@ -53,12 +67,12 @@ void main() {
     createdAt: DateTime(2024),
   );
 
-  final adminUser = UserEntity(
-    id: 'admin-789',
-    email: 'admin@example.com',
-    displayName: 'Admin User',
+  final scorerUser = UserEntity(
+    id: 'scorer-321',
+    email: 'scorer@example.com',
+    displayName: 'Scorer User',
     organizationId: 'org-1',
-    role: UserRole.admin,
+    role: UserRole.scorer,
     isActive: true,
     createdAt: DateTime(2024),
   );
@@ -71,6 +85,9 @@ void main() {
       when(
         () => mockUserRepository.getUserById('owner-123'),
       ).thenAnswer((_) async => Right(ownerUser));
+      when(
+        () => mockRbac.assertPermission(any(), any()),
+      ).thenReturn(const Right(unit));
       when(
         () => mockUserRepository.getUserById('target-456'),
       ).thenAnswer((_) async => Right(targetUser));
@@ -104,7 +121,7 @@ void main() {
         'does not match requestingUserId', () async {
       when(
         () => mockAuthRepository.getCurrentAuthenticatedUser(),
-      ).thenAnswer((_) async => Right(adminUser));
+      ).thenAnswer((_) async => Right(scorerUser));
 
       final result = await useCase(
         const RemoveOrganizationMemberParams(
@@ -122,18 +139,21 @@ void main() {
     });
 
     test('returns AuthorizationPermissionDeniedFailure '
-        'when requester is not Owner', () async {
+        'when requester does not have permission', () async {
       when(
         () => mockAuthRepository.getCurrentAuthenticatedUser(),
-      ).thenAnswer((_) async => Right(adminUser));
+      ).thenAnswer((_) async => Right(scorerUser));
       when(
-        () => mockUserRepository.getUserById('admin-789'),
-      ).thenAnswer((_) async => Right(adminUser));
+        () => mockUserRepository.getUserById('scorer-321'),
+      ).thenAnswer((_) async => Right(scorerUser));
+      when(
+        () => mockRbac.assertPermission(any(), any()),
+      ).thenReturn(const Left(AuthorizationPermissionDeniedFailure()));
 
       final result = await useCase(
         const RemoveOrganizationMemberParams(
           targetUserId: 'target-456',
-          requestingUserId: 'admin-789',
+          requestingUserId: 'scorer-321',
         ),
       );
 

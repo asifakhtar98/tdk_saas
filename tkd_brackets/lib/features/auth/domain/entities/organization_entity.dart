@@ -44,6 +44,9 @@ class OrganizationEntity with _$OrganizationEntity {
 
     /// When the organization was created.
     required DateTime createdAt,
+
+    /// Whether this is demo data.
+    @Default(false) bool isDemoData,
   }) = _OrganizationEntity;
 }
 

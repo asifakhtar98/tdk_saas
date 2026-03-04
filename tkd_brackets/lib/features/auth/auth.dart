@@ -31,6 +31,8 @@ export 'domain/repositories/auth_repository.dart';
 export 'domain/repositories/invitation_repository.dart';
 export 'domain/repositories/organization_repository.dart';
 export 'domain/repositories/user_repository.dart';
+// Domain - Services
+export 'domain/services/demo_migration_service.dart';
 // Domain - Use Cases
 export 'domain/usecases/accept_invitation_params.dart';
 export 'domain/usecases/accept_invitation_use_case.dart';

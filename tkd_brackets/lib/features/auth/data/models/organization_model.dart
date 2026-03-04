@@ -77,7 +77,6 @@ class OrganizationModel with _$OrganizationModel {
     OrganizationEntity entity, {
     int syncVersion = 1,
     bool isDeleted = false,
-    bool isDemoData = false,
     DateTime? updatedAtTimestamp,
     DateTime? deletedAtTimestamp,
   }) {
@@ -98,7 +97,7 @@ class OrganizationModel with _$OrganizationModel {
       updatedAtTimestamp: updatedAtTimestamp ?? now,
       syncVersion: syncVersion,
       isDeleted: isDeleted,
-      isDemoData: isDemoData,
+      isDemoData: entity.isDemoData,
       deletedAtTimestamp: deletedAtTimestamp,
     );
   }
@@ -139,6 +138,7 @@ class OrganizationModel with _$OrganizationModel {
       maxParticipantsPerTournament: maxParticipantsPerTournament,
       maxScorers: maxScorers,
       isActive: isActive,
+      isDemoData: isDemoData,
       createdAt: createdAtTimestamp,
     );
   }

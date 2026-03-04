@@ -3,6 +3,8 @@ import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/usecases/use_case.dart';
 import 'package:tkd_brackets/features/auth/domain/entities/invitation_entity.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/permission.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/rbac_permission_service.dart';
 import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/invitation_repository.dart';
@@ -27,11 +29,13 @@ class SendInvitationUseCase
     this._invitationRepository,
     this._userRepository,
     this._authRepository,
+    this._rbac,
   );
 
   final InvitationRepository _invitationRepository;
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
+  final RbacPermissionService _rbac;
 
   static const _uuid = Uuid();
 
@@ -60,18 +64,19 @@ class SendInvitationUseCase
         );
       }
 
-      // 2. Verify inviter is Owner
+      // 2. Verify inviter has sendInvitations permission
       final userResult = await _userRepository.getUserById(
         params.invitedByUserId,
       );
       return userResult.fold(Left.new, (inviter) async {
-        if (inviter.role != UserRole.owner) {
-          return const Left(
-            AuthorizationPermissionDeniedFailure(
-              userFriendlyMessage:
-                  'Only organization owners can send invitations.',
-              technicalDetails: 'Non-owner attempted to send invitation',
-            ),
+        final permissionResult = _rbac.assertPermission(
+          inviter.role,
+          Permission.sendInvitations,
+        );
+
+        if (permissionResult.isLeft()) {
+          return Left(
+            permissionResult.fold((f) => f, (_) => throw Exception('unreachable')),
           );
         }
 

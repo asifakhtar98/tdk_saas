@@ -2,6 +2,8 @@ import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/usecases/use_case.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/permission.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/rbac_permission_service.dart';
 import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/user_repository.dart';
@@ -10,10 +12,15 @@ import 'package:tkd_brackets/features/auth/domain/usecases/remove_organization_m
 @injectable
 class RemoveOrganizationMemberUseCase
     extends UseCase<Unit, RemoveOrganizationMemberParams> {
-  RemoveOrganizationMemberUseCase(this._userRepository, this._authRepository);
+  RemoveOrganizationMemberUseCase(
+    this._userRepository,
+    this._authRepository,
+    this._rbac,
+  );
 
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
+  final RbacPermissionService _rbac;
 
   @override
   Future<Either<Failure, Unit>> call(
@@ -33,18 +40,19 @@ class RemoveOrganizationMemberUseCase
         );
       }
 
-      // 2. Verify requesting user is Owner
+      // 2. Verify requesting user has permission
       final requesterResult = await _userRepository.getUserById(
         params.requestingUserId,
       );
       return requesterResult.fold(Left.new, (requester) async {
-        if (requester.role != UserRole.owner) {
-          return const Left(
-            AuthorizationPermissionDeniedFailure(
-              userFriendlyMessage:
-                  'Only organization owners can remove team members.',
-              technicalDetails: 'Non-owner attempted to remove team member',
-            ),
+        final permissionResult = _rbac.assertPermission(
+          requester.role,
+          Permission.manageTeamMembers,
+        );
+
+        if (permissionResult.isLeft()) {
+          return Left(
+            permissionResult.fold((f) => f, (_) => throw Exception('unreachable')),
           );
         }
 

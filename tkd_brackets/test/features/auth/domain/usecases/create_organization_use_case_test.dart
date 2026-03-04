@@ -73,6 +73,13 @@ void main() {
       () => mockMigrateDemoDataUseCase.call(any()),
     ).thenAnswer((_) async => const Right(unit));
 
+    // Default: Slug doesn't exist
+    when(
+      () => mockOrganizationRepository.getOrganizationBySlug(any()),
+    ).thenAnswer(
+      (_) async => const Left(LocalCacheAccessFailure(userFriendlyMessage: '')),
+    );
+
     useCase = CreateOrganizationUseCase(
       mockOrganizationRepository,
       mockUserRepository,
