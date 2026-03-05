@@ -107,8 +107,6 @@ class UpdateParticipantStatusUseCase {
       checkInStatus: newStatus,
       checkInAtTimestamp: newCheckInAtTimestamp,
       dqReason: newDqReason,
-      syncVersion: participant.syncVersion + 1,
-      updatedAtTimestamp: DateTime.now(),
     );
   }
 }

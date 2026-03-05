@@ -291,7 +291,13 @@ void main() {
       ).thenReturn(createTestMatch(divisionId: 'd2'));
       when(
         () => mockParticipantRepository.updateParticipant(any()),
-      ).thenAnswer((_) async => Right(createTestParticipant()));
+      ).thenAnswer((invocation) async {
+        final p = invocation.positionalArguments.first as ParticipantEntity;
+        return Right(p.copyWith(
+          syncVersion: p.syncVersion + 1,
+          updatedAtTimestamp: DateTime.now(),
+        ));
+      });
 
       final result = await useCase(
         tournamentId: 'tournament-1',
@@ -327,7 +333,13 @@ void main() {
       ).thenReturn(createTestMatch());
       when(
         () => mockParticipantRepository.updateParticipant(any()),
-      ).thenAnswer((_) async => Right(createTestParticipant()));
+      ).thenAnswer((invocation) async {
+        final p = invocation.positionalArguments.first as ParticipantEntity;
+        return Right(p.copyWith(
+          syncVersion: p.syncVersion + 1,
+          updatedAtTimestamp: DateTime.now(),
+        ));
+      });
 
       final result = await useCase(
         tournamentId: 'tournament-1',
@@ -483,7 +495,13 @@ void main() {
       ).thenReturn(createTestMatch(divisionId: 'new-division'));
       when(
         () => mockParticipantRepository.updateParticipant(any()),
-      ).thenAnswer((_) async => Right(createTestParticipant()));
+      ).thenAnswer((invocation) async {
+        final p = invocation.positionalArguments.first as ParticipantEntity;
+        return Right(p.copyWith(
+          syncVersion: p.syncVersion + 1,
+          updatedAtTimestamp: DateTime.now(),
+        ));
+      });
 
       final result = await useCase(
         tournamentId: 'tournament-1',
@@ -533,7 +551,13 @@ void main() {
       });
       when(
         () => mockParticipantRepository.updateParticipant(any()),
-      ).thenAnswer((_) async => Right(createTestParticipant()));
+      ).thenAnswer((invocation) async {
+        final p = invocation.positionalArguments.first as ParticipantEntity;
+        return Right(p.copyWith(
+          syncVersion: p.syncVersion + 1,
+          updatedAtTimestamp: DateTime.now(),
+        ));
+      });
 
       final result = await useCase(
         tournamentId: 'tournament-1',
@@ -567,7 +591,13 @@ void main() {
       });
       when(
         () => mockParticipantRepository.updateParticipant(any()),
-      ).thenAnswer((_) async => Right(createTestParticipant()));
+      ).thenAnswer((invocation) async {
+        final p = invocation.positionalArguments.first as ParticipantEntity;
+        return Right(p.copyWith(
+          syncVersion: p.syncVersion + 1,
+          updatedAtTimestamp: DateTime.now(),
+        ));
+      });
 
       final result = await useCase(
         tournamentId: 'tournament-1',
@@ -611,7 +641,13 @@ void main() {
       ).thenReturn(createTestMatch());
       when(
         () => mockParticipantRepository.updateParticipant(any()),
-      ).thenAnswer((_) async => Right(createTestParticipant()));
+      ).thenAnswer((invocation) async {
+        final p = invocation.positionalArguments.first as ParticipantEntity;
+        return Right(p.copyWith(
+          syncVersion: p.syncVersion + 1,
+          updatedAtTimestamp: DateTime.now(),
+        ));
+      });
 
       final result = await useCase(
         tournamentId: 'tournament-1',
@@ -636,9 +672,18 @@ void main() {
         when(
           () => mockService.evaluateMatch(any(), any()),
         ).thenReturn(createTestMatch(divisionId: 'new-division'));
-        when(
-          () => mockParticipantRepository.updateParticipant(any()),
-        ).thenAnswer((_) async => Right(createTestParticipant()));
+        when(() => mockParticipantRepository.updateParticipant(any())).thenAnswer((
+          invocation,
+        ) async {
+          final participant =
+              invocation.positionalArguments.first as ParticipantEntity;
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
+        });
 
         await useCase(
           tournamentId: 'tournament-1',
@@ -652,13 +697,7 @@ void main() {
                       mockParticipantRepository.updateParticipant(captureAny()),
                 ).captured.single
                 as ParticipantEntity;
-        expect(captured.syncVersion, originalParticipant.syncVersion + 1);
-        expect(
-          captured.updatedAtTimestamp.isAfter(
-            originalParticipant.updatedAtTimestamp,
-          ),
-          true,
-        );
+        expect(captured.divisionId, 'new-division');
       },
     );
   });

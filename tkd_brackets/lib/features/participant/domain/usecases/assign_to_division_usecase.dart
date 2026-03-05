@@ -119,8 +119,6 @@ class AssignToDivisionUseCase {
 
     final updatedParticipant = participant.copyWith(
       divisionId: divisionId,
-      syncVersion: participant.syncVersion + 1,
-      updatedAtTimestamp: DateTime.now(),
     );
 
     return _participantRepository.updateParticipant(updatedParticipant);

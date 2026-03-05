@@ -8,6 +8,11 @@ abstract class ParticipantRemoteDatasource {
   /// Get all participants for a division from remote.
   Future<List<ParticipantModel>> getParticipantsForDivision(String divisionId);
 
+  /// Get all participants for a tournament from remote.
+  Future<List<ParticipantModel>> getParticipantsForTournament(
+    String tournamentId,
+  );
+
   /// Get participant by ID from remote.
   Future<ParticipantModel?> getParticipantById(String id);
 
@@ -27,6 +32,13 @@ class ParticipantRemoteDatasourceImplementation
   @override
   Future<List<ParticipantModel>> getParticipantsForDivision(
     String divisionId,
+  ) async {
+    throw UnimplementedError('Supabase participant sync not yet implemented');
+  }
+
+  @override
+  Future<List<ParticipantModel>> getParticipantsForTournament(
+    String tournamentId,
   ) async {
     throw UnimplementedError('Supabase participant sync not yet implemented');
   }

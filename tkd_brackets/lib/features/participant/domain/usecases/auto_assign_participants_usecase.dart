@@ -148,10 +148,8 @@ class AutoAssignParticipantsUseCase {
 
             if (!dryRun) {
               final updatedParticipant = participant.copyWith(
-                divisionId: bestMatch.divisionId,
-                syncVersion: participant.syncVersion + 1,
-                updatedAtTimestamp: DateTime.now(),
-              );
+      divisionId: bestMatch.divisionId,
+    );
               await _participantRepository.updateParticipant(
                 updatedParticipant,
               );

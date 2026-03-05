@@ -33,8 +33,6 @@ class DisqualifyParticipantUseCase {
         checkInStatus: ParticipantStatus.disqualified,
         checkInAtTimestamp: null,
         dqReason: trimmedReason,
-        syncVersion: participant.syncVersion + 1,
-        updatedAtTimestamp: DateTime.now(),
       );
 
       return _participantRepository.updateParticipant(updatedParticipant);

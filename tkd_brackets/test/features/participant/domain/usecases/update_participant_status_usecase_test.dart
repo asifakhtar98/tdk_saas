@@ -82,7 +82,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -102,7 +107,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -122,7 +132,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -142,7 +157,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -166,7 +186,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -189,7 +214,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -213,7 +243,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -236,7 +271,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -260,7 +300,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -280,7 +325,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -365,7 +415,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -465,7 +520,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -522,7 +582,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -547,7 +612,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(
@@ -571,7 +641,12 @@ void main() {
         ) async {
           final participant =
               invocation.positionalArguments.first as ParticipantEntity;
-          return Right(participant);
+          return Right(
+            participant.copyWith(
+              syncVersion: participant.syncVersion + 1,
+              updatedAtTimestamp: DateTime.now(),
+            ),
+          );
         });
 
         final result = await useCase(

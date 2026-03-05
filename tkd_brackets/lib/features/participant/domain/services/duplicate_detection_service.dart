@@ -1,10 +1,8 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
-import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
-import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
-import 'package:tkd_brackets/features/participant/data/models/participant_model.dart';
 import 'package:tkd_brackets/features/participant/domain/entities/participant_entity.dart';
+import 'package:tkd_brackets/features/participant/domain/repositories/participant_repository.dart';
 import 'package:tkd_brackets/features/participant/domain/services/duplicate_match.dart';
 import 'package:tkd_brackets/features/participant/domain/services/duplicate_match_type.dart';
 import 'package:tkd_brackets/features/participant/domain/services/participant_check_data.dart';
@@ -25,8 +23,8 @@ class DuplicateConfidence {
 /// (Levenshtein distance), and date of birth comparison.
 @lazySingleton
 class DuplicateDetectionService {
-  DuplicateDetectionService(this._divisionRepository);
-  final DivisionRepository _divisionRepository;
+  DuplicateDetectionService(this._participantRepository);
+  final ParticipantRepository _participantRepository;
 
   /// Checks for duplicate participants in a tournament.
   ///
@@ -124,35 +122,7 @@ class DuplicateDetectionService {
 
   Future<Either<Failure, List<ParticipantEntity>>>
   _getExistingParticipantsForTournament(String tournamentId) async {
-    final divisionsResult = await _divisionRepository.getDivisionsForTournament(
-      tournamentId,
-    );
-
-    final divisions = divisionsResult.fold(
-      (failure) => <DivisionEntity>[],
-      (divisions) => divisions,
-    );
-
-    if (divisions.isEmpty) {
-      return const Right([]);
-    }
-
-    final divisionIds = divisions.map((d) => d.id).toList();
-
-    final participantsResult = await _divisionRepository
-        .getParticipantsForDivisions(divisionIds);
-
-    return participantsResult.fold(
-      Left.new,
-      (entries) => Right(
-        entries
-            .map(
-              (entry) =>
-                  ParticipantModel.fromDriftEntry(entry).convertToEntity(),
-            )
-            .toList(),
-      ),
-    );
+    return _participantRepository.getParticipantsForTournament(tournamentId);
   }
 
   String _normalizeString(String input) {

@@ -164,8 +164,6 @@ class UpdateSeedPositionsUseCase {
 
       final updatedParticipant = participant.copyWith(
         seedNumber: i + 1, // 1-based seed numbering
-        syncVersion: participant.syncVersion + 1,
-        updatedAtTimestamp: DateTime.now(),
       );
 
       final updateResult = await _participantRepository.updateParticipant(

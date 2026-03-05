@@ -676,10 +676,12 @@ void main() {
         final mockUserQuery = MockSupabaseQueryBuilder();
         final mockTournamentQuery = MockSupabaseQueryBuilder();
         final mockDivisionQuery = MockSupabaseQueryBuilder();
+        final mockParticipantQuery = MockSupabaseQueryBuilder();
         when(() => mockSupabaseClient.from('organizations')).thenAnswer((_) => mockOrgQuery);
         when(() => mockSupabaseClient.from('users')).thenAnswer((_) => mockUserQuery);
         when(() => mockSupabaseClient.from('tournaments')).thenAnswer((_) => mockTournamentQuery);
         when(() => mockSupabaseClient.from('divisions')).thenAnswer((_) => mockDivisionQuery);
+        when(() => mockSupabaseClient.from('participants')).thenAnswer((_) => mockParticipantQuery);
 
         const orgId = 'org-1';
         await testDatabase.insertOrganization(
@@ -708,6 +710,8 @@ void main() {
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
         when(() => mockDivisionQuery.select(any()))
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+        when(() => mockParticipantQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
 
         await syncService.pull();
 
@@ -721,10 +725,12 @@ void main() {
         final mockUserQuery = MockSupabaseQueryBuilder();
         final mockTournamentQuery = MockSupabaseQueryBuilder();
         final mockDivisionQuery = MockSupabaseQueryBuilder();
+        final mockParticipantQuery = MockSupabaseQueryBuilder();
         when(() => mockSupabaseClient.from('organizations')).thenAnswer((_) => mockOrgQuery);
         when(() => mockSupabaseClient.from('users')).thenAnswer((_) => mockUserQuery);
         when(() => mockSupabaseClient.from('tournaments')).thenAnswer((_) => mockTournamentQuery);
         when(() => mockSupabaseClient.from('divisions')).thenAnswer((_) => mockDivisionQuery);
+        when(() => mockSupabaseClient.from('participants')).thenAnswer((_) => mockParticipantQuery);
 
         const orgId = 'org-1';
         await testDatabase.insertOrganization(
@@ -753,6 +759,8 @@ void main() {
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
         when(() => mockDivisionQuery.select(any()))
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+        when(() => mockParticipantQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
 
         await syncService.pull();
 
@@ -766,10 +774,12 @@ void main() {
         final mockUserQuery = MockSupabaseQueryBuilder();
         final mockTournamentQuery = MockSupabaseQueryBuilder();
         final mockDivisionQuery = MockSupabaseQueryBuilder();
+        final mockParticipantQuery = MockSupabaseQueryBuilder();
         when(() => mockSupabaseClient.from('organizations')).thenAnswer((_) => mockOrgQuery);
         when(() => mockSupabaseClient.from('users')).thenAnswer((_) => mockUserQuery);
         when(() => mockSupabaseClient.from('tournaments')).thenAnswer((_) => mockTournamentQuery);
         when(() => mockSupabaseClient.from('divisions')).thenAnswer((_) => mockDivisionQuery);
+        when(() => mockSupabaseClient.from('participants')).thenAnswer((_) => mockParticipantQuery);
 
         final remoteUser = {
           'id': 'user-new',
@@ -788,6 +798,8 @@ void main() {
         when(() => mockTournamentQuery.select(any()))
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
         when(() => mockDivisionQuery.select(any()))
+            .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
+        when(() => mockParticipantQuery.select(any()))
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([]));
         when(() => mockUserQuery.select(any()))
             .thenAnswer((_) => FakePostgrestBuilder<PostgrestList>([remoteUser]));

@@ -114,7 +114,7 @@ development_status:
   # FRs: FR13-FR19
   # Dependencies: Epic 3 (Tournament & Division Management)
   # ═══════════════════════════════════════════════════════════════════════════
-  epic-4: in-progress
+  epic-4: done
   4-1-participant-feature-structure: done
   4-2-participant-entity-and-repository: done
   4-3-manual-participant-entry: done
@@ -128,7 +128,7 @@ development_status:
   4-11-participant-edit-and-transfer: done
   4-12-participant-management-ui: done
   4-13-paste-from-spreadsheet: done
-  4-14-code-review-and-fix-participant-management: backlog
+  4-14-code-review-and-fix-participant-management: done
   epic-4-retrospective: backlog
 
   # ═══════════════════════════════════════════════════════════════════════════

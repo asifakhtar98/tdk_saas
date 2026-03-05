@@ -352,6 +352,25 @@ class AppDatabase extends _$AppDatabase {
         .get();
   }
 
+  /// Get all active participants for a tournament (across all divisions).
+  Future<List<ParticipantEntry>> getParticipantsForTournament(
+    String tournamentId,
+  ) {
+    final query = select(participants).join([
+      innerJoin(
+        divisions,
+        divisions.id.equalsExp(participants.divisionId),
+        useColumns: false,
+      ),
+    ]);
+
+    query.where(divisions.tournamentId.equals(tournamentId));
+    query.where(participants.isDeleted.equals(false));
+    query.orderBy([OrderingTerm.asc(participants.lastName)]);
+
+    return query.map((row) => row.readTable(participants)).get();
+  }
+
   /// Get participant by ID.
   Future<ParticipantEntry?> getParticipantById(String id) {
     return (select(

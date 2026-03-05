@@ -1,24 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:tkd_brackets/core/database/app_database.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
-import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
-import 'package:tkd_brackets/features/division/domain/repositories/division_repository.dart';
 import 'package:tkd_brackets/features/participant/domain/entities/participant_entity.dart';
+import 'package:tkd_brackets/features/participant/domain/repositories/participant_repository.dart';
 import 'package:tkd_brackets/features/participant/domain/services/duplicate_detection_service.dart';
 import 'package:tkd_brackets/features/participant/domain/services/duplicate_match_type.dart';
 import 'package:tkd_brackets/features/participant/domain/services/participant_check_data.dart';
 
-class MockDivisionRepository extends Mock implements DivisionRepository {}
+class MockParticipantRepository extends Mock implements ParticipantRepository {}
 
 void main() {
   late DuplicateDetectionService service;
-  late MockDivisionRepository mockDivisionRepository;
+  late MockParticipantRepository mockParticipantRepository;
 
   setUp(() {
-    mockDivisionRepository = MockDivisionRepository();
-    service = DuplicateDetectionService(mockDivisionRepository);
+    mockParticipantRepository = MockParticipantRepository();
+    service = DuplicateDetectionService(mockParticipantRepository);
   });
 
   ParticipantEntity createTestParticipant({
@@ -384,48 +382,18 @@ void main() {
 
   group('checkForDuplicatesBatch', () {
     test('batch check returns correct row number mapping', () async {
-      final division = DivisionEntity(
-        id: 'division-1',
-        tournamentId: 'tournament-1',
-        name: 'Test Division',
-        category: DivisionCategory.sparring,
-        gender: DivisionGender.male,
-        ageMin: 8,
-        ageMax: 12,
-        weightMinKg: 30,
-        weightMaxKg: 40,
-        beltRankMin: 'blue',
-        beltRankMax: 'blue',
-        bracketFormat: BracketFormat.singleElimination,
-        assignedRingNumber: 1,
-        status: DivisionStatus.ready,
-        createdAtTimestamp: DateTime.now(),
-        updatedAtTimestamp: DateTime.now(),
-      );
-
-      final participantEntry = ParticipantEntry(
+      final participant = createTestParticipant(
         id: 'existing-1',
-        divisionId: 'division-1',
         firstName: 'John',
         lastName: 'Smith',
         schoolOrDojangName: "Kim's TKD",
-        beltRank: 'blue',
-        checkInStatus: 'pending',
-        syncVersion: 1,
-        isBye: false,
-        isDeleted: false,
-        isDemoData: false,
-        createdAtTimestamp: DateTime.now(),
-        updatedAtTimestamp: DateTime.now(),
       );
 
       when(
-        () => mockDivisionRepository.getDivisionsForTournament('tournament-1'),
-      ).thenAnswer((_) async => Right([division]));
-      when(
-        () =>
-            mockDivisionRepository.getParticipantsForDivisions(['division-1']),
-      ).thenAnswer((_) async => Right([participantEntry]));
+        () => mockParticipantRepository.getParticipantsForTournament(
+          'tournament-1',
+        ),
+      ).thenAnswer((_) async => Right([participant]));
 
       final newParticipants = [
         const ParticipantCheckData(
@@ -458,68 +426,25 @@ void main() {
     test(
       'batch check with multiple new participants and multiple existing',
       () async {
-        final division = DivisionEntity(
-          id: 'division-1',
-          tournamentId: 'tournament-1',
-          name: 'Test Division',
-          category: DivisionCategory.sparring,
-          gender: DivisionGender.male,
-          ageMin: 8,
-          ageMax: 12,
-          weightMinKg: 30,
-          weightMaxKg: 40,
-          beltRankMin: 'blue',
-          beltRankMax: 'blue',
-          bracketFormat: BracketFormat.singleElimination,
-          assignedRingNumber: 1,
-          status: DivisionStatus.ready,
-          createdAtTimestamp: DateTime.now(),
-          updatedAtTimestamp: DateTime.now(),
-        );
-
-        final participantEntry1 = ParticipantEntry(
+        final participant1 = createTestParticipant(
           id: 'existing-1',
-          divisionId: 'division-1',
           firstName: 'John',
           lastName: 'Smith',
           schoolOrDojangName: "Kim's TKD",
-          beltRank: 'blue',
-          checkInStatus: 'pending',
-          syncVersion: 1,
-          isBye: false,
-          isDeleted: false,
-          isDemoData: false,
-          createdAtTimestamp: DateTime.now(),
-          updatedAtTimestamp: DateTime.now(),
         );
 
-        final participantEntry2 = ParticipantEntry(
+        final participant2 = createTestParticipant(
           id: 'existing-2',
-          divisionId: 'division-1',
           firstName: 'Jane',
           lastName: 'Doe',
           schoolOrDojangName: "Kim's TKD",
-          beltRank: 'blue',
-          checkInStatus: 'pending',
-          syncVersion: 1,
-          isBye: false,
-          isDeleted: false,
-          isDemoData: false,
-          createdAtTimestamp: DateTime.now(),
-          updatedAtTimestamp: DateTime.now(),
         );
 
         when(
-          () =>
-              mockDivisionRepository.getDivisionsForTournament('tournament-1'),
-        ).thenAnswer((_) async => Right([division]));
-        when(
-          () => mockDivisionRepository.getParticipantsForDivisions([
-            'division-1',
-          ]),
-        ).thenAnswer(
-          (_) async => Right([participantEntry1, participantEntry2]),
-        );
+          () => mockParticipantRepository.getParticipantsForTournament(
+            'tournament-1',
+          ),
+        ).thenAnswer((_) async => Right([participant1, participant2]));
 
         final newParticipants = [
           const ParticipantCheckData(
@@ -559,8 +484,9 @@ void main() {
       'checkForDuplicatesBatch returns map with empty lists on fetch failure',
       () async {
         when(
-          () =>
-              mockDivisionRepository.getDivisionsForTournament('tournament-1'),
+          () => mockParticipantRepository.getParticipantsForTournament(
+            'tournament-1',
+          ),
         ).thenAnswer((_) async => const Left(ServerConnectionFailure()));
 
         final newParticipants = [
@@ -578,8 +504,7 @@ void main() {
 
         expect(result.isRight(), true);
         result.fold((failure) => fail('Should not fail'), (matches) {
-          expect(matches.length, 1);
-          expect(matches[1], isEmpty);
+          expect(matches.isEmpty, true);
         });
       },
     );
@@ -587,33 +512,10 @@ void main() {
     test(
       'checkForDuplicatesBatch returns map with empty lists when getParticipants fails',
       () async {
-        final division = DivisionEntity(
-          id: 'division-1',
-          tournamentId: 'tournament-1',
-          name: 'Test Division',
-          category: DivisionCategory.sparring,
-          gender: DivisionGender.male,
-          ageMin: 8,
-          ageMax: 12,
-          weightMinKg: 30,
-          weightMaxKg: 40,
-          beltRankMin: 'blue',
-          beltRankMax: 'blue',
-          bracketFormat: BracketFormat.singleElimination,
-          assignedRingNumber: 1,
-          status: DivisionStatus.ready,
-          createdAtTimestamp: DateTime.now(),
-          updatedAtTimestamp: DateTime.now(),
-        );
-
         when(
-          () =>
-              mockDivisionRepository.getDivisionsForTournament('tournament-1'),
-        ).thenAnswer((_) async => Right([division]));
-        when(
-          () => mockDivisionRepository.getParticipantsForDivisions([
-            'division-1',
-          ]),
+          () => mockParticipantRepository.getParticipantsForTournament(
+            'tournament-1',
+          ),
         ).thenAnswer((_) async => const Left(ServerConnectionFailure()));
 
         final newParticipants = [

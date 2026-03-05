@@ -153,8 +153,6 @@ class UpdateParticipantUseCase {
       registrationNumber:
           params.registrationNumber?.trim() ?? participant.registrationNumber,
       notes: params.notes?.trim() ?? participant.notes,
-      syncVersion: participant.syncVersion + 1,
-      updatedAtTimestamp: DateTime.now(),
     );
 
     // STEP 11: Persist and return

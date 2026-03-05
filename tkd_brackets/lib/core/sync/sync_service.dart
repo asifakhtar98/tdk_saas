@@ -116,6 +116,7 @@ class SyncServiceImplementation implements SyncService {
     'users',
     'tournaments',
     'divisions',
+    'participants',
   ];
 
   StreamSubscription<ConnectivityStatus>? _connectivitySubscription;
@@ -419,6 +420,11 @@ class SyncServiceImplementation implements SyncService {
               ..where((d) => d.id.isIn(recordIds)))
             .get();
         return ds.map(_divisionToMap).toList();
+      case 'participants':
+        final ps = await (_appDatabase.select(_appDatabase.participants)
+              ..where((p) => p.id.isIn(recordIds)))
+            .get();
+        return ps.map(_participantToMap).toList();
       default:
         return [];
     }
@@ -441,6 +447,9 @@ class SyncServiceImplementation implements SyncService {
       case 'divisions':
         final d = await _appDatabase.getDivisionById(recordId);
         if (d != null) return _divisionToMap(d);
+      case 'participants':
+        final p = await _appDatabase.getParticipantById(recordId);
+        if (p != null) return _participantToMap(p);
     }
     return null;
   }
@@ -487,6 +496,8 @@ class SyncServiceImplementation implements SyncService {
         await _applyRemoteTournament(remote);
       case 'divisions':
         await _applyRemoteDivision(remote);
+      case 'participants':
+        await _applyRemoteParticipant(remote);
     }
   }
 
@@ -656,6 +667,19 @@ class SyncServiceImplementation implements SyncService {
     }
   }
 
+  Future<void> _applyRemoteParticipant(Map<String, dynamic> remote) async {
+    final id = remote['id'] as String;
+    final existing = await _appDatabase.getParticipantById(id);
+
+    if (existing == null) {
+      await _appDatabase.insertParticipant(_mapToParticipantsCompanion(remote));
+    } else {
+      await (_appDatabase.update(_appDatabase.participants)
+            ..where((p) => p.id.equals(id)))
+          .write(_mapToParticipantsCompanion(remote));
+    }
+  }
+
   /// Converts a TournamentEntry to a map for Supabase upsert.
   Map<String, dynamic> _tournamentToMap(TournamentEntry tournament) {
     return {
@@ -768,6 +792,66 @@ class SyncServiceImplementation implements SyncService {
     if (value is DateTime) return value;
     if (value is String) return DateTime.tryParse(value);
     return null;
+  }
+
+  /// Converts a ParticipantEntry to a map for Supabase upsert.
+  Map<String, dynamic> _participantToMap(ParticipantEntry participant) {
+    return {
+      'id': participant.id,
+      'division_id': participant.divisionId,
+      'first_name': participant.firstName,
+      'last_name': participant.lastName,
+      'date_of_birth': participant.dateOfBirth?.toIso8601String(),
+      'gender': participant.gender,
+      'weight_kg': participant.weightKg,
+      'school_or_dojang_name': participant.schoolOrDojangName,
+      'belt_rank': participant.beltRank,
+      'seed_number': participant.seedNumber,
+      'registration_number': participant.registrationNumber,
+      'is_bye': participant.isBye,
+      'check_in_status': participant.checkInStatus,
+      'check_in_at_timestamp': participant.checkInAtTimestamp?.toIso8601String(),
+      'dq_reason': participant.dqReason,
+      'photo_url': participant.photoUrl,
+      'notes': participant.notes,
+      'sync_version': participant.syncVersion,
+      'is_deleted': participant.isDeleted,
+      'deleted_at_timestamp': participant.deletedAtTimestamp?.toIso8601String(),
+      'is_demo_data': participant.isDemoData,
+      'created_at_timestamp': participant.createdAtTimestamp.toIso8601String(),
+      'updated_at_timestamp': participant.updatedAtTimestamp.toIso8601String(),
+    };
+  }
+
+  /// Converts a remote map to ParticipantsCompanion.
+  ParticipantsCompanion _mapToParticipantsCompanion(Map<String, dynamic> map) {
+    return ParticipantsCompanion(
+      id: Value(map['id'] as String),
+      divisionId: Value(map['division_id'] as String),
+      firstName: Value(map['first_name'] as String),
+      lastName: Value(map['last_name'] as String),
+      dateOfBirth: Value(_parseDateTime(map['date_of_birth'])),
+      gender: Value(map['gender'] as String?),
+      weightKg: Value(map['weight_kg'] != null ? (map['weight_kg'] as num).toDouble() : null),
+      schoolOrDojangName: Value(map['school_or_dojang_name'] as String?),
+      beltRank: Value(map['belt_rank'] as String?),
+      seedNumber: Value(map['seed_number'] as int?),
+      registrationNumber: Value(map['registration_number'] as String?),
+      isBye: Value(map['is_bye'] as bool? ?? false),
+      checkInStatus: Value(map['check_in_status'] as String? ?? 'pending'),
+      checkInAtTimestamp: Value(_parseDateTime(map['check_in_at_timestamp'])),
+      dqReason: Value(map['dq_reason'] as String?),
+      photoUrl: Value(map['photo_url'] as String?),
+      notes: Value(map['notes'] as String?),
+      syncVersion: Value(map['sync_version'] as int? ?? 1),
+      isDeleted: Value(map['is_deleted'] as bool? ?? false),
+      deletedAtTimestamp: Value(_parseDateTime(map['deleted_at_timestamp'])),
+      isDemoData: Value(map['is_demo_data'] as bool? ?? false),
+      createdAtTimestamp:
+          Value(_parseDateTime(map['created_at_timestamp']) ?? DateTime.now()),
+      updatedAtTimestamp:
+          Value(_parseDateTime(map['updated_at_timestamp']) ?? DateTime.now()),
+    );
   }
 
   @override

@@ -180,8 +180,6 @@ class TransferParticipantUseCase {
     final updatedParticipant = participant.copyWith(
       divisionId: params.targetDivisionId,
       seedNumber: null, // Reset seed — it's division-specific
-      syncVersion: participant.syncVersion + 1,
-      updatedAtTimestamp: DateTime.now(),
     );
 
     // STEP 14: Persist and return

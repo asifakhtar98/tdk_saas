@@ -12,6 +12,11 @@ abstract class ParticipantRepository {
     String divisionId,
   );
 
+  /// Get all active participants for a tournament.
+  Future<Either<Failure, List<ParticipantEntity>>> getParticipantsForTournament(
+    String tournamentId,
+  );
+
   /// Get participant by ID.
   /// Returns [Left(Failure)] if not found or error occurs.
   Future<Either<Failure, ParticipantEntity>> getParticipantById(String id);

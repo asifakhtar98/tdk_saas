@@ -6,6 +6,7 @@ import 'package:tkd_brackets/core/network/connectivity_service.dart';
 import 'package:tkd_brackets/features/participant/data/datasources/participant_local_datasource.dart';
 import 'package:tkd_brackets/features/participant/data/datasources/participant_remote_datasource.dart';
 import 'package:tkd_brackets/features/participant/data/models/participant_model.dart';
+import 'package:tkd_brackets/core/monitoring/sentry_service.dart';
 import 'package:tkd_brackets/features/participant/domain/entities/participant_entity.dart';
 import 'package:tkd_brackets/features/participant/domain/repositories/participant_repository.dart';
 
@@ -39,6 +40,42 @@ class ParticipantRepositoryImplementation implements ParticipantRepository {
         try {
           final remoteModels = await _remoteDatasource
               .getParticipantsForDivision(divisionId);
+          for (final model in remoteModels) {
+            final existing = await _localDatasource.getParticipantById(
+              model.id,
+            );
+            if (existing == null) {
+              await _localDatasource.insertParticipant(model);
+            } else if (model.syncVersion > existing.syncVersion) {
+              await _localDatasource.updateParticipant(model);
+            }
+          }
+          models = remoteModels;
+        } on Exception catch (_) {
+          // Use local data if remote fails
+        }
+      }
+
+      return Right(models.map((m) => m.convertToEntity()).toList());
+    } on Exception catch (e) {
+      return Left(LocalCacheAccessFailure(technicalDetails: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ParticipantEntity>>> getParticipantsForTournament(
+    String tournamentId,
+  ) async {
+    try {
+      var models = await _localDatasource.getParticipantsForTournament(
+        tournamentId,
+      );
+
+      if (await _connectivityService.hasInternetConnection()) {
+        try {
+          final remoteModels = await _remoteDatasource
+              .getParticipantsForTournament(tournamentId);
+
           for (final model in remoteModels) {
             final existing = await _localDatasource.getParticipantById(
               model.id,
@@ -99,8 +136,13 @@ class ParticipantRepositoryImplementation implements ParticipantRepository {
       if (await _connectivityService.hasInternetConnection()) {
         try {
           await _remoteDatasource.insertParticipant(model);
-        } on Exception catch (_) {
-          // Queued for sync
+        } on Exception catch (e) {
+          SentryService.addBreadcrumb(
+            message: 'Failed to sync new participant to remote: $e',
+            category: 'sync',
+            data: {'participantId': participant.id},
+          );
+          // TODO(sync): Implement explicit sync queue for offline persistence
         }
       }
 
@@ -120,8 +162,12 @@ class ParticipantRepositoryImplementation implements ParticipantRepository {
       );
       final newSyncVersion = (existing?.syncVersion ?? 0) + 1;
 
+      final now = DateTime.now();
       final model = ParticipantModel.convertFromEntity(
-        participant.copyWith(syncVersion: newSyncVersion),
+        participant.copyWith(
+          syncVersion: newSyncVersion,
+          updatedAtTimestamp: now,
+        ),
       );
 
       await _localDatasource.updateParticipant(model);
@@ -129,12 +175,22 @@ class ParticipantRepositoryImplementation implements ParticipantRepository {
       if (await _connectivityService.hasInternetConnection()) {
         try {
           await _remoteDatasource.updateParticipant(model);
-        } on Exception catch (_) {
-          // Queued for sync
+        } on Exception catch (e) {
+          SentryService.addBreadcrumb(
+            message: 'Failed to sync participant update to remote: $e',
+            category: 'sync',
+            data: {'participantId': participant.id},
+          );
+          // TODO(sync): Implement explicit sync queue for offline persistence
         }
       }
 
-      return Right(participant.copyWith(syncVersion: newSyncVersion));
+      return Right(
+        participant.copyWith(
+          syncVersion: newSyncVersion,
+          updatedAtTimestamp: now,
+        ),
+      );
     } on Exception catch (e) {
       return Left(LocalCacheWriteFailure(technicalDetails: e.toString()));
     }
@@ -148,8 +204,13 @@ class ParticipantRepositoryImplementation implements ParticipantRepository {
       if (await _connectivityService.hasInternetConnection()) {
         try {
           await _remoteDatasource.deleteParticipant(id);
-        } on Exception catch (_) {
-          // Queued for sync
+        } on Exception catch (e) {
+          SentryService.addBreadcrumb(
+            message: 'Failed to sync participant deletion to remote: $e',
+            category: 'sync',
+            data: {'participantId': id},
+          );
+          // TODO(sync): Implement explicit sync queue for offline persistence
         }
       }
 
@@ -175,8 +236,12 @@ class ParticipantRepositoryImplementation implements ParticipantRepository {
           for (final model in models) {
             await _remoteDatasource.insertParticipant(model);
           }
-        } on Exception catch (_) {
-          // Queued for sync - local data is safe
+        } on Exception catch (e) {
+          SentryService.addBreadcrumb(
+            message: 'Failed to sync batch participants to remote: $e',
+            category: 'sync',
+          );
+          // TODO(sync): Implement explicit sync queue - local data is safe
         }
       }
 

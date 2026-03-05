@@ -9,6 +9,11 @@ abstract class ParticipantLocalDatasource {
   /// Get all participants for a division.
   Future<List<ParticipantModel>> getParticipantsForDivision(String divisionId);
 
+  /// Get all participants for a tournament.
+  Future<List<ParticipantModel>> getParticipantsForTournament(
+    String tournamentId,
+  );
+
   /// Get participant by ID.
   Future<ParticipantModel?> getParticipantById(String id);
 
@@ -40,6 +45,14 @@ class ParticipantLocalDatasourceImplementation
     String divisionId,
   ) async {
     final entries = await _database.getParticipantsForDivision(divisionId);
+    return entries.map(ParticipantModel.fromDriftEntry).toList();
+  }
+
+  @override
+  Future<List<ParticipantModel>> getParticipantsForTournament(
+    String tournamentId,
+  ) async {
+    final entries = await _database.getParticipantsForTournament(tournamentId);
     return entries.map(ParticipantModel.fromDriftEntry).toList();
   }
 

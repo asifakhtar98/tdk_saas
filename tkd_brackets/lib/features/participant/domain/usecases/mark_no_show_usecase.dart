@@ -20,8 +20,6 @@ class MarkNoShowUseCase {
         checkInStatus: ParticipantStatus.noShow,
         checkInAtTimestamp: null,
         dqReason: null,
-        syncVersion: participant.syncVersion + 1,
-        updatedAtTimestamp: DateTime.now(),
       );
 
       return _participantRepository.updateParticipant(updatedParticipant);
