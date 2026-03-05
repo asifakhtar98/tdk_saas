@@ -2,12 +2,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/features/participant/domain/usecases/bulk_import_row_status.dart';
 import 'package:tkd_brackets/features/participant/domain/usecases/bulk_import_usecase.dart';
+import 'package:tkd_brackets/features/participant/domain/services/clipboard_input_service.dart';
 import 'package:tkd_brackets/features/participant/presentation/bloc/csv_import_event.dart';
 import 'package:tkd_brackets/features/participant/presentation/bloc/csv_import_state.dart';
 
 @injectable
 class CSVImportBloc extends Bloc<CSVImportEvent, CSVImportState> {
-  CSVImportBloc(this._bulkImportUseCase) : super(const CSVImportInitial()) {
+  CSVImportBloc(this._bulkImportUseCase, this._clipboardInputService)
+      : super(const CSVImportInitial()) {
     on<CSVImportContentChanged>(_onContentChanged);
     on<CSVImportPreviewRequested>(_onPreviewRequested);
     on<CSVImportRowSelectionToggled>(_onRowSelectionToggled);
@@ -17,6 +19,7 @@ class CSVImportBloc extends Bloc<CSVImportEvent, CSVImportState> {
   }
 
   final BulkImportUseCase _bulkImportUseCase;
+  final ClipboardInputService _clipboardInputService;
 
   void _onContentChanged(
     CSVImportContentChanged event,
@@ -36,10 +39,13 @@ class CSVImportBloc extends Bloc<CSVImportEvent, CSVImportState> {
     final csvContent = _getCurrentCsvContent();
     if (csvContent.isEmpty) return;
 
+    // Normalize tab-delimited spreadsheet paste to comma-delimited CSV
+    final normalizedContent = _clipboardInputService.normalizeToCSV(csvContent);
+
     emit(CSVImportPreviewInProgress(csvContent: csvContent));
 
     final result = await _bulkImportUseCase.generatePreview(
-      csvContent: csvContent,
+      csvContent: normalizedContent,
       divisionId: event.divisionId,
       tournamentId: event.tournamentId,
     );

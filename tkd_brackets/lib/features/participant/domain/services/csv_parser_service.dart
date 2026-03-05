@@ -41,6 +41,14 @@ class CSVParserService {
     'regnumber': 'registrationNumber',
     'registrationnumber': 'registrationNumber',
     'notes': 'notes',
+    'first name': 'firstName',
+    'last name': 'lastName',
+    'date of birth': 'dateOfBirth',
+    'belt rank': 'beltRank',
+    'weight kg': 'weightKg',
+    'registration number': 'registrationNumber',
+    'school name': 'schoolOrDojangName',
+    'dojang name': 'schoolOrDojangName',
   };
 
   /// Validation constants (mirrored from CreateParticipantUseCase

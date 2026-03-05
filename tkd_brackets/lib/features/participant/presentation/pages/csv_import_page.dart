@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tkd_brackets/core/di/injection.dart';
 import 'package:tkd_brackets/features/participant/domain/usecases/bulk_import_row_status.dart';
 import 'package:tkd_brackets/features/participant/domain/usecases/bulk_import_usecase.dart';
+import 'package:tkd_brackets/features/participant/domain/services/clipboard_input_service.dart';
 import 'package:tkd_brackets/features/participant/presentation/bloc/csv_import_bloc.dart';
 import 'package:tkd_brackets/features/participant/presentation/bloc/csv_import_event.dart';
 import 'package:tkd_brackets/features/participant/presentation/bloc/csv_import_state.dart';
@@ -20,7 +21,10 @@ class CSVImportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CSVImportBloc(getIt<BulkImportUseCase>()),
+      create: (context) => CSVImportBloc(
+        getIt<BulkImportUseCase>(),
+        getIt<ClipboardInputService>(),
+      ),
       child: _CSVImportView(tournamentId: tournamentId, divisionId: divisionId),
     );
   }
@@ -107,8 +111,9 @@ class _CSVImportView extends StatelessWidget {
               maxLines: null,
               expands: true,
               decoration: const InputDecoration(
-                hintText:
-                    'first_name,last_name,school,belt\nJohn,Doe,Academy,red',
+                hintText: 'Paste CSV or spreadsheet data here.\n'
+                    'Example: first_name,last_name,school,belt\n'
+                    'John,Doe,Academy,red',
                 border: OutlineInputBorder(),
               ),
               onChanged: (v) => context.read<CSVImportBloc>().add(

@@ -1,4 +1,5 @@
 export 'auto_assignment_service.dart';
+export 'clipboard_input_service.dart';
 export 'csv_import_result.dart';
 export 'csv_parser_service.dart';
 export 'csv_row_data.dart';

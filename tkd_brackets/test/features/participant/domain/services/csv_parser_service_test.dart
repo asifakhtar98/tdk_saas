@@ -121,6 +121,36 @@ Mike,Johnson,Champion TKD,Black 3rd Dan''';
         expect(importResult.validRows[0].weightKg, equals(38.0));
       });
     });
+
+    test('parses CSV with space-separated column headers (spreadsheet style)',
+        () async {
+      const spaceHeadersFixture = '''
+First Name,Last Name,School Name,Belt Rank,Date of Birth,Weight Kg,Registration Number
+John,Doe,Academy,Black,2010-01-01,50.0,REG123''';
+
+      final result = await service.parseCSV(
+        csvContent: spaceHeadersFixture,
+        divisionId: 'division-1',
+      );
+
+      expect(result.isRight(), isTrue);
+      result.fold((failure) => fail('Should not fail'), (importResult) {
+        expect(importResult.successCount, equals(1));
+        expect(importResult.validRows[0].firstName, equals('John'));
+        expect(importResult.validRows[0].lastName, equals('Doe'));
+        expect(
+          importResult.validRows[0].schoolOrDojangName,
+          equals('Academy'),
+        );
+        expect(importResult.validRows[0].beltRank, equals('black'));
+        expect(
+          importResult.validRows[0].dateOfBirth,
+          equals(DateTime(2010, 1, 1)),
+        );
+        expect(importResult.validRows[0].weightKg, equals(50.0));
+        expect(importResult.validRows[0].registrationNumber, equals('REG123'));
+      });
+    });
   });
 
   group('date format parsing', () {
