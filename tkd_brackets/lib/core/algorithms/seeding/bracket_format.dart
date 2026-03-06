@@ -7,7 +7,8 @@
 enum BracketFormat {
   singleElimination('single_elimination'),
   doubleElimination('double_elimination'),
-  roundRobin('round_robin');
+  roundRobin('round_robin'),
+  poolPlay('pool_play');
 
   const BracketFormat(this.value);
   final String value;

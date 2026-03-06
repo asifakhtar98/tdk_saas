@@ -6,6 +6,7 @@ import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/bracket_entity.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/bracket_generation_result.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/double_elimination_bracket_generation_result.dart';
+import 'package:tkd_brackets/features/bracket/domain/entities/hybrid_bracket_generation_result.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/match_entity.dart';
 
 import 'package:tkd_brackets/features/bracket/domain/repositories/bracket_repository.dart';
@@ -16,6 +17,8 @@ import 'package:tkd_brackets/features/bracket/domain/usecases/generate_round_rob
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_round_robin_bracket_use_case.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_single_elimination_bracket_params.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_single_elimination_bracket_use_case.dart';
+import 'package:tkd_brackets/features/bracket/domain/usecases/generate_pool_play_elimination_bracket_params.dart';
+import 'package:tkd_brackets/features/bracket/domain/usecases/generate_pool_play_elimination_bracket_use_case.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/regenerate_bracket_params.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/regenerate_bracket_use_case.dart';
 
@@ -32,12 +35,16 @@ class MockGenerateDoubleEliminationBracketUseCase extends Mock
 class MockGenerateRoundRobinBracketUseCase extends Mock
     implements GenerateRoundRobinBracketUseCase {}
 
+class MockGeneratePoolPlayEliminationBracketUseCase extends Mock
+    implements GeneratePoolPlayEliminationBracketUseCase {}
+
 void main() {
   late MockBracketRepository mockBracketRepo;
   late MockMatchRepository mockMatchRepo;
   late MockGenerateSingleEliminationBracketUseCase mockSingleElimUC;
   late MockGenerateDoubleEliminationBracketUseCase mockDoubleElimUC;
   late MockGenerateRoundRobinBracketUseCase mockRoundRobinUC;
+  late MockGeneratePoolPlayEliminationBracketUseCase mockPoolPlayUC;
   late RegenerateBracketUseCase useCase;
 
   setUpAll(() {
@@ -66,6 +73,12 @@ void main() {
         participantIds: ['p1', 'p2'],
       ),
     );
+    registerFallbackValue(
+      const GeneratePoolPlayEliminationBracketParams(
+        divisionId: 'div1',
+        participantIds: ['p1', 'p2'],
+      ),
+    );
   });
 
   setUp(() {
@@ -74,12 +87,14 @@ void main() {
     mockSingleElimUC = MockGenerateSingleEliminationBracketUseCase();
     mockDoubleElimUC = MockGenerateDoubleEliminationBracketUseCase();
     mockRoundRobinUC = MockGenerateRoundRobinBracketUseCase();
+    mockPoolPlayUC = MockGeneratePoolPlayEliminationBracketUseCase();
     useCase = RegenerateBracketUseCase(
       mockBracketRepo,
       mockMatchRepo,
       mockSingleElimUC,
       mockDoubleElimUC,
       mockRoundRobinUC,
+      mockPoolPlayUC,
     );
   });
 
@@ -538,6 +553,37 @@ void main() {
       expect(captured.participantIds, equals(['p1', 'p2', 'p3']));
       verifyNever(() => mockSingleElimUC(any()));
       verifyNever(() => mockDoubleElimUC(any()));
+    });
+
+    test('poolPlay → calls GeneratePoolPlayEliminationBracketUseCase', () async {
+      setupEmptyDivision();
+      final bracket = makeBracket();
+      when(() => mockPoolPlayUC(any())).thenAnswer(
+        (_) async => Right(HybridBracketGenerationResult(
+          poolBrackets: const [],
+          eliminationBracket:
+              BracketGenerationResult(bracket: bracket, matches: const []),
+          allMatches: const [],
+        )),
+      );
+
+      final result = await useCase(
+        const RegenerateBracketParams(
+          divisionId: 'div1',
+          participantIds: ['p1', 'p2', 'p3'],
+          bracketFormat: BracketFormat.poolPlay,
+        ),
+      );
+      expect(result.isRight(), isTrue);
+
+      final captured =
+          verify(() => mockPoolPlayUC(captureAny())).captured.single
+              as GeneratePoolPlayEliminationBracketParams;
+      expect(captured.divisionId, equals('div1'));
+      expect(captured.participantIds, equals(['p1', 'p2', 'p3']));
+      verifyNever(() => mockSingleElimUC(any()));
+      verifyNever(() => mockDoubleElimUC(any()));
+      verifyNever(() => mockRoundRobinUC(any()));
     });
   });
 

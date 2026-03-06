@@ -12,6 +12,8 @@ import 'package:tkd_brackets/features/bracket/domain/usecases/generate_round_rob
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_round_robin_bracket_use_case.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_single_elimination_bracket_params.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_single_elimination_bracket_use_case.dart';
+import 'package:tkd_brackets/features/bracket/domain/usecases/generate_pool_play_elimination_bracket_params.dart';
+import 'package:tkd_brackets/features/bracket/domain/usecases/generate_pool_play_elimination_bracket_use_case.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/regenerate_bracket_params.dart';
 
 /// Use case that orchestrates bracket regeneration.
@@ -28,6 +30,7 @@ class RegenerateBracketUseCase
     this._singleEliminationUseCase,
     this._doubleEliminationUseCase,
     this._roundRobinUseCase,
+    this._poolPlayUseCase,
   );
 
   final BracketRepository _bracketRepository;
@@ -35,6 +38,7 @@ class RegenerateBracketUseCase
   final GenerateSingleEliminationBracketUseCase _singleEliminationUseCase;
   final GenerateDoubleEliminationBracketUseCase _doubleEliminationUseCase;
   final GenerateRoundRobinBracketUseCase _roundRobinUseCase;
+  final GeneratePoolPlayEliminationBracketUseCase _poolPlayUseCase;
 
   @override
   Future<Either<Failure, RegenerateBracketResult>> call(
@@ -151,6 +155,13 @@ class RegenerateBracketUseCase
               divisionId: params.divisionId,
               participantIds: params.participantIds,
               // poolIdentifier defaults to 'A' in the params
+            ),
+          );
+        case BracketFormat.poolPlay:
+          generationResult = await _poolPlayUseCase(
+            GeneratePoolPlayEliminationBracketParams(
+              divisionId: params.divisionId,
+              participantIds: params.participantIds,
             ),
           );
       }

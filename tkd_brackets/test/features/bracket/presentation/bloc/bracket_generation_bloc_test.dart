@@ -6,6 +6,7 @@ import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/bracket_entity.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/bracket_generation_result.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/double_elimination_bracket_generation_result.dart';
+import 'package:tkd_brackets/features/bracket/domain/entities/hybrid_bracket_generation_result.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/match_entity.dart';
 import 'package:tkd_brackets/features/bracket/domain/entities/regenerate_bracket_result.dart';
 import 'package:tkd_brackets/features/bracket/domain/repositories/bracket_repository.dart';
@@ -15,6 +16,8 @@ import 'package:tkd_brackets/features/bracket/domain/usecases/generate_round_rob
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_round_robin_bracket_use_case.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_single_elimination_bracket_params.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_single_elimination_bracket_use_case.dart';
+import 'package:tkd_brackets/features/bracket/domain/usecases/generate_pool_play_elimination_bracket_params.dart';
+import 'package:tkd_brackets/features/bracket/domain/usecases/generate_pool_play_elimination_bracket_use_case.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/regenerate_bracket_params.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/regenerate_bracket_use_case.dart';
 import 'package:tkd_brackets/features/bracket/presentation/bloc/bracket_generation_bloc.dart';
@@ -43,6 +46,9 @@ class MockGenerateRoundRobinBracketUseCase extends Mock
 class MockRegenerateBracketUseCase extends Mock
     implements RegenerateBracketUseCase {}
 
+class MockGeneratePoolPlayEliminationBracketUseCase extends Mock
+    implements GeneratePoolPlayEliminationBracketUseCase {}
+
 class FakeGenerateSingleEliminationBracketParams extends Fake
     implements GenerateSingleEliminationBracketParams {}
 
@@ -55,6 +61,9 @@ class FakeGenerateRoundRobinBracketParams extends Fake
 class FakeRegenerateBracketParams extends Fake
     implements RegenerateBracketParams {}
 
+class FakeGeneratePoolPlayEliminationBracketParams extends Fake
+    implements GeneratePoolPlayEliminationBracketParams {}
+
 void main() {
   late MockDivisionRepository divisionRepository;
   late MockParticipantRepository participantRepository;
@@ -63,6 +72,7 @@ void main() {
   late MockGenerateDoubleEliminationBracketUseCase generateDoubleUseCase;
   late MockGenerateRoundRobinBracketUseCase generateRoundRobinUseCase;
   late MockRegenerateBracketUseCase regenerateUseCase;
+  late MockGeneratePoolPlayEliminationBracketUseCase generatePoolPlayUseCase;
 
   const divisionId = 'd1';
   final testDivision = DivisionEntity(
@@ -123,6 +133,7 @@ void main() {
     registerFallbackValue(FakeGenerateDoubleEliminationBracketParams());
     registerFallbackValue(FakeGenerateRoundRobinBracketParams());
     registerFallbackValue(FakeRegenerateBracketParams());
+    registerFallbackValue(FakeGeneratePoolPlayEliminationBracketParams());
   });
 
   setUp(() {
@@ -133,6 +144,7 @@ void main() {
     generateDoubleUseCase = MockGenerateDoubleEliminationBracketUseCase();
     generateRoundRobinUseCase = MockGenerateRoundRobinBracketUseCase();
     regenerateUseCase = MockRegenerateBracketUseCase();
+    generatePoolPlayUseCase = MockGeneratePoolPlayEliminationBracketUseCase();
   });
 
   BracketGenerationBloc buildBloc() => BracketGenerationBloc(
@@ -143,6 +155,7 @@ void main() {
         generateDoubleUseCase,
         generateRoundRobinUseCase,
         regenerateUseCase,
+        generatePoolPlayUseCase,
       );
 
   group('BracketGenerationBloc', () {
@@ -249,6 +262,61 @@ void main() {
       expect: () => [
         const BracketGenerationInProgress(),
         BracketGenerationSuccess(generatedBracketId: testBracket.id),
+      ],
+    );
+
+    blocTest<BracketGenerationBloc, BracketGenerationState>(
+      'generateRequested emits [InProgress, Success] for Pool Play',
+      setUp: () {
+        when(() => generatePoolPlayUseCase(any())).thenAnswer(
+          (_) async => Right(HybridBracketGenerationResult(
+            poolBrackets: [
+              BracketGenerationResult(
+                  bracket: testBracket.copyWith(
+                      id: 'pool-a', bracketType: BracketType.pool),
+                  matches: const []),
+              BracketGenerationResult(
+                  bracket: testBracket.copyWith(
+                      id: 'pool-b', bracketType: BracketType.pool),
+                  matches: const []),
+            ],
+            eliminationBracket:
+                BracketGenerationResult(bracket: testBracket, matches: const []),
+            allMatches: const [],
+          )),
+        );
+      },
+      build: buildBloc,
+      seed: () => BracketGenerationLoadSuccess(
+        division: testDivision.copyWith(bracketFormat: BracketFormat.poolPlay),
+        participants: testParticipants,
+        existingBrackets: const [],
+      ),
+      act: (bloc) => bloc.add(const BracketGenerationGenerateRequested()),
+      expect: () => [
+        const BracketGenerationInProgress(),
+        BracketGenerationSuccess(generatedBracketId: testBracket.id),
+      ],
+    );
+
+    blocTest<BracketGenerationBloc, BracketGenerationState>(
+      'generateRequested emits [InProgress, LoadFailure] for Pool Play failure',
+      setUp: () {
+        when(() => generatePoolPlayUseCase(any())).thenAnswer(
+          (_) async => const Left(
+              ServerResponseFailure(userFriendlyMessage: 'Pool Error')),
+        );
+      },
+      build: buildBloc,
+      seed: () => BracketGenerationLoadSuccess(
+        division: testDivision.copyWith(bracketFormat: BracketFormat.poolPlay),
+        participants: testParticipants,
+        existingBrackets: const [],
+      ),
+      act: (bloc) => bloc.add(const BracketGenerationGenerateRequested()),
+      expect: () => [
+        const BracketGenerationInProgress(),
+        const BracketGenerationLoadFailure(userFriendlyMessage: 'Pool Error'),
       ],
     );
 

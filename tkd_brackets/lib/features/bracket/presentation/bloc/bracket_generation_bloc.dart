@@ -9,6 +9,9 @@ import 'package:tkd_brackets/features/bracket/domain/usecases/generate_double_el
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_round_robin_bracket_params.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_round_robin_bracket_use_case.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_single_elimination_bracket_params.dart';
+import 'package:tkd_brackets/features/bracket/domain/entities/hybrid_bracket_generation_result.dart';
+import 'package:tkd_brackets/features/bracket/domain/usecases/generate_pool_play_elimination_bracket_params.dart';
+import 'package:tkd_brackets/features/bracket/domain/usecases/generate_pool_play_elimination_bracket_use_case.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/generate_single_elimination_bracket_use_case.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/regenerate_bracket_params.dart';
 import 'package:tkd_brackets/features/bracket/domain/usecases/regenerate_bracket_use_case.dart';
@@ -32,6 +35,7 @@ class BracketGenerationBloc
     this._generateDoubleEliminationUseCase,
     this._generateRoundRobinUseCase,
     this._regenerateBracketUseCase,
+    this._generatePoolPlayEliminationUseCase,
   ) : super(const BracketGenerationState.initial()) {
     on<BracketGenerationLoadRequested>(_onLoadRequested);
     on<BracketGenerationFormatSelected>(_onFormatSelected);
@@ -49,6 +53,8 @@ class BracketGenerationBloc
       _generateDoubleEliminationUseCase;
   final GenerateRoundRobinBracketUseCase _generateRoundRobinUseCase;
   final RegenerateBracketUseCase _regenerateBracketUseCase;
+  final GeneratePoolPlayEliminationBracketUseCase
+      _generatePoolPlayEliminationUseCase;
 
 
   Future<void> _onLoadRequested(
@@ -185,9 +191,21 @@ class BracketGenerationBloc
           )),
         );
       case BracketFormat.poolPlay:
-        emit(const BracketGenerationState.loadFailure(
-          userFriendlyMessage: 'Pool play format is not yet available.',
-        ));
+        final result = await _generatePoolPlayEliminationUseCase(
+          GeneratePoolPlayEliminationBracketParams(
+            divisionId: divisionId,
+            participantIds: activeParticipantIds,
+          ),
+        );
+        result.fold(
+          (failure) => emit(BracketGenerationState.loadFailure(
+            userFriendlyMessage: failure.userFriendlyMessage,
+            technicalDetails: failure.technicalDetails,
+          )),
+          (res) => emit(BracketGenerationState.generationSuccess(
+            generatedBracketId: res.eliminationBracket.bracket.id,
+          )),
+        );
     }
   }
 
@@ -237,6 +255,8 @@ class BracketGenerationBloc
           bracketId = genResult.bracket.id;
         } else if (genResult is DoubleEliminationBracketGenerationResult) {
           bracketId = genResult.winnersBracket.id;
+        } else if (genResult is HybridBracketGenerationResult) {
+          bracketId = genResult.eliminationBracket.bracket.id;
         } else {
           emit(const BracketGenerationState.loadFailure(
             userFriendlyMessage: 'Unexpected generation result type.',
@@ -255,7 +275,7 @@ class BracketGenerationBloc
       BracketFormat.singleElimination => seeding.BracketFormat.singleElimination,
       BracketFormat.doubleElimination => seeding.BracketFormat.doubleElimination,
       BracketFormat.roundRobin => seeding.BracketFormat.roundRobin,
-      BracketFormat.poolPlay => seeding.BracketFormat.singleElimination,
+      BracketFormat.poolPlay => seeding.BracketFormat.poolPlay,
     };
   }
 
