@@ -13,6 +13,9 @@ import 'package:tkd_brackets/features/auth/presentation/pages/auth_page.dart';
 import 'package:tkd_brackets/features/auth/presentation/pages/magic_link_callback_page.dart';
 import 'package:tkd_brackets/features/auth/presentation/pages/organization_setup_page.dart';
 import 'package:tkd_brackets/features/auth/presentation/pages/organization_dashboard_page.dart';
+import 'package:tkd_brackets/features/bracket/presentation/pages/bracket_generation_page.dart';
+import 'package:tkd_brackets/features/bracket/presentation/pages/bracket_page.dart';
+
 
 part 'routes.g.dart';
 
@@ -173,4 +176,45 @@ class OrganizationDashboardRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const OrganizationDashboardPage();
+}
+
+/// Bracket generation route.
+@TypedGoRoute<BracketGenerationRoute>(
+  path: '/tournaments/:tournamentId/divisions/:divisionId/brackets',
+)
+class BracketGenerationRoute extends GoRouteData {
+  const BracketGenerationRoute({
+    required this.tournamentId,
+    required this.divisionId,
+  });
+
+  final String tournamentId;
+  final String divisionId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      BracketGenerationPage(
+        tournamentId: tournamentId,
+        divisionId: divisionId,
+      );
+}
+
+/// Bracket viewer route.
+@TypedGoRoute<BracketViewerRoute>(
+  path: '/tournaments/:tournamentId/divisions/:divisionId/brackets/:bracketId',
+)
+class BracketViewerRoute extends GoRouteData {
+  const BracketViewerRoute({
+    required this.tournamentId,
+    required this.divisionId,
+    required this.bracketId,
+  });
+
+  final String tournamentId;
+  final String divisionId;
+  final String bracketId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      BracketPage(bracketId: bracketId);
 }

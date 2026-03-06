@@ -79,6 +79,8 @@ class AppRouter {
           $csvImportRoute,
           $organizationDashboardRoute,
           $settingsRoute,
+          $bracketGenerationRoute,
+          $bracketViewerRoute,
         ],
       ),
     ],
