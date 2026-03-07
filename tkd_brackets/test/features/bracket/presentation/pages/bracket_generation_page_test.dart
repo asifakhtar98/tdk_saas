@@ -43,7 +43,7 @@ void main() {
   });
 
   Widget createWidget() {
-    return MaterialApp(
+    return const MaterialApp(
       home: BracketGenerationPage(
         tournamentId: tournamentId,
         divisionId: divisionId,

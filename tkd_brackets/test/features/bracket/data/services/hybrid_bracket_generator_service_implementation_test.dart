@@ -269,4 +269,3 @@ void main() {
     expect(result.eliminationBracket, isNotNull);
   });
 }
-

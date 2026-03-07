@@ -22,8 +22,8 @@ void main() {
   setUpAll(() {
     registerFallbackValue(BracketFormat.singleElimination);
     registerFallbackValue(SeedingStrategy.ranked);
-    registerFallbackValue(<SeedingConstraint>[]);
-    registerFallbackValue(<String, int>{});
+    registerFallbackValue(const <SeedingConstraint>[]);
+    registerFallbackValue(const <String, int>{});
   });
 
   setUp(() {
@@ -31,24 +31,24 @@ void main() {
     useCase = RankedSeedingImportUseCase(mockEngine);
   });
 
-  final tParticipants = [
-    const SeedingParticipant(id: 'p1', dojangName: 'Tiger TKD'),
-    const SeedingParticipant(id: 'p2', dojangName: 'Dragon MA'),
-    const SeedingParticipant(id: 'p3', dojangName: 'Eagle Gym'),
+  const tParticipants = [
+    SeedingParticipant(id: 'p1', dojangName: 'Tiger TKD'),
+    SeedingParticipant(id: 'p2', dojangName: 'Dragon MA'),
+    SeedingParticipant(id: 'p3', dojangName: 'Eagle Gym'),
   ];
 
-  final tParticipantNames = {
+  const tParticipantNames = {
     'p1': 'John Smith',
     'p2': 'Jane Doe',
     'p3': 'Alex Kim',
   };
 
-  final tRankedEntries = [
-    const RankedSeedingEntry(name: 'John Smith', rank: 1),
-    const RankedSeedingEntry(name: 'Alex Kim', rank: 2),
+  const tRankedEntries = [
+    RankedSeedingEntry(name: 'John Smith', rank: 1),
+    RankedSeedingEntry(name: 'Alex Kim', rank: 2),
   ];
 
-  final tParams = RankedSeedingImportParams(
+  const tParams = RankedSeedingImportParams(
     divisionId: 'div1',
     participants: tParticipants,
     rankedEntries: tRankedEntries,
@@ -74,7 +74,7 @@ void main() {
 
   group('RankedSeedingImportUseCase - Validation', () {
     test('should return ValidationFailure when divisionId is empty', () async {
-      final result = await useCase(RankedSeedingImportParams(
+      final result = await useCase(const RankedSeedingImportParams(
         divisionId: '',
         participants: tParticipants,
         rankedEntries: tRankedEntries,
@@ -85,9 +85,11 @@ void main() {
 
     test('should return ValidationFailure when less than 2 participants',
         () async {
-      final result = await useCase(RankedSeedingImportParams(
+      final result = await useCase(const RankedSeedingImportParams(
         divisionId: 'div1',
-        participants: [tParticipants.first],
+        participants: [
+          SeedingParticipant(id: 'p1', dojangName: 'Tiger TKD'),
+        ],
         rankedEntries: tRankedEntries,
         participantNames: tParticipantNames,
       ));
@@ -96,11 +98,11 @@ void main() {
 
     test('should return ValidationFailure when participant ID is empty',
         () async {
-      final result = await useCase(RankedSeedingImportParams(
+      final result = await useCase(const RankedSeedingImportParams(
         divisionId: 'div1',
         participants: [
-          const SeedingParticipant(id: '', dojangName: 'Tiger TKD'),
-          const SeedingParticipant(id: 'p2', dojangName: 'Dragon MA'),
+          SeedingParticipant(id: '', dojangName: 'Tiger TKD'),
+          SeedingParticipant(id: 'p2', dojangName: 'Dragon MA'),
         ],
         rankedEntries: tRankedEntries,
         participantNames: {'': 'No Name', 'p2': 'Jane Doe'},
@@ -110,11 +112,11 @@ void main() {
 
     test('should return ValidationFailure when duplicate participant IDs',
         () async {
-      final result = await useCase(RankedSeedingImportParams(
+      final result = await useCase(const RankedSeedingImportParams(
         divisionId: 'div1',
         participants: [
-          const SeedingParticipant(id: 'p1', dojangName: 'Tiger TKD'),
-          const SeedingParticipant(id: 'p1', dojangName: 'Dragon MA'),
+          SeedingParticipant(id: 'p1', dojangName: 'Tiger TKD'),
+          SeedingParticipant(id: 'p1', dojangName: 'Dragon MA'),
         ],
         rankedEntries: tRankedEntries,
         participantNames: {'p1': 'John Smith'},
@@ -124,21 +126,21 @@ void main() {
 
     test('should return ValidationFailure when rankedEntries is empty',
         () async {
-      final result = await useCase(RankedSeedingImportParams(
+      final result = await useCase(const RankedSeedingImportParams(
         divisionId: 'div1',
         participants: tParticipants,
-        rankedEntries: const [],
+        rankedEntries: [],
         participantNames: tParticipantNames,
       ));
       expect(result.isLeft(), isTrue);
     });
 
     test('should return ValidationFailure when rank is <= 0', () async {
-      final result = await useCase(RankedSeedingImportParams(
+      final result = await useCase(const RankedSeedingImportParams(
         divisionId: 'div1',
         participants: tParticipants,
         rankedEntries: [
-          const RankedSeedingEntry(name: 'John Smith', rank: 0),
+          RankedSeedingEntry(name: 'John Smith', rank: 0),
         ],
         participantNames: tParticipantNames,
       ));
@@ -146,12 +148,12 @@ void main() {
     });
 
     test('should return ValidationFailure when duplicate ranks', () async {
-      final result = await useCase(RankedSeedingImportParams(
+      final result = await useCase(const RankedSeedingImportParams(
         divisionId: 'div1',
         participants: tParticipants,
         rankedEntries: [
-          const RankedSeedingEntry(name: 'John Smith', rank: 1),
-          const RankedSeedingEntry(name: 'Alex Kim', rank: 1),
+          RankedSeedingEntry(name: 'John Smith', rank: 1),
+          RankedSeedingEntry(name: 'Alex Kim', rank: 1),
         ],
         participantNames: tParticipantNames,
       ));
@@ -159,11 +161,11 @@ void main() {
     });
 
     test('should return ValidationFailure when entry name is empty', () async {
-      final result = await useCase(RankedSeedingImportParams(
+      final result = await useCase(const RankedSeedingImportParams(
         divisionId: 'div1',
         participants: tParticipants,
         rankedEntries: [
-          const RankedSeedingEntry(name: '  ', rank: 1),
+          RankedSeedingEntry(name: '  ', rank: 1),
         ],
         participantNames: tParticipantNames,
       ));
@@ -172,7 +174,7 @@ void main() {
 
     test('should return ValidationFailure when matchThreshold > 1.0',
         () async {
-      final result = await useCase(RankedSeedingImportParams(
+      final result = await useCase(const RankedSeedingImportParams(
         divisionId: 'div1',
         participants: tParticipants,
         rankedEntries: tRankedEntries,
@@ -184,7 +186,7 @@ void main() {
 
     test('should return ValidationFailure when matchThreshold < 0.0',
         () async {
-      final result = await useCase(RankedSeedingImportParams(
+      final result = await useCase(const RankedSeedingImportParams(
         divisionId: 'div1',
         participants: tParticipants,
         rankedEntries: tRankedEntries,
@@ -196,7 +198,7 @@ void main() {
 
     test('should return ValidationFailure when participantNames is incomplete',
         () async {
-      final result = await useCase(RankedSeedingImportParams(
+      final result = await useCase(const RankedSeedingImportParams(
         divisionId: 'div1',
         participants: tParticipants,
         rankedEntries: tRankedEntries,
@@ -224,11 +226,11 @@ void main() {
 
     test('should match close names above threshold', () async {
       setupMockEngine();
-      final fuzzyParams = RankedSeedingImportParams(
+      const fuzzyParams = RankedSeedingImportParams(
         divisionId: 'div1',
         participants: tParticipants,
         rankedEntries: [
-          const RankedSeedingEntry(
+          RankedSeedingEntry(
               name: 'Jon Smith', rank: 1), // Fuzzy match for John Smith
         ],
         participantNames: tParticipantNames,
@@ -243,18 +245,18 @@ void main() {
               .matchResult;
       expect(matchResult.matchedParticipants.containsKey('p1'), isTrue);
       expect(matchResult.matchedParticipants['p1'], 1);
-      expect(matchResult.matchConfidences['p1']!, greaterThanOrEqualTo(0.8));
+      expect(matchResult.matchConfidences['p1'], greaterThanOrEqualTo(0.8));
     });
 
     test(
         'should reject names below threshold and add to unmatchedEntries',
         () async {
       setupMockEngine();
-      final belowThresholdParams = RankedSeedingImportParams(
+      const belowThresholdParams = RankedSeedingImportParams(
         divisionId: 'div1',
         participants: tParticipants,
         rankedEntries: [
-          const RankedSeedingEntry(
+          RankedSeedingEntry(
               name: 'ZZZZZZZZZ', rank: 1), // No match
         ],
         participantNames: tParticipantNames,
@@ -287,8 +289,8 @@ void main() {
       final clubParams = RankedSeedingImportParams(
         divisionId: 'div1',
         participants: sameNameParticipants,
-        rankedEntries: [
-          const RankedSeedingEntry(
+        rankedEntries: const [
+          RankedSeedingEntry(
               name: 'John Smith', rank: 1, club: 'Dragon MA'),
         ],
         participantNames: sameNameMap,
@@ -324,8 +326,8 @@ void main() {
       final noClubParams = RankedSeedingImportParams(
         divisionId: 'div1',
         participants: sameNameParticipants,
-        rankedEntries: [
-          const RankedSeedingEntry(
+        rankedEntries: const [
+          RankedSeedingEntry(
               name: 'John Smith', rank: 1), // No club → first match wins
         ],
         participantNames: sameNameMap,
@@ -376,13 +378,13 @@ void main() {
         'should normalize rank gaps (1, 3, 7 → seeds 1, 2, 3)',
         () async {
       setupMockEngine();
-      final gapParams = RankedSeedingImportParams(
+      const gapParams = RankedSeedingImportParams(
         divisionId: 'div1',
         participants: tParticipants,
         rankedEntries: [
-          const RankedSeedingEntry(name: 'John Smith', rank: 1),
-          const RankedSeedingEntry(name: 'Jane Doe', rank: 3),
-          const RankedSeedingEntry(name: 'Alex Kim', rank: 7),
+          RankedSeedingEntry(name: 'John Smith', rank: 1),
+          RankedSeedingEntry(name: 'Jane Doe', rank: 3),
+          RankedSeedingEntry(name: 'Alex Kim', rank: 7),
         ],
         participantNames: tParticipantNames,
       );
@@ -409,11 +411,11 @@ void main() {
         () async {
       setupMockEngine();
       // Only rank one participant — others unmatched
-      final oneMatchParams = RankedSeedingImportParams(
+      const oneMatchParams = RankedSeedingImportParams(
         divisionId: 'div1',
         participants: tParticipants,
         rankedEntries: [
-          const RankedSeedingEntry(name: 'John Smith', rank: 1),
+          RankedSeedingEntry(name: 'John Smith', rank: 1),
         ],
         participantNames: tParticipantNames,
       );

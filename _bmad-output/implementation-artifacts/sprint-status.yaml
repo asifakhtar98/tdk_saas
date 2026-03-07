@@ -137,7 +137,7 @@ development_status:
   # FRs: FR20-FR31
   # Dependencies: Epic 4 (Participant Management)
   # ═══════════════════════════════════════════════════════════════════════════
-  epic-5: in-progress
+  epic-5: done
   5-1-bracket-feature-structure: done
   5-2-bracket-entity-and-repository: done
   5-3-match-entity-and-repository: done
@@ -155,7 +155,7 @@ development_status:
   5-15-pool-play-elimination-hybrid-generator: done
   5-16-random-seeding-algorithm: done
   5-17-ranked-seeding-import: done
-  5-18-code-review-and-fix-bracket-generation: backlog
+  5-18-code-review-and-fix-bracket-generation: done
   epic-5-retrospective: backlog
 
   # ═══════════════════════════════════════════════════════════════════════════

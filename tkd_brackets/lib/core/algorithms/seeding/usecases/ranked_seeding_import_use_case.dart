@@ -171,13 +171,13 @@ class RankedSeedingImportUseCase
     return null;
   }
 
-  /// Computes similarity ratio between two strings (0.0–1.0).
-  /// 1.0 = identical, 0.0 = completely different.
+  /// Computes similarity ratio between two strings (0–1).
+  /// 1 = identical, 0 = completely different.
   double _levenshteinSimilarity(String a, String b) {
-    if (a == b) return 1.0;
-    if (a.isEmpty || b.isEmpty) return 0.0;
+    if (a == b) return 1;
+    if (a.isEmpty || b.isEmpty) return 0;
     final maxLen = a.length > b.length ? a.length : b.length;
-    return 1.0 - (_levenshteinDistance(a, b) / maxLen);
+    return 1 - (_levenshteinDistance(a, b) / maxLen);
   }
 
   /// Standard Levenshtein distance via dynamic programming.

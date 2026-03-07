@@ -62,7 +62,7 @@ void main() {
       expect(result.isLeft(), isTrue);
     });
 
-    test('should handle Windows line endings (\\r\\n)', () {
+    test(r"should handle Windows line endings (r'\r\n')", () {
       const csv = 'Name,Rank\r\nJohn Smith,1\r\nJane Doe,2';
       final result = parser.parse(csv);
 
