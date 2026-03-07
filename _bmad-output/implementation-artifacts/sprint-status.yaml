@@ -153,7 +153,7 @@ development_status:
   5-13-bracket-visualization-renderer: done
   5-14-bracket-generation-ui-integration: done
   5-15-pool-play-elimination-hybrid-generator: done
-  5-16-random-seeding-algorithm: backlog
+  5-16-random-seeding-algorithm: done
   5-17-ranked-seeding-import: backlog
   5-18-code-review-and-fix-bracket-generation: backlog
   epic-5-retrospective: backlog
