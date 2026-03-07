@@ -61,7 +61,7 @@ development_status:
   1-11-demo-mode-data-seeding: done
   1-12-foundation-ui-shell: done
   1-13-code-review-and-fix-foundation: done
-  epic-1-retrospective: done
+  epic-1-retrospective: optional
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Epic 2: Authentication & Organization
@@ -69,7 +69,7 @@ development_status:
   # FRs: FR51-FR58
   # Dependencies: Epic 1 (Foundation)
   # ═══════════════════════════════════════════════════════════════════════════
-  epic-2: in-progress
+  epic-2: done
   2-1-auth-feature-structure-and-domain-layer: done
   2-2-user-entity-and-repository: done
   2-3-email-magic-link-sign-up: done
@@ -82,7 +82,7 @@ development_status:
   2-10-demo-to-production-migration: done
   2-11-auth-and-organization-ui: done
   2-12-code-review-and-fix-authentication: done
-  epic-2-retrospective: backlog
+  epic-2-retrospective: optional
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Epic 3: Tournament & Division Management
@@ -106,7 +106,7 @@ development_status:
   3-5-duplicate-tournament-as-template: done
   3-14-tournament-management-ui: done
   3-15-code-review-and-fix-tournament-management: done
-  epic-3-retrospective: done
+  epic-3-retrospective: optional
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Epic 4: Participant Management
@@ -129,7 +129,7 @@ development_status:
   4-12-participant-management-ui: done
   4-13-paste-from-spreadsheet: done
   4-14-code-review-and-fix-participant-management: done
-  epic-4-retrospective: backlog
+  epic-4-retrospective: optional
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Epic 5: Bracket Generation & Seeding
@@ -154,7 +154,7 @@ development_status:
   5-14-bracket-generation-ui-integration: done
   5-15-pool-play-elimination-hybrid-generator: done
   5-16-random-seeding-algorithm: done
-  5-17-ranked-seeding-import: backlog
+  5-17-ranked-seeding-import: done
   5-18-code-review-and-fix-bracket-generation: backlog
   epic-5-retrospective: backlog
 
