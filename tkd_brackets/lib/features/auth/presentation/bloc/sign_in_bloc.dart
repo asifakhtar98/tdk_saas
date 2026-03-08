@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:tkd_brackets/core/di/injection.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/sign_in_with_email_params.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/sign_in_with_email_use_case.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/sign_up_with_email_params.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/sign_up_with_email_use_case.dart';
+import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_bloc.dart';
+import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_event.dart';
 import 'package:tkd_brackets/features/auth/presentation/bloc/sign_in_event.dart';
 import 'package:tkd_brackets/features/auth/presentation/bloc/sign_in_state.dart';
 
@@ -34,7 +37,10 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
 
     result.fold(
       (failure) => emit(SignInState.failure(failure)),
-      (user) => emit(SignInState.success(user)),
+      (user) {
+        getIt<AuthenticationBloc>().add(AuthenticationEvent.userChanged(user));
+        emit(SignInState.success(user));
+      },
     );
   }
 
@@ -49,7 +55,10 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
 
     result.fold(
       (failure) => emit(SignInState.failure(failure)),
-      (user) => emit(SignInState.success(user)),
+      (user) {
+        getIt<AuthenticationBloc>().add(AuthenticationEvent.userChanged(user));
+        emit(SignInState.success(user));
+      },
     );
   }
 

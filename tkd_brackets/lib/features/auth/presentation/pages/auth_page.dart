@@ -38,7 +38,14 @@ class _AuthPageState extends State<AuthPage> {
           builder: (context, state) {
             if (state is SignInSuccess) {
               return Center(
-                child: Text('Success! Setting up your session...'),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    const Text('Success! Setting up your session...'),
+                  ],
+                ),
               );
             }
 

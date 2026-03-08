@@ -58,7 +58,7 @@ Performance, reliability, and offline capability are the driving NFRs:
 ### Cross-Cutting Concerns Identified
 
 1. **Authentication & Authorization**
-   - Supabase Auth with email OTP/magic link
+   - Supabase Auth with email/password
    - Row-Level Security for multi-tenancy
    - RBAC (Owner, Admin, Scorer, Viewer) enforcement
 
@@ -418,7 +418,7 @@ dart run very_good_analysis
 - Clean Architecture folder structure
 
 **Important Decisions (Shape Architecture):**
-- Email magic link authentication
+- Email/password authentication
 - Local-only demo mode (no backend for trial)
 - Minimal Realtime (scoring only)
 - Hybrid BLoC scoping
@@ -464,7 +464,7 @@ CREATE POLICY "org_members_tournaments" ON tournaments
 
 | Decision             | Choice                      | Rationale                       |
 | -------------------- | --------------------------- | ------------------------------- |
-| **Auth Method**      | Email Magic Link Only       | Passwordless, simple UX         |
+| **Auth Method**      | Email/Password              | Secure login                    |
 | **RBAC Enforcement** | App (BLoC) + Database (RLS) | UI hides, DB enforces           |
 | **Demo Mode**        | Local-Only (Drift)          | Zero backend cost for trials    |
 | **Session Duration** | 30-day refresh token        | Convenience for returning users |
@@ -601,7 +601,7 @@ Future<void> main() async {
 **Implementation Sequence:**
 1. Project scaffold with Clean Architecture structure
 2. Core infrastructure (DI, routing, themes, error handling)
-3. Auth feature with magic link + RLS setup
+3. Auth feature with email/password + RLS setup
 4. Drift database with sync layer
 5. Tournament/Division/Bracket features
 6. Scoring feature with minimal Realtime
@@ -4485,7 +4485,7 @@ SuggestedDivision? findDivision(ParticipantEntity athlete, FederationTemplate fe
 
 ### 21. Email Templates & Configuration
 
-**Purpose:** Auth magic links and team invitations
+**Purpose:** Auth emails and team invitations
 
 **Supabase Email Configuration:**
 
@@ -4494,7 +4494,7 @@ SuggestedDivision? findDivision(ParticipantEntity athlete, FederationTemplate fe
 [auth.email]
 enable_signup = true
 double_confirm_changes = false
-enable_confirmations = false  # Magic link doesn't need confirmation
+enable_confirmations = true  # Email/password needs confirmation
 
 [auth.email.template.magic_link]
 subject = "Sign in to TKD Brackets"
@@ -4505,7 +4505,7 @@ subject = "You've been invited to join {{ .SiteURL }}"
 content_path = "./supabase/templates/invite.html"
 ```
 
-**Magic Link Template:**
+**Email Template:**
 
 ```html
 <!-- supabase/templates/magic_link.html -->
@@ -4934,7 +4934,7 @@ SegmentedButton<ThemeMode>(
 
 **Non-Functional Requirements:**
 - Performance: Optimistic updates (200ms scoring), Drift caching
-- Security: RLS + Custom Claims, Magic Link auth, Session management, GDPR deletion
+- Security: RLS + Custom Claims, Email/Password auth, Session management, GDPR deletion
 - Reliability: Offline-first with LWW sync, Recovery architecture
 - Accessibility: Semantics widgets + accessibility_tools
 - Rate Limiting: Multi-layer protection documented
@@ -4997,7 +4997,7 @@ SegmentedButton<ThemeMode>(
 - **CSV Import** with auto-column detection
 - **Keyboard-first scoring** with defined shortcuts
 - **Public sharing** via shareable links
-- **Complete auth lifecycle** (magic link, logout, account deletion)
+- **Complete auth lifecycle** (email/password, logout, account deletion)
 
 **Areas for Future Enhancement:**
 - CI/CD pipeline configuration (post-MVP)

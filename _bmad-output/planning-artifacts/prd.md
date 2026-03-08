@@ -134,7 +134,7 @@ classification:
 | **Scoring**           | Keyboard-first score entry, Undo/redo                                                     |
 | **Display**           | 2-3 themes (including dark mode), Zoom/pan for large brackets                             |
 | **Export**            | PDF export (clean, no watermark), Shareable bracket links                                 |
-| **Auth**              | Email OTP/Magic link sign-in (Supabase Auth)                                              |
+| **Auth**              | Email/Password authentication (Supabase Auth)                                             |
 | **Account**           | Save brackets, Private/public toggle                                                      |
 | **Limits**            | Free: 3 active brackets, 32 participants/bracket, 2 tournaments/month                     |
 | **Landing Page**      | Lightweight HTML entry page for SEO with deferred app loading                             |
@@ -187,7 +187,7 @@ It's Friday night, 8 PM. Master Kim just finished teaching his last class. Tomor
 Then he remembers: *"Let me try that TKD Brackets thing Coach Park recommended."*
 
 **📈 Rising Action:**
-- He signs up with email magic link in 10 seconds
+- He signs up with email/password in 10 seconds
 - Clicks **"New Tournament"** → names it "January Sparring Championship"
 - Opens **Smart Division Builder** — selects age groups, belt levels, weight classes
 - Pastes his student roster from a spreadsheet — the system auto-sorts into 6 divisions
@@ -205,7 +205,7 @@ Tomorrow, he'll run the smoothest tournament he's ever hosted. When parents ask 
 ---
 
 **🔧 Capabilities Revealed:**
-- Email magic link sign-in
+- Email/Password sign-in
 - Smart Division Builder (age/belt/weight)
 - CSV/paste import from spreadsheet
 - Dojang separation seeding
@@ -327,12 +327,12 @@ David thinks: *"This is so much better than asking random people what's happenin
 
 ### Journey Requirements Summary
 
-| Journey                     | Key Capabilities Revealed                                                                           |
-| --------------------------- | --------------------------------------------------------------------------------------------------- |
-| **Master Kim - Setup**      | Email magic link, Division Builder, CSV import, Dojang separation, PDF export, One-click generation |
-| **Master Kim - Edge Case**  | Remove participant, Bracket regeneration, Quick re-export, Error recovery                           |
-| **Mrs. Rodriguez - Scorer** | Scorer role/permissions, Simple score modal, Keyboard input, Undo/redo, Visual animations           |
-| **David Chen - Spectator**  | Public links, Mobile view-only, Manual refresh, Clean visualization                                 |
+| Journey                     | Key Capabilities Revealed                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------- |
+| **Master Kim - Setup**      | Email/Password, Division Builder, CSV import, Dojang separation, PDF export, One-click generation |
+| **Master Kim - Edge Case**  | Remove participant, Bracket regeneration, Quick re-export, Error recovery                         |
+| **Mrs. Rodriguez - Scorer** | Scorer role/permissions, Simple score modal, Keyboard input, Undo/redo, Visual animations         |
+| **David Chen - Spectator**  | Public links, Mobile view-only, Manual refresh, Clean visualization                               |
 
 **All journeys connect to these core capability areas:**
 1. **Onboarding & Auth** — Quick signup, role-based access
@@ -649,7 +649,7 @@ TKD Brackets takes the generic bracket tool market (BracketHQ, Challonge, Smooth
 
 | Integration        | Priority | Purpose                                   |
 | ------------------ | -------- | ----------------------------------------- |
-| **Supabase Auth**  | Core     | Email OTP/magic link authentication       |
+| **Supabase Auth**  | Core     | Email/Password authentication             |
 | **Stripe**         | High     | Subscription billing, payment processing  |
 | **PDF Generation** | Core     | Export brackets for print                 |
 | **Webhooks**       | Medium   | Notify external systems on bracket events |
@@ -763,7 +763,7 @@ TKD Brackets will ship as a fully-featured tournament management platform from D
 - ✅ Mobile-friendly view-only mode
 
 #### Authentication & Accounts
-- ✅ Supabase Auth with email OTP/magic link
+- ✅ Supabase Auth with email/password
 - ✅ Organization accounts with hierarchy
 - ✅ RBAC (Owner, Admin, Scorer, Viewer)
 - ✅ Invitation flow with role assignment
@@ -932,8 +932,8 @@ TKD Brackets will ship as a fully-featured tournament management platform from D
 
 ### 8. Authentication & Accounts
 
-- **FR51:** User can sign up with email OTP/magic link (Supabase Auth)
-- **FR52:** User can sign in with email OTP/magic link
+- **FR51:** User can sign up with email and password (Supabase Auth)
+- **FR52:** User can sign in with email and password
 - **FR53:** User can create an organization account
 - **FR54:** Owner can invite users to organization with assigned role
 - **FR55:** Invited user can accept invitation and join organization
@@ -1023,7 +1023,7 @@ _Demo Mode enables zero-friction trial. On signup, local demo data migrates to c
 
 | Requirement | Target | Rationale |
 | ----------- | ------ | --------- ||
-| **Authentication** | Supabase Auth (email OTP/magic link) | Secure, passwordless login |
+| **Authentication** | Supabase Auth (email/password) | Secure login |
 | **Data Encryption** | At rest and in transit (TLS 1.3) | Industry standard protection |
 | **Session Management** | Automatic timeout after inactivity | Prevent unauthorized access |
 | **RBAC Enforcement** | Server-side validation | Roles cannot be bypassed |

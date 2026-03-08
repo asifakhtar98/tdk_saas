@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npx playwright test",
     "test:journey": "npx playwright test specs/new-user-journey.spec.ts",
+    "test:live": "npx playwright test specs/live.spec.ts",
     "test:headed": "npx playwright test --headed",
     "test:debug": "npx playwright test --debug",
     "report": "npx playwright show-report"

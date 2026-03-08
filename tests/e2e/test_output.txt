@@ -1,0 +1,245 @@
+
+Running 1 test using 1 worker
+
+[Browser]: Installing/Activating first service worker.
+[Browser]: Activated new service worker.
+[Browser]: Injecting <script> tag. Using callback.
+[Browser]: supabase.supabase_flutter: INFO: ***** Supabase init completed ***** 
+[Browser]: Using WasmStorageImplementation.sharedIndexedDb due to missing browser features: {MissingBrowserFeature.dedicatedWorkersInSharedWorkers, MissingBrowserFeature.sharedArrayBuffers}
+[Browser]: GoRouter: INFO: Full paths for routes:
+[Browser]: ├─/ (minified:p)
+[Browser]: ├─/demo (minified:p)
+[Browser]: ├─/auth (minified:p)
+[Browser]: ├─/organization/setup (minified:p)
+[Browser]: └─ (ShellRoute)
+[Browser]:   ├─/dashboard (minified:p)
+[Browser]:   ├─/tournaments (minified:p)
+[Browser]:   ├─/tournaments/:tournamentId (minified:p)
+[Browser]:   ├─/tournaments/:tournamentId/divisions (minified:p)
+[Browser]:   ├─/tournaments/:tournamentId/divisions/:divisionId/participants (minified:p)
+[Browser]:   ├─/tournaments/:tournamentId/divisions/:divisionId/participants/import (minified:p)
+[Browser]:   ├─/organization (minified:p)
+[Browser]:   ├─/settings (minified:p)
+[Browser]:   ├─/tournaments/:tournamentId/divisions/:divisionId/brackets (minified:p)
+[Browser]:   └─/tournaments/:tournamentId/divisions/:divisionId/brackets/:bracketId (minified:p)
+[Browser]:  
+[Browser]: GoRouter: INFO: Using MaterialApp configuration 
+[Browser]: GoRouter: INFO: going to /auth 
+[Browser Error]: Failed to load resource: the server responded with a status of 500 ()
+[Browser]: GoRouter: INFO: redirecting to <optimized out>#af946 
+[Browser]: GoRouter: INFO: Using MaterialApp configuration 
+[Browser Error]: Failed to load resource: the server responded with a status of 500 ()
+[Browser Error]: Failed to load resource: the server responded with a status of 400 ()
+[DEBUG] Current page URL: http://localhost:8080/dashboard
+[DEBUG] Current page content: <!DOCTYPE html><html lang="en"><head>
+  <base href="/">
+  <meta charset="UTF-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  
+  <!-- SEO Meta Tags -->
+  <title>TKD Brackets</title>
+  <meta name="description" content="Create professional tournament brackets for Taekwondo competitions. Smart Division Builder, WT/ITF/ATA templates, dojang separation seeding, and instant PDF export. Free to use.">
+  <meta name="keywords" content="taekwondo, tournament brackets, bracket maker, sparring tournament, poomsae, WT, ITF, ATA, martial arts, competition, dojang">
+  <meta name="author" content="TKD Brackets">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="TKD Brackets - Tournament Bracket Maker for Taekwondo">
+  <meta property="og:description" content="Create professional tournament brackets in minutes. Free for small tournaments.">
+  <meta property="og:image" content="icons/Icon-512.png">
+  
+  <!-- Theme & Icons -->
+  <meta name="theme-color" content="#1E3A5F">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="TKD Brackets">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+  
+  <!-- Landing Page Styles -->
+  <link rel="stylesheet" href="landing.css">
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "TKD Brackets",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "Web Browser",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Tournament bracket management software for Taekwondo competitions."
+  }
+  </script>
+<script type="application/javascript" src="http://localhost:8080/main.dart.js"></script><meta name="generator" content="Flutter"><meta flt-viewport="" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><meta id="flutterweb-theme" name="theme-color" content="rgba(0,0,0,0)"></head>
+<body class="landing-page flutter-loaded" flt-embedding="full-page" flt-renderer="canvaskit" flt-build-mode="release" spellcheck="false" style="position: fixed; inset: 0px; overflow: hidden; padding: 0px; margin: 0px; user-select: none; touch-action: none;">
+  <!-- Background -->
+  <div class="bg-animation"></div>
+  
+  <!-- Landing Page -->
+  <div class="landing-container" id="landing-container">
+    
+    <!-- Header -->
+    <header class="landing-header">
+      <a href="#" class="logo">
+        <div class="logo-icon">🥋</div>
+        <span>TKD Brackets</span>
+      </a>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-text">
+          <div class="hero-badge">🏆 Built for Taekwondo</div>
+          <h1 class="hero-title">
+            Create Tournament Brackets in <span>Minutes, Not Hours</span>
+          </h1>
+          <p class="hero-subtitle">
+            The only bracket maker designed specifically for Taekwondo. Smart Division Builder for age, belt, and weight classes. Dojang separation seeding. WT, ITF, and ATA templates built-in.
+          </p>
+          <button onclick="launchApp()" class="btn btn-cta" id="hero-cta-btn">
+            Get Started — It's Free
+          </button>
+        </div>
+        <div class="hero-visual">
+          <div class="bracket-preview">
+            <div class="bracket-header">
+              <span class="bracket-title">Juniors -45kg Sparring</span>
+              <span class="bracket-badge">Live</span>
+            </div>
+            <div class="bracket-mockup">
+              <div class="bracket-round">
+                <div class="bracket-match">
+                  <div class="match-player winner">
+                    <span>J. Kim</span>
+                    <span class="match-score">12</span>
+                  </div>
+                  <div class="match-player">
+                    <span>M. Park</span>
+                    <span class="match-score">8</span>
+                  </div>
+                </div>
+                <div class="bracket-match">
+                  <div class="match-player">
+                    <span>S. Lee</span>
+                    <span class="match-score">6</span>
+                  </div>
+                  <div class="match-player winner">
+                    <span>D. Cho</span>
+                    <span class="match-score">9</span>
+                  </div>
+                </div>
+              </div>
+              <div class="bracket-round" style="margin-top: 2rem;">
+                <div class="bracket-match">
+                  <div class="match-player">
+                    <span>J. Kim</span>
+                    <span class="match-score">—</span>
+                  </div>
+                  <div class="match-player">
+                    <span>D. Cho</span>
+                    <span class="match-score">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+  </div>
+  
+  <!-- Loading Overlay -->
+  <div class="flutter-loading active" id="flutter-loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading TKD Brackets...</div>
+  </div>
+  
+  <script>
+    let appRequested = false;
+    
+    function launchApp() {
+      if (appRequested) return;
+      appRequested = true;
+      document.getElementById('flutter-loading').classList.add('active');
+      
+      const script = document.createElement('script');
+      script.src = 'flutter_bootstrap.js';
+      script.onerror = function() {
+        document.getElementById('flutter-loading').innerHTML = `
+          <div style="text-align: center; color: #F87171;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+            <div>Failed to load. Please refresh and try again.</div>
+            <button onclick="location.reload()" class="btn btn-cta" style="margin-top: 1.5rem;">Refresh</button>
+          </div>
+        `;
+      };
+      document.body.appendChild(script);
+    }
+    
+    window.addEventListener('flutter-initialized', function() {
+      document.body.classList.add('flutter-loaded');
+    });
+    
+    window.addEventListener('flutter-first-frame', function() {
+      document.body.classList.add('flutter-loaded');
+    });
+    
+    if (window.location.hash === '#app' || window.location.pathname !== '/' || window.location.search.includes('launch=true')) {
+      launchApp();
+    }
+  </script>
+
+
+<script src="flutter_bootstrap.js"></script><flt-announcement-host><flt-announcement-polite aria-live="polite" style="position: fixed; overflow: hidden; transform: translate(-99999px, -99999px); width: 1px; height: 1px;"></flt-announcement-polite><flt-announcement-assertive aria-live="assertive" style="position: fixed; overflow: hidden; transform: translate(-99999px, -99999px); width: 1px; height: 1px;"></flt-announcement-assertive></flt-announcement-host><flutter-view flt-view-id="0" tabindex="-1" style="position: absolute; inset: 0px; width: 1440px; height: 900px;"><flt-glass-pane></flt-glass-pane><flt-text-editing-host></flt-text-editing-host><flt-semantics-host style="position: absolute; transform-origin: 0px 0px 0px; transform: scale(1);"><flt-semantics id="flt-semantic-node-0" style="position: absolute; overflow: visible; filter: opacity(0%); color: rgba(0, 0, 0, 0); pointer-events: none; width: 1440px; height: 900px; top: 0px; left: 0px;"><flt-semantics id="flt-semantic-node-1" style="position: absolute; overflow: visible; pointer-events: none; width: 1440px; height: 900px; top: 0px; left: 0px;"><flt-semantics id="flt-semantic-node-16" style="position: absolute; overflow: visible; pointer-events: none; width: 1440px; height: 900px; top: 0px; left: 0px;"><flt-semantics id="flt-semantic-node-22" style="position: absolute; overflow: visible; pointer-events: none; width: 1440px; height: 56px; top: 0px; left: 0px; z-index: 2;"><h2 id="flt-semantic-node-23" style="margin: 0px; padding: 0px; font-size: 10px; position: absolute; overflow: visible; pointer-events: all; width: 106.358px; height: 28px; transform-origin: 0px 0px 0px; transform: matrix(1, 0, 0, 1, 666.821, 14); z-index: 1;">Dashboard</h2><flt-semantics id="flt-semantic-node-24" style="position: absolute; overflow: visible; pointer-events: all; z-index: 2; width: 24px; height: 24px; transform-origin: 0px 0px 0px; transform: matrix(1, 0, 0, 1, 1400, 16);"><span style="display: inline-block; white-space: nowrap; transform-origin: 0px 0px 0px; pointer-events: none; transform: scale(0.0784314, 1.2);">All changes synced
+Sync status: Synced</span></flt-semantics></flt-semantics><flt-semantics id="flt-semantic-node-17" style="position: absolute; overflow: visible; pointer-events: none; z-index: 1; width: 1184px; height: 844px; transform-origin: 0px 0px 0px; transform: matrix(1, 0, 0, 1, 256, 56);"><flt-semantics id="flt-semantic-node-18" style="position: absolute; overflow: visible; pointer-events: none; width: 1184px; height: 844px; top: 0px; left: 0px;"><flt-semantics id="flt-semantic-node-19" style="position: absolute; overflow: visible; pointer-events: all; z-index: 1; width: 64px; height: 64px; transform-origin: 0px 0px 0px; transform: matrix(1, 0, 0, 1, 560, 350);"><span style="display: inline-block; white-space: nowrap; transform-origin: 0px 0px 0px; pointer-events: none; transform: scale(0.537815, 3.2);">Dashboard icon</span></flt-semantics><flt-semantics id="flt-semantic-node-20" style="position: absolute; overflow: visible; pointer-events: all; z-index: 2; width: 135.365px; height: 36px; transform-origin: 0px 0px 0px; transform: matrix(1, 0, 0, 1, 524.317, 430);"><span style="display: inline-block; white-space: nowrap; transform-origin: 0px 0px 0px; pointer-events: none; transform: scale(1.63091, 1.8);">Dashboard</span></flt-semantics><flt-semantics id="flt-semantic-node-21" style="position: absolute; overflow: visible; pointer-events: all; z-index: 3; width: 248.818px; height: 20px; transform-origin: 0px 0px 0px; transform: matrix(1, 0, 0, 1, 467.591, 474);"><span style="display: inline-block; white-space: nowrap; transform-origin: 0px 0px 0px; pointer-events: none; transform: scale(0.849209, 1);">Tournament overview coming in Epic 3</span></flt-semantics></flt-semantics></flt-semantics></flt-semantics></flt-semantics></flt-semantics></flt-semantics-host><style id="flt-text-editing-stylesheet">flutter-view flt-scene-host {  font: normal normal 14px sans-serif;}flutter-view flt-semantics input[type=range] {  appearance: none;  -webkit-appearance: none;  width: 100%;  position: absolute;  border: none;  top: 0;  right: 0;  bottom: 0;  left: 0;}flutter-view input::selection {  background-color: transparent;}flutter-view textarea::selection {  background-color: transparent;}flutter-view flt-semantics input,flutter-view flt-semantics textarea,flutter-view flt-semantics [contentEditable="true"] {  caret-color: transparent;}flutter-view .flt-text-editing::placeholder {  opacity: 0;}flutter-view:focus { outline: rgb(0, 0, 0) none 0px;}flutter-view .transparentTextEditing:-webkit-autofill,flutter-view .transparentTextEditing:-webkit-autofill:hover,flutter-view .transparentTextEditing:-webkit-autofill:focus,flutter-view .transparentTextEditing:-webkit-autofill:active {  opacity: 0 !important;}</style></flutter-view></body></html>
+  ✘  1 [chromium] › specs/live.spec.ts:24:9 › End to End Live Tests - Auth and Bracket Creation › Authenticate and create new bracket (41.2s)
+
+
+  1) [chromium] › specs/live.spec.ts:24:9 › End to End Live Tests - Auth and Bracket Creation › Authenticate and create new bracket › Login to the application 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText('Tournaments', { exact: true }).first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for getByText('Tournaments', { exact: true }).first()[22m
+
+
+      48 |             try {
+      49 |                 const tournamentsHeader = page.getByText('Tournaments', { exact: true }).first();
+    > 50 |                 await expect(tournamentsHeader).toBeVisible({ timeout: 15000 });
+         |                                                 ^
+      51 |             } catch (e) {
+      52 |                 console.log("[DEBUG] Current page URL:", page.url());
+      53 |                 console.log("[DEBUG] Current page content:", await page.content());
+        at /Users/asak/Documents/dev/proj/personal/taekwondo_fix/tests/e2e/specs/live.spec.ts:50:49
+        at /Users/asak/Documents/dev/proj/personal/taekwondo_fix/tests/e2e/specs/live.spec.ts:28:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/live-End-to-End-Live-Tests-500f4-cate-and-create-new-bracket-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/live-End-to-End-Live-Tests-500f4-cate-and-create-new-bracket-chromium/error-context.md
+
+  1 failed
+    [chromium] › specs/live.spec.ts:24:9 › End to End Live Tests - Auth and Bracket Creation › Authenticate and create new bracket 
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m

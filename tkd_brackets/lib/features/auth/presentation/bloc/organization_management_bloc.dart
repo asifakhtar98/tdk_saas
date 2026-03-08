@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:tkd_brackets/core/di/injection.dart';
+import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_bloc.dart';
+import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_event.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/invitation_repository.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/organization_repository.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/user_repository.dart';
@@ -58,6 +61,7 @@ class OrganizationManagementBloc
       (failure) => emit(OrganizationManagementState.failure(failure)),
       (org) {
         _currentOrganizationId = org.id;
+        getIt<AuthenticationBloc>().add(const AuthenticationEvent.checkRequested());
         emit(OrganizationManagementState.creationSuccess(org));
       },
     );

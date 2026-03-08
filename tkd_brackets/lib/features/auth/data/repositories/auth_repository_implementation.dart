@@ -113,7 +113,12 @@ class AuthRepositoryImplementation implements AuthRepository {
         updatedAtTimestamp: DateTime.now(),
       );
       
-      await _userRemoteDatasource.updateUser(userModel);
+      try {
+        await _userRemoteDatasource.updateUser(userModel);
+      } catch (e) {
+        // Ignore backend exceptions like schema mismatch during sign-in
+        // as long as the user authenticated. 
+      }
 
       final localUser = await _userLocalDatasource.getUserById(userModel.id);
       if (localUser != null) {

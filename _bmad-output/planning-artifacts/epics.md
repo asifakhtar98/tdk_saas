@@ -92,8 +92,8 @@ This document provides the complete epic and story breakdown for TKD Brackets, d
 - FR50: Spectator can refresh bracket view to see latest scores
 
 **8. Authentication & Accounts (FR51-FR58)**
-- FR51: User can sign up with email OTP/magic link (Supabase Auth)
-- FR52: User can sign in with email OTP/magic link
+- FR51: User can sign up with email and password (Supabase Auth)
+- FR52: User can sign in with email and password
 - FR53: User can create an organization account
 - FR54: Owner can invite users to organization with assigned role
 - FR55: Invited user can accept invitation and join organization
@@ -149,7 +149,7 @@ This document provides the complete epic and story breakdown for TKD Brackets, d
 - NFR11: Recovery time < 1 minute after any issue
 
 **Security**
-- NFR12: Supabase Auth with email OTP/magic link
+- NFR12: Supabase Auth with email and password
 - NFR13: Data encryption at rest and in transit (TLS 1.3)
 - NFR14: Automatic session timeout after inactivity
 - NFR15: Server-side RBAC enforcement (roles cannot be bypassed)
@@ -287,8 +287,8 @@ This document provides the complete epic and story breakdown for TKD Brackets, d
 | FR48 | Epic 7       | Public shareable links             |
 | FR49 | Epic 7       | Spectator mobile view              |
 | FR50 | Epic 7       | Spectator refresh                  |
-| FR51 | Epic 2       | Email magic link signup            |
-| FR52 | Epic 2       | Email magic link signin            |
+| FR51 | Epic 2       | Email/Password signup              |
+| FR52 | Epic 2       | Email/Password signin              |
 | FR53 | Epic 2       | Create organization                |
 | FR54 | Epic 2       | Invite users with roles            |
 | FR55 | Epic 2       | Accept invitation                  |
@@ -352,19 +352,19 @@ This document provides the complete epic and story breakdown for TKD Brackets, d
 **User Outcome:** Tournament organizers can create their organization account, set up their team with proper permissions (Owner, Admin, Scorer, Viewer), and manage membership.
 
 **FRs Covered:** FR51-FR58 (8 FRs)
-| FR   | Capability                    |
-| ---- | ----------------------------- |
-| FR51 | Sign up with email magic link |
-| FR52 | Sign in with email magic link |
-| FR53 | Create organization           |
-| FR54 | Invite users with roles       |
-| FR55 | Accept invitation             |
-| FR56 | RBAC enforcement              |
-| FR57 | Change user roles             |
-| FR58 | Remove users                  |
+| FR   | Capability                      |
+| ---- | ------------------------------- |
+| FR51 | Sign up with email and password |
+| FR52 | Sign in with email and password |
+| FR53 | Create organization             |
+| FR54 | Invite users with roles         |
+| FR55 | Accept invitation               |
+| FR56 | RBAC enforcement                |
+| FR57 | Change user roles               |
+| FR58 | Remove users                    |
 
 **Scope:**
-- Supabase Auth integration (magic link flow)
+- Supabase Auth integration (email/password flow)
 - User entity and repository
 - Organization entity and repository
 - Invitation entity and repository
@@ -989,38 +989,38 @@ lib/features/auth/
 
 ---
 
-### Story 2.3: Email Magic Link Sign Up
+### Story 2.3: Email/Password Sign Up
 
 **As a** new user,
-**I want** to sign up using email magic link (OTP),
-**So that** I can create an account without remembering a password (FR51).
+**I want** to sign up using email and password,
+**So that** I can create an account (FR51).
 
 **Acceptance Criteria:**
 
 **Given** the user is not authenticated
-**When** they enter their email and request magic link
-**Then** `SignUpWithEmailUseCase` sends magic link via Supabase Auth
-**And** `SupabaseAuthDataSource` handles the `signInWithOtp()` call
-**And** error cases are handled (invalid email, rate limit, network error)
-**And** `Either<Failure, Unit>` is returned for success/failure
-**And** unit tests verify magic link request flow (mocked Supabase)
+**When** they enter their email and password
+**Then** `SignUpWithEmailUseCase` registers the user via Supabase Auth
+**And** `SupabaseAuthDataSource` handles the `signUp()` call
+**And** error cases are handled (invalid email, weak password, already exists, network error)
+**And** `Either<Failure, T>` is returned for success/failure
+**And** unit tests verify sign-up flow (mocked Supabase)
 
 ---
 
-### Story 2.4: Email Magic Link Sign In
+### Story 2.4: Email/Password Sign In
 
 **As a** returning user,
-**I want** to sign in using email magic link,
+**I want** to sign in using email and password,
 **So that** I can access my account securely (FR52).
 
 **Acceptance Criteria:**
 
 **Given** the user has an existing account
-**When** they enter their email and click the magic link
-**Then** `SignInWithEmailUseCase` verifies the OTP via Supabase Auth
+**When** they enter their email and password
+**Then** `SignInWithEmailUseCase` authenticates via Supabase Auth
 **And** user session is established and persisted
 **And** user profile is fetched from Supabase and cached locally
-**And** error cases handled (expired link, invalid token, network error)
+**And** error cases handled (invalid credentials, network error)
 **And** unit tests verify sign-in flow (mocked Supabase)
 
 ---
