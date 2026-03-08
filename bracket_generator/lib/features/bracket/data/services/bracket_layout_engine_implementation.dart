@@ -44,10 +44,16 @@ class BracketLayoutEngineImplementation implements BracketLayoutEngine {
     if (bracket.bracketType == BracketType.pool) {
       return BracketFormat.roundRobin;
     }
-    final hasLoserAdvances = matches.any(
+    
+    // A bracket is double elimination if there are multiple matches with loser advances,
+    // or if the bracket Data JSON says so.
+    final hasLoserAdvancesCount = matches.where(
       (m) => m.loserAdvancesToMatchId != null,
-    );
-    if (hasLoserAdvances) {
+    ).length;
+    
+    // In single elimination with 3rd place, exactly 2 matches (semifinals) have a loser target.
+    // In double elimination, almost half the matches do.
+    if (hasLoserAdvancesCount > 2 || (bracket.bracketDataJson?['doubleElimination'] == true)) {
       return BracketFormat.doubleElimination;
     }
     return BracketFormat.singleElimination;
@@ -107,16 +113,29 @@ class BracketLayoutEngineImplementation implements BracketLayoutEngine {
               yOffset + i * (options.matchCardHeight + options.verticalSpacing);
         } else {
           // Subsequent rounds: Center between feeding matches
-          final feedingMatches =
+          var feedingMatches =
               matchesByRound[r - 1]
                   ?.where((m) => m.winnerAdvancesToMatchId == match.id)
                   .toList() ??
               [];
+              
+          // If no winners feed here, check if losers feed here (e.g., 3rd place match)
+          if (feedingMatches.isEmpty) {
+            feedingMatches = matchesByRound[r - 1]
+                  ?.where((m) => m.loserAdvancesToMatchId == match.id)
+                  .toList() ??
+              [];
+          }
 
           if (feedingMatches.length == 2) {
             final slot1 = matchMap[feedingMatches[0].id]!;
             final slot2 = matchMap[feedingMatches[1].id]!;
             yPos = (slot1.position.dy + slot2.position.dy) / 2;
+            
+            // Push 3rd place match down visually so it doesn't overlap the final
+            if (match.loserAdvancesToMatchId == null && feedingMatches[0].loserAdvancesToMatchId == match.id) {
+               yPos += options.matchCardHeight + options.verticalSpacing; 
+            }
           } else if (feedingMatches.length == 1) {
             yPos = matchMap[feedingMatches[0].id]!.position.dy;
           } else {
@@ -184,7 +203,7 @@ class BracketLayoutEngineImplementation implements BracketLayoutEngine {
     return BracketLayout(
       format: format,
       rounds: finalRounds,
-      canvasSize: Size(xOffset + canvasWidth, max(0, yOffset + canvasHeight)),
+      canvasSize: Size(max(1.0, xOffset + canvasWidth), max(1.0, yOffset + canvasHeight)),
     );
   }
 
@@ -261,10 +280,13 @@ class BracketLayoutEngineImplementation implements BracketLayoutEngine {
     ];
 
     final totalWidth = max(
-      winnersLayout.canvasSize.width,
-      losersLayout.canvasSize.width,
+      1.0, 
+      max(
+        winnersLayout.canvasSize.width,
+        losersLayout.canvasSize.width,
+      )
     );
-    final totalHeight = losersYOffset + losersLayout.canvasSize.height;
+    final totalHeight = max(1.0, losersYOffset + losersLayout.canvasSize.height);
 
     return BracketLayout(
       format: BracketFormat.doubleElimination,
@@ -277,7 +299,7 @@ class BracketLayoutEngineImplementation implements BracketLayoutEngine {
     return const BracketLayout(
       format: BracketFormat.roundRobin,
       rounds: [],
-      canvasSize: Size.zero,
+      canvasSize: Size(1.0, 1.0),
     );
   }
 

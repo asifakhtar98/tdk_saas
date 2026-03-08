@@ -18,4 +18,26 @@ class ParticipantEntity {
     this.seedNumber,
     this.isBye = false,
   });
+
+  ParticipantEntity copyWith({
+    String? id,
+    String? divisionId,
+    String? firstName,
+    String? lastName,
+    String? schoolOrDojangName,
+    String? beltRank,
+    int? seedNumber,
+    bool? isBye,
+  }) {
+    return ParticipantEntity(
+      id: id ?? this.id,
+      divisionId: divisionId ?? this.divisionId,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      schoolOrDojangName: schoolOrDojangName ?? this.schoolOrDojangName,
+      beltRank: beltRank ?? this.beltRank,
+      seedNumber: seedNumber ?? this.seedNumber,
+      isBye: isBye ?? this.isBye,
+    );
+  }
 }

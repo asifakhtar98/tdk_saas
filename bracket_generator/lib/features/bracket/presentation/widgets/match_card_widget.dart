@@ -1,21 +1,30 @@
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:bracket_generator/features/bracket/domain/entities/match_entity.dart';
+import 'package:bracket_generator/features/participant/domain/entities/participant_entity.dart';
 
 class MatchCardWidget extends StatelessWidget {
   final MatchEntity match;
+  final Map<String, ParticipantEntity> participantMap;
   final bool isHighlighted;
   final VoidCallback? onTap;
   final Size? size;
 
   const MatchCardWidget({
     required this.match,
+    required this.participantMap,
     required this.isHighlighted,
     super.key,
     this.onTap,
     this.size,
   });
+
+  String _name(String? id) {
+    if (id == null) return 'BYE';
+    final p = participantMap[id];
+    if (p == null) return 'TBD';
+    return p.lastName.isNotEmpty ? p.lastName : p.firstName;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,15 +60,7 @@ class MatchCardWidget extends StatelessWidget {
             ),
           ),
           clipBehavior: Clip.antiAlias,
-          child: isBye
-              ? CustomPaint(
-                  foregroundPainter: _DashedBorderPainter(
-                    color: Colors.grey.shade400,
-                    borderRadius: 8,
-                  ),
-                  child: _buildCardContent(theme, colorScheme, borderColor),
-                )
-              : _buildCardContent(theme, colorScheme, borderColor),
+          child: _buildCardContent(theme, colorScheme, borderColor),
         ),
       ),
     );
@@ -128,6 +129,9 @@ class MatchCardWidget extends StatelessWidget {
     bool isWinner, {
     required bool isRed,
   }) {
+    final displayName = _name(participantId);
+    final isEmptySlot = participantId == null;
+
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -142,10 +146,10 @@ class MatchCardWidget extends StatelessWidget {
             const SizedBox(width: 4),
             Expanded(
               child: Text(
-                participantId ?? (isWinner ? '' : 'BYE'),
+                displayName,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
-                  fontStyle: participantId == null ? FontStyle.italic : null,
+                  fontStyle: isEmptySlot ? FontStyle.italic : null,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -157,46 +161,4 @@ class MatchCardWidget extends StatelessWidget {
       ),
     );
   }
-}
-
-class _DashedBorderPainter extends CustomPainter {
-  final Color color;
-  final double borderRadius;
-
-  _DashedBorderPainter({required this.color, required this.borderRadius});
-
-  static const _dashWidth = 5.0;
-  static const _dashSpace = 3.0;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-
-    final path = Path()
-      ..addRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(0, 0, size.width, size.height),
-          Radius.circular(borderRadius),
-        ),
-      );
-
-    final dashPath = Path();
-    for (final metric in path.computeMetrics()) {
-      var distance = 0.0;
-      while (distance < metric.length) {
-        final end = math.min(distance + _dashWidth, metric.length);
-        dashPath.addPath(metric.extractPath(distance, end), Offset.zero);
-        distance = end + _dashSpace;
-      }
-    }
-
-    canvas.drawPath(dashPath, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _DashedBorderPainter oldDelegate) =>
-      color != oldDelegate.color || borderRadius != oldDelegate.borderRadius;
 }

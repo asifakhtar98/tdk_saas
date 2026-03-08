@@ -30,13 +30,18 @@ class BracketConnectionLinesPainter extends CustomPainter {
               slot.advancesToSlot!.position.dy +
               slot.advancesToSlot!.size.height / 2;
 
+          // Guard against NaN / Infinity
+          if (!startX.isFinite || !startY.isFinite || !endX.isFinite || !endY.isFinite) {
+            continue;
+          }
+
           final midX = startX + (endX - startX) / 2;
 
           final path = Path()
-            ..moveTo(startX, startY)
-            ..lineTo(midX, startY)
-            ..lineTo(midX, endY)
-            ..lineTo(endX, endY);
+            ..moveTo(startX, startY + 30)
+            ..lineTo(midX, startY + 30)
+            ..lineTo(midX, endY + 30)
+            ..lineTo(endX, endY + 30);
 
           canvas.drawPath(path, paint);
         }
@@ -67,7 +72,7 @@ class BracketConnectionLinesWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: layout.canvasSize,
+      size: Size.infinite,
       painter: BracketConnectionLinesPainter(
         layout: layout,
         lineColor: lineColor ?? Theme.of(context).colorScheme.outlineVariant,

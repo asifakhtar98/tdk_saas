@@ -1,3 +1,7 @@
+/// Sentinel value to explicitly set a nullable field to null in copyWith.
+/// Using this instead of null allows distinguishing "not provided" from "set to null".
+const _sentinel = Object();
+
 class MatchEntity {
   final String id;
   final String bracketId;
@@ -47,6 +51,10 @@ class MatchEntity {
     this.isDemoData = false,
   });
 
+  /// copyWith that supports explicitly setting nullable fields to null.
+  /// Pass the field normally to update it, or omit it to keep the current value.
+  /// To explicitly set a field to null, pass null for that field.
+  /// The sentinel pattern lets us distinguish "not provided" from "set to null".
   MatchEntity copyWith({
     String? id,
     String? bracketId,
@@ -54,15 +62,15 @@ class MatchEntity {
     int? matchNumberInRound,
     DateTime? createdAtTimestamp,
     DateTime? updatedAtTimestamp,
-    String? participantRedId,
-    String? participantBlueId,
-    String? winnerId,
-    String? winnerAdvancesToMatchId,
-    String? loserAdvancesToMatchId,
+    Object? participantRedId = _sentinel,
+    Object? participantBlueId = _sentinel,
+    Object? winnerId = _sentinel,
+    Object? winnerAdvancesToMatchId = _sentinel,
+    Object? loserAdvancesToMatchId = _sentinel,
     int? scheduledRingNumber,
     DateTime? scheduledTime,
     MatchStatus? status,
-    MatchResultType? resultType,
+    Object? resultType = _sentinel,
     String? notes,
     DateTime? startedAtTimestamp,
     DateTime? completedAtTimestamp,
@@ -78,15 +86,15 @@ class MatchEntity {
       matchNumberInRound: matchNumberInRound ?? this.matchNumberInRound,
       createdAtTimestamp: createdAtTimestamp ?? this.createdAtTimestamp,
       updatedAtTimestamp: updatedAtTimestamp ?? this.updatedAtTimestamp,
-      participantRedId: participantRedId ?? this.participantRedId,
-      participantBlueId: participantBlueId ?? this.participantBlueId,
-      winnerId: winnerId ?? this.winnerId,
-      winnerAdvancesToMatchId: winnerAdvancesToMatchId ?? this.winnerAdvancesToMatchId,
-      loserAdvancesToMatchId: loserAdvancesToMatchId ?? this.loserAdvancesToMatchId,
+      participantRedId: identical(participantRedId, _sentinel) ? this.participantRedId : participantRedId as String?,
+      participantBlueId: identical(participantBlueId, _sentinel) ? this.participantBlueId : participantBlueId as String?,
+      winnerId: identical(winnerId, _sentinel) ? this.winnerId : winnerId as String?,
+      winnerAdvancesToMatchId: identical(winnerAdvancesToMatchId, _sentinel) ? this.winnerAdvancesToMatchId : winnerAdvancesToMatchId as String?,
+      loserAdvancesToMatchId: identical(loserAdvancesToMatchId, _sentinel) ? this.loserAdvancesToMatchId : loserAdvancesToMatchId as String?,
       scheduledRingNumber: scheduledRingNumber ?? this.scheduledRingNumber,
       scheduledTime: scheduledTime ?? this.scheduledTime,
       status: status ?? this.status,
-      resultType: resultType ?? this.resultType,
+      resultType: identical(resultType, _sentinel) ? this.resultType : resultType as MatchResultType?,
       notes: notes ?? this.notes,
       startedAtTimestamp: startedAtTimestamp ?? this.startedAtTimestamp,
       completedAtTimestamp: completedAtTimestamp ?? this.completedAtTimestamp,
