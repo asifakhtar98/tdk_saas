@@ -5,6 +5,7 @@ import 'package:tkd_brackets/core/database/app_database.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/network/connectivity_service.dart';
 import 'package:tkd_brackets/core/sync/sync_service.dart';
+import 'package:tkd_brackets/core/demo/demo_data_constants.dart';
 import 'package:tkd_brackets/features/division/domain/entities/division_entity.dart';
 import 'package:tkd_brackets/features/tournament/data/datasources/tournament_local_datasource.dart';
 import 'package:tkd_brackets/features/tournament/data/datasources/tournament_remote_datasource.dart';
@@ -101,20 +102,26 @@ class TournamentRepositoryImplementation implements TournamentRepository {
     String organizationId,
   ) async {
     try {
-      final model = TournamentModel.convertFromEntity(tournament);
+      final isDemoData = organizationId == DemoDataConstants.demoOrganizationId;
+      final model = TournamentModel.convertFromEntity(
+        tournament,
+        isDemoData: isDemoData,
+      );
 
       // Always save locally first
       await _localDatasource.insertTournament(model);
 
-      // Sync to remote if online
-      if (await _connectivityService.hasInternetConnection()) {
-        try {
-          await _remoteDatasource.insertTournament(model);
-        } on Exception catch (_) {
+      // Sync to remote if online and not demo data
+      if (!isDemoData) {
+        if (await _connectivityService.hasInternetConnection()) {
+          try {
+            await _remoteDatasource.insertTournament(model);
+          } on Exception catch (_) {
+            _queueTournamentSync(tournament.id, 'insert');
+          }
+        } else {
           _queueTournamentSync(tournament.id, 'insert');
         }
-      } else {
-        _queueTournamentSync(tournament.id, 'insert');
       }
 
       return Right(tournament);
@@ -132,22 +139,26 @@ class TournamentRepositoryImplementation implements TournamentRepository {
       final existing = await _localDatasource.getTournamentById(tournament.id);
       final newSyncVersion = (existing?.syncVersion ?? 0) + 1;
 
+      final isDemoData = tournament.organizationId == DemoDataConstants.demoOrganizationId;
       final model = TournamentModel.convertFromEntity(
         tournament,
         syncVersion: newSyncVersion,
+        isDemoData: isDemoData,
       );
 
       await _localDatasource.updateTournament(model);
 
       // Sync to remote if online
-      if (await _connectivityService.hasInternetConnection()) {
-        try {
-          await _remoteDatasource.updateTournament(model);
-        } on Exception catch (_) {
+      if (!isDemoData) {
+        if (await _connectivityService.hasInternetConnection()) {
+          try {
+            await _remoteDatasource.updateTournament(model);
+          } on Exception catch (_) {
+            _queueTournamentSync(tournament.id, 'update');
+          }
+        } else {
           _queueTournamentSync(tournament.id, 'update');
         }
-      } else {
-        _queueTournamentSync(tournament.id, 'update');
       }
 
       return Right(model.convertToEntity());
@@ -159,16 +170,19 @@ class TournamentRepositoryImplementation implements TournamentRepository {
   @override
   Future<Either<Failure, Unit>> deleteTournament(String id) async {
     try {
+      final existing = await _localDatasource.getTournamentById(id);
       await _localDatasource.deleteTournament(id);
 
-      if (await _connectivityService.hasInternetConnection()) {
-        try {
-          await _remoteDatasource.deleteTournament(id);
-        } on Exception catch (_) {
+      if (existing != null && !existing.isDemoData) {
+        if (await _connectivityService.hasInternetConnection()) {
+          try {
+            await _remoteDatasource.deleteTournament(id);
+          } on Exception catch (_) {
+            _queueTournamentSync(id, 'delete');
+          }
+        } else {
           _queueTournamentSync(id, 'delete');
         }
-      } else {
-        _queueTournamentSync(id, 'delete');
       }
 
       return const Right(unit);

@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/usecases/use_case.dart';
+import 'package:tkd_brackets/core/demo/demo_data_constants.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/user_repository.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 import 'package:tkd_brackets/features/tournament/domain/repositories/tournament_repository.dart';
@@ -65,20 +66,24 @@ class CreateTournamentUseCase
     final userResult = await _userRepository.getCurrentUser();
     final user = userResult.fold((failure) => null, (user) => user);
 
-    if (user == null || user.organizationId.isEmpty) {
-      return const Left(
-        AuthenticationFailure(
-          userFriendlyMessage: 'You must be logged in with an organization',
-        ),
-      );
+    final String organizationId;
+    final String createdByUserId;
+
+    if (user != null && user.organizationId.isNotEmpty) {
+      organizationId = user.organizationId;
+      createdByUserId = user.id;
+    } else {
+      // Fallback for Demo Mode / Unauthenticated offline creation
+      organizationId = DemoDataConstants.demoOrganizationId;
+      createdByUserId = DemoDataConstants.demoUserId;
     }
 
     final tournamentId = _uuid.v4();
 
     final tournament = TournamentEntity(
       id: tournamentId,
-      organizationId: user.organizationId,
-      createdByUserId: user.id,
+      organizationId: organizationId,
+      createdByUserId: createdByUserId,
       name: trimmedName,
       scheduledDate: params.scheduledDate,
       description: params.description?.trim(),
@@ -91,6 +96,6 @@ class CreateTournamentUseCase
       updatedAtTimestamp: DateTime.now(),
     );
 
-    return _repository.createTournament(tournament, user.organizationId);
+    return _repository.createTournament(tournament, organizationId);
   }
 }

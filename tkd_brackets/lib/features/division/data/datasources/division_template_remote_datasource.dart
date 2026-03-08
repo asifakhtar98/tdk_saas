@@ -18,7 +18,8 @@ abstract class DivisionTemplateRemoteDatasource {
 @LazySingleton(as: DivisionTemplateRemoteDatasource)
 class DivisionTemplateRemoteDatasourceImplementation
     implements DivisionTemplateRemoteDatasource {
-  DivisionTemplateRemoteDatasourceImplementation(this._supabase);
+  DivisionTemplateRemoteDatasourceImplementation(SupabaseClient supabase)
+      : _supabase = supabase;
 
   final SupabaseClient _supabase;
 

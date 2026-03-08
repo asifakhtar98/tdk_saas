@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:tkd_brackets/core/demo/demo_data_constants.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_params.dart';
 import 'package:tkd_brackets/features/tournament/domain/usecases/archive_tournament_usecase.dart';
@@ -40,7 +41,7 @@ class TournamentBloc extends Bloc<TournamentEvent, TournamentState> {
   ) async {
     emit(const TournamentLoadInProgress());
 
-    final orgId = event.organizationId ?? 'default-org';
+    final orgId = event.organizationId ?? DemoDataConstants.demoOrganizationId;
     _currentOrganizationId = orgId;
 
     final result = await _getTournamentsUseCase(orgId);

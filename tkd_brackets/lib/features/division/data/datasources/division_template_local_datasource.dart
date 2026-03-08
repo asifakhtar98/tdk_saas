@@ -18,7 +18,8 @@ abstract class DivisionTemplateLocalDatasource {
 @LazySingleton(as: DivisionTemplateLocalDatasource)
 class DivisionTemplateLocalDatasourceImplementation
     implements DivisionTemplateLocalDatasource {
-  DivisionTemplateLocalDatasourceImplementation(this._database);
+  DivisionTemplateLocalDatasourceImplementation(AppDatabase database)
+      : _database = database;
 
   final AppDatabase _database;
 

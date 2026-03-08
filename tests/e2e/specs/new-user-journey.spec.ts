@@ -41,8 +41,17 @@ test.describe('New User Journey Flow', () => {
             const signInBtn = page.getByText('Sign In', { exact: true });
             await signInBtn.click();
 
-            const snackbarText = page.getByText('Sign in available in Story 2.4').first();
-            await expect(snackbarText, 'Snackbar not shown when clicking Sign In').toBeVisible({ timeout: 15000 });
+            // Verify navigation to Auth Page
+            // The "TKD Brackets" text might be considered hidden if it's part of a logo or hero section
+            // Let's look for functional elements
+            const emailInput = page.getByLabel('Email Address');
+            const signUpToggle = page.getByText("Don't have an account? Sign Up");
+
+            await expect(emailInput, 'Email input should be visible on Auth Page').toBeVisible({ timeout: 15000 });
+            await expect(signUpToggle, 'Sign Up toggle should be visible').toBeVisible();
+
+            // Go back to home for next steps
+            await page.goBack();
         });
 
         await test.step('Proceed from Home Page to unauthenticated Demo Mode', async () => {

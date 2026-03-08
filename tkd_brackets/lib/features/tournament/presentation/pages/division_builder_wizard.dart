@@ -1,16 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:tkd_brackets/core/di/injection.dart';
+import 'package:tkd_brackets/features/division/domain/usecases/smart_division_builder_params.dart';
+import 'package:tkd_brackets/features/division/presentation/bloc/division_builder_bloc.dart';
 import 'package:tkd_brackets/features/tournament/domain/entities/tournament_entity.dart';
 
-class DivisionBuilderWizard extends StatefulWidget {
+class DivisionBuilderWizard extends StatelessWidget {
   const DivisionBuilderWizard({required this.tournamentId, super.key});
 
   final String tournamentId;
 
   @override
-  State<DivisionBuilderWizard> createState() => _DivisionBuilderWizardState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<DivisionBuilderBloc>(),
+      child: _DivisionBuilderWizardView(tournamentId: tournamentId),
+    );
+  }
 }
 
-class _DivisionBuilderWizardState extends State<DivisionBuilderWizard> {
+class _DivisionBuilderWizardView extends StatefulWidget {
+  const _DivisionBuilderWizardView({required this.tournamentId});
+
+  final String tournamentId;
+
+  @override
+  State<_DivisionBuilderWizardView> createState() =>
+      _DivisionBuilderWizardViewState();
+}
+
+class _DivisionBuilderWizardViewState extends State<_DivisionBuilderWizardView> {
   int _currentStep = 0;
   FederationType _selectedFederation = FederationType.wt;
   final Set<String> _selectedAgeGroups = {};
@@ -31,79 +51,110 @@ class _DivisionBuilderWizardState extends State<DivisionBuilderWizard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Division Builder')),
-      body: Stepper(
-        currentStep: _currentStep,
-        onStepContinue: _onStepContinue,
-        onStepCancel: _onStepCancel,
-        controlsBuilder: (context, details) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Row(
-              children: [
-                if (_currentStep > 0)
-                  TextButton(
-                    onPressed: details.onStepCancel,
-                    child: const Text('Back'),
-                  ),
-                const SizedBox(width: 8),
-                if (_currentStep < 4)
-                  FilledButton(
-                    onPressed: details.onStepContinue,
-                    child: const Text('Continue'),
-                  )
-                else
-                  FilledButton(
-                    onPressed: _isCreating ? null : _createDivisions,
-                    child: _isCreating
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Create Divisions'),
-                  ),
-              ],
-            ),
-          );
-        },
-        steps: [
-          Step(
-            title: const Text('Select Federation'),
-            subtitle: Text(_selectedFederation.value.toUpperCase()),
-            isActive: _currentStep >= 0,
-            state: _currentStep > 0 ? StepState.complete : StepState.indexed,
-            content: _buildFederationSelection(),
+    return BlocConsumer<DivisionBuilderBloc, DivisionBuilderState>(
+      listener: (context, state) {
+        state.whenOrNull(
+          inProgress: () {
+            setState(() {
+              _isCreating = true;
+            });
+          },
+          success: () {
+            setState(() {
+              _isCreating = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Divisions created successfully!')),
+            );
+            
+            context.go('/tournaments/${widget.tournamentId}');
+          },
+          failure: (message) {
+            setState(() {
+              _isCreating = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: $message'), backgroundColor: Colors.red),
+            );
+          },
+        );
+      },
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(title: const Text('Division Builder')),
+          body: Stepper(
+            currentStep: _currentStep,
+            onStepContinue: _onStepContinue,
+            onStepCancel: _onStepCancel,
+            controlsBuilder: (context, details) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Row(
+                  children: [
+                    if (_currentStep > 0)
+                      TextButton(
+                        onPressed: details.onStepCancel,
+                        child: const Text('Back'),
+                      ),
+                    const SizedBox(width: 8),
+                    if (_currentStep < 4)
+                      FilledButton(
+                        onPressed: details.onStepContinue,
+                        child: const Text('Continue'),
+                      )
+                    else
+                      FilledButton(
+                        onPressed: _isCreating ? null : _createDivisions,
+                        child: _isCreating
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Text('Create Divisions'),
+                      ),
+                  ],
+                ),
+              );
+            },
+            steps: [
+              Step(
+                title: const Text('Select Federation'),
+                subtitle: Text(_selectedFederation.value.toUpperCase()),
+                isActive: _currentStep >= 0,
+                state: _currentStep > 0 ? StepState.complete : StepState.indexed,
+                content: _buildFederationSelection(),
+              ),
+              Step(
+                title: const Text('Configure Age Groups'),
+                subtitle: Text('${_selectedAgeGroups.length} selected'),
+                isActive: _currentStep >= 1,
+                state: _currentStep > 1 ? StepState.complete : StepState.indexed,
+                content: _buildAgeGroupSelection(),
+              ),
+              Step(
+                title: const Text('Configure Belt Groups'),
+                subtitle: Text('${_selectedBeltGroups.length} selected'),
+                isActive: _currentStep >= 2,
+                state: _currentStep > 2 ? StepState.complete : StepState.indexed,
+                content: _buildBeltGroupSelection(),
+              ),
+              Step(
+                title: const Text('Configure Weight Classes'),
+                isActive: _currentStep >= 3,
+                state: _currentStep > 3 ? StepState.complete : StepState.indexed,
+                content: _buildWeightClassInfo(),
+              ),
+              Step(
+                title: const Text('Review & Create'),
+                isActive: _currentStep >= 4,
+                state: _currentStep > 4 ? StepState.complete : StepState.indexed,
+                content: _buildReview(),
+              ),
+            ],
           ),
-          Step(
-            title: const Text('Configure Age Groups'),
-            subtitle: Text('${_selectedAgeGroups.length} selected'),
-            isActive: _currentStep >= 1,
-            state: _currentStep > 1 ? StepState.complete : StepState.indexed,
-            content: _buildAgeGroupSelection(),
-          ),
-          Step(
-            title: const Text('Configure Belt Groups'),
-            subtitle: Text('${_selectedBeltGroups.length} selected'),
-            isActive: _currentStep >= 2,
-            state: _currentStep > 2 ? StepState.complete : StepState.indexed,
-            content: _buildBeltGroupSelection(),
-          ),
-          Step(
-            title: const Text('Configure Weight Classes'),
-            isActive: _currentStep >= 3,
-            state: _currentStep > 3 ? StepState.complete : StepState.indexed,
-            content: _buildWeightClassInfo(),
-          ),
-          Step(
-            title: const Text('Review & Create'),
-            isActive: _currentStep >= 4,
-            state: _currentStep > 4 ? StepState.complete : StepState.indexed,
-            content: _buildReview(),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -237,31 +288,20 @@ class _DivisionBuilderWizardState extends State<DivisionBuilderWizard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Weight classes will be automatically generated based on the federation standards.',
-        ),
+        Text(_getWeightClassInfo()),
         const SizedBox(height: 16),
-        Card(
+        const Card(
           child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: EdgeInsets.all(16),
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Federation Standards',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Icon(Icons.info_outline),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    'Weight classes will be automatically generated based on the selected federation and age groups.',
+                  ),
                 ),
-                const SizedBox(height: 12),
-                Text(_getWeightClassInfo()),
               ],
             ),
           ),
@@ -271,8 +311,9 @@ class _DivisionBuilderWizardState extends State<DivisionBuilderWizard> {
   }
 
   Widget _buildReview() {
-    final divisionsCount =
-        _selectedAgeGroups.length * _selectedBeltGroups.length * 2;
+    final divisionsCount = _selectedAgeGroups.length *
+        _selectedBeltGroups.length *
+        _selectedGenderCount();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -283,23 +324,24 @@ class _DivisionBuilderWizardState extends State<DivisionBuilderWizard> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildReviewRow(
                   'Federation',
                   _getFederationLabel(_selectedFederation),
                 ),
                 const Divider(),
-                _buildReviewRow('Age Groups', _selectedAgeGroups.join(', ')),
-                const Divider(),
                 _buildReviewRow(
-                  'Belt Groups',
-                  _selectedBeltGroups.map(_formatBeltGroup).join(', '),
+                  'Age Groups',
+                  _selectedAgeGroups.isEmpty
+                      ? 'None selected'
+                      : _selectedAgeGroups.join(', '),
                 ),
                 const Divider(),
                 _buildReviewRow(
-                  'Estimated Divisions',
-                  '$divisionsCount (${_selectedGenderCount()} genders)',
+                  'Belt Groups',
+                  _selectedBeltGroups.isEmpty
+                      ? 'None selected'
+                      : _selectedBeltGroups.map(_formatBeltGroup).join(', '),
                 ),
               ],
             ),
@@ -378,19 +420,24 @@ class _DivisionBuilderWizardState extends State<DivisionBuilderWizard> {
     }
   }
 
-  Future<void> _createDivisions() async {
-    setState(() {
-      _isCreating = true;
-    });
+  void _createDivisions() {
+    final ageGroupsConfig = AgeGroupConfig.storyAgeGroups
+        .where((a) => _selectedAgeGroups.contains(a.name))
+        .toList();
 
-    await Future<void>.delayed(const Duration(seconds: 2));
+    final beltGroupsConfig = BeltGroupConfig.storyBeltGroups
+        .where((b) => _selectedBeltGroups.contains(b.name))
+        .toList();
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Divisions created successfully!')),
-      );
-      Navigator.of(context).pop();
-    }
+    context.read<DivisionBuilderBloc>().add(
+          DivisionBuilderEvent.createRequested(
+            tournamentId: widget.tournamentId,
+            federationType: _selectedFederation,
+            ageGroups: ageGroupsConfig,
+            beltGroups: beltGroupsConfig,
+            weightClasses: WeightClassConfig.forFederation(_selectedFederation),
+          ),
+        );
   }
 
   int _selectedGenderCount() {

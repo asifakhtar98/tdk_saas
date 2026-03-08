@@ -97,18 +97,21 @@ class DivisionRepositoryImplementation implements DivisionRepository {
 
       await _localDatasource.insertDivision(model);
 
-      if (await _connectivityService.hasInternetConnection()) {
-        try {
-          await _remoteDatasource.insertDivision(model);
-        } on Exception catch (_) {
+      if (!division.isDemoData) {
+        if (await _connectivityService.hasInternetConnection()) {
+          try {
+            await _remoteDatasource.insertDivision(model);
+          } on Exception catch (_) {
+            _queueDivisionSync(division.id, 'insert');
+          }
+        } else {
           _queueDivisionSync(division.id, 'insert');
         }
-      } else {
-        _queueDivisionSync(division.id, 'insert');
       }
 
       return Right(division);
-    } on Exception catch (e) {
+    } catch (e, stackTrace) {
+      print('ERROR IN DivisionRepository.createDivision: $e\n$stackTrace');
       return Left(LocalCacheWriteFailure(technicalDetails: e.toString()));
     }
   }
@@ -128,14 +131,16 @@ class DivisionRepositoryImplementation implements DivisionRepository {
 
       await _localDatasource.updateDivision(model);
 
-      if (await _connectivityService.hasInternetConnection()) {
-        try {
-          await _remoteDatasource.updateDivision(model);
-        } on Exception catch (_) {
+      if (!division.isDemoData) {
+        if (await _connectivityService.hasInternetConnection()) {
+          try {
+            await _remoteDatasource.updateDivision(model);
+          } on Exception catch (_) {
+            _queueDivisionSync(division.id, 'update');
+          }
+        } else {
           _queueDivisionSync(division.id, 'update');
         }
-      } else {
-        _queueDivisionSync(division.id, 'update');
       }
 
       return Right(model.convertToEntity());
@@ -147,16 +152,19 @@ class DivisionRepositoryImplementation implements DivisionRepository {
   @override
   Future<Either<Failure, Unit>> deleteDivision(String id) async {
     try {
+      final existing = await _localDatasource.getDivisionById(id);
       await _localDatasource.deleteDivision(id);
 
-      if (await _connectivityService.hasInternetConnection()) {
-        try {
-          await _remoteDatasource.deleteDivision(id);
-        } on Exception catch (_) {
+      if (existing != null && !existing.isDemoData) {
+        if (await _connectivityService.hasInternetConnection()) {
+          try {
+            await _remoteDatasource.deleteDivision(id);
+          } on Exception catch (_) {
+            _queueDivisionSync(id, 'delete');
+          }
+        } else {
           _queueDivisionSync(id, 'delete');
         }
-      } else {
-        _queueDivisionSync(id, 'delete');
       }
 
       return const Right(unit);

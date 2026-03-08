@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
@@ -49,9 +50,10 @@ abstract class ConnectivityService {
 @LazySingleton(as: ConnectivityService)
 class ConnectivityServiceImplementation implements ConnectivityService {
   ConnectivityServiceImplementation(
-    this._connectivity,
-    this._internetConnection,
-  ) {
+    Connectivity connectivity,
+    InternetConnection internetConnection,
+  )   : _connectivity = connectivity,
+        _internetConnection = internetConnection {
     _initialize();
   }
 
@@ -139,6 +141,10 @@ class ConnectivityServiceImplementation implements ConnectivityService {
 
   @override
   Future<bool> hasInternetConnection() async {
+    if (kIsWeb) {
+      final results = await _connectivity.checkConnectivity();
+      return results.isNotEmpty && !results.contains(ConnectivityResult.none);
+    }
     return _internetConnection.hasInternetAccess;
   }
 

@@ -12,10 +12,12 @@ import 'package:tkd_brackets/features/division/domain/repositories/division_temp
 class DivisionTemplateRepositoryImplementation
     implements DivisionTemplateRepository {
   DivisionTemplateRepositoryImplementation(
-    this._localDatasource,
-    this._remoteDatasource,
-    this._connectivityService,
-  );
+    DivisionTemplateLocalDatasource localDatasource,
+    DivisionTemplateRemoteDatasource remoteDatasource,
+    ConnectivityService connectivityService,
+  )   : _localDatasource = localDatasource,
+        _remoteDatasource = remoteDatasource,
+        _connectivityService = connectivityService;
 
   final DivisionTemplateLocalDatasource _localDatasource;
   final DivisionTemplateRemoteDatasource _remoteDatasource;

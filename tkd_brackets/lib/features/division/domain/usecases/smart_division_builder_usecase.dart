@@ -39,8 +39,16 @@ class SmartDivisionBuilderUseCase
     final stopwatch = Stopwatch()..start();
 
     try {
-      final participants = await _getParticipants(params);
-      final divisions = _generateDivisions(params, participants);
+      print('SDB STARTING...');
+      final tournament = await _database.getTournamentById(params.tournamentId);
+      final isDemoData = tournament?.isDemoData ?? false;
+      print('TOURNAMENT DEMO DATA: $isDemoData');
+      final effectiveParams = params.copyWith(isDemoMode: isDemoData);
+
+      final participants = await _getParticipants(effectiveParams);
+      print('PARTICIPANTS COUNT: ${participants.length}');
+      final divisions = _generateDivisions(effectiveParams, participants, isDemoData);
+      print('DIVISIONS TO GENERATE: ${divisions.length}');
 
       stopwatch.stop();
       if (stopwatch.elapsedMilliseconds > 500) {
@@ -54,16 +62,26 @@ class SmartDivisionBuilderUseCase
       }
 
       final savedDivisions = <DivisionEntity>[];
-      for (final division in divisions) {
+      for (var i = 0; i < divisions.length; i++) {
+        print('SAVING DIVISION $i...');
+        final division = divisions[i];
         final result = await _divisionRepository.createDivision(division);
         result.fold(
-          (failure) => savedDivisions.add(division),
-          savedDivisions.add,
+          (failure) {
+            print('FAILED TO SAVE $i: $failure');
+            savedDivisions.add(division);
+          },
+          (div) {
+            print('SUCCESS SAVING $i');
+            savedDivisions.add(div);
+          },
         );
       }
+      print('ALL SAVED!');
 
       return Right(savedDivisions);
-    } on Exception catch (e) {
+    } catch (e, stackTrace) {
+      print('ERROR IN SmartDivisionBuilderUseCase: $e\n$stackTrace');
       return Left(
         ServerResponseFailure(
           userFriendlyMessage: 'Failed to generate divisions: $e',
@@ -144,6 +162,7 @@ class SmartDivisionBuilderUseCase
   List<DivisionEntity> _generateDivisions(
     SmartDivisionBuilderParams params,
     List<_ParticipantData> participants,
+    bool isDemoData,
   ) {
     final divisions = <DivisionEntity>[];
     final now = DateTime.now();
@@ -193,6 +212,7 @@ class SmartDivisionBuilderUseCase
                 weightClass: null,
                 now: now,
                 weightConfig: params.weightClasses,
+                isDemoData: isDemoData,
               ),
             );
           } else {
@@ -229,6 +249,7 @@ class SmartDivisionBuilderUseCase
                   weightClass: weightClass,
                   now: now,
                   weightConfig: params.weightClasses,
+                  isDemoData: isDemoData,
                 ),
               );
             }
@@ -288,6 +309,7 @@ class SmartDivisionBuilderUseCase
     required WeightClass? weightClass,
     required DateTime now,
     required WeightClassConfig weightConfig,
+    required bool isDemoData,
   }) {
     return DivisionEntity(
       id: _uuid.v4(),
@@ -309,6 +331,7 @@ class SmartDivisionBuilderUseCase
       status: DivisionStatus.setup,
       createdAtTimestamp: now,
       updatedAtTimestamp: now,
+      isDemoData: isDemoData,
     );
   }
 
