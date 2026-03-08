@@ -4,16 +4,15 @@ part 'sign_in_event.freezed.dart';
 
 @freezed
 class SignInEvent with _$SignInEvent {
-  const factory SignInEvent.signUpRequested({required String email}) =
-      SignUpRequested;
-
-  const factory SignInEvent.signInRequested({required String email}) =
-      SignInRequested;
-
-  const factory SignInEvent.magicLinkVerificationRequested({
+  const factory SignInEvent.signUpRequested({
     required String email,
-    required String token,
-  }) = MagicLinkVerificationRequested;
+    required String password,
+  }) = SignUpRequested;
+
+  const factory SignInEvent.signInRequested({
+    required String email,
+    required String password,
+  }) = SignInRequested;
 
   const factory SignInEvent.formReset() = FormReset;
 }

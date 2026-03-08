@@ -65,7 +65,6 @@ class AppRouter {
       $homeRoute,
       $demoRoute,
       $authRoute,
-      $authCallbackRoute,
       $organizationSetupRoute,
       // Authenticated routes (with shell)
       createAppShellRoute(

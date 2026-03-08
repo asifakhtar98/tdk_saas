@@ -6,27 +6,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// Handles authentication flows: magic link (OTP), session management.
 /// Separate from `UserRemoteDatasource` which handles user profile data.
 abstract class SupabaseAuthDatasource {
-  /// Send magic link (OTP) to email for sign-up/sign-in.
-  ///
-  /// [email] - User's email address.
-  /// [shouldCreateUser] - If true, creates account if email not found.
-  ///                       Set to true for sign-up, false for sign-in only.
-  /// [redirectTo] - Optional redirect URL for web apps after magic link click.
-  ///                Required for web deployment. Should be app's callback URL.
-  ///
-  /// Supabase rate limits: 3 emails per email per 60 seconds.
-  Future<void> sendMagicLink({
+  /// Sign up with email and password
+  Future<AuthResponse> signUp({
     required String email,
-    required bool shouldCreateUser,
-    String? redirectTo,
+    required String password,
   });
 
-  /// Verify OTP from magic link or email code.
-  /// Returns the authenticated session.
-  Future<AuthResponse> verifyOtp({
+  /// Sign in with email and password
+  Future<AuthResponse> signInWithPassword({
     required String email,
-    required String token,
-    required OtpType type,
+    required String password,
   });
 
   /// Get the currently authenticated user.
@@ -51,25 +40,25 @@ class SupabaseAuthDatasourceImplementation implements SupabaseAuthDatasource {
   final SupabaseClient _supabase;
 
   @override
-  Future<void> sendMagicLink({
+  Future<AuthResponse> signUp({
     required String email,
-    required bool shouldCreateUser,
-    String? redirectTo,
+    required String password,
   }) async {
-    await _supabase.auth.signInWithOtp(
+    return _supabase.auth.signUp(
       email: email,
-      shouldCreateUser: shouldCreateUser,
-      emailRedirectTo: redirectTo, // Required for web apps
+      password: password,
     );
   }
 
   @override
-  Future<AuthResponse> verifyOtp({
+  Future<AuthResponse> signInWithPassword({
     required String email,
-    required String token,
-    required OtpType type,
+    required String password,
   }) async {
-    return _supabase.auth.verifyOTP(email: email, token: token, type: type);
+    return _supabase.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
   }
 
   @override

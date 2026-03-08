@@ -26,6 +26,7 @@ class _AuthPageState extends State<AuthPage> {
         body: BlocConsumer<SignInBloc, SignInState>(
           listener: (context, state) {
             if (state is SignInFailure) {
+              debugPrint('Sign in failed: ${state.failure.userFriendlyMessage}');
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.failure.userFriendlyMessage),
@@ -35,8 +36,10 @@ class _AuthPageState extends State<AuthPage> {
             }
           },
           builder: (context, state) {
-            if (state is SignInMagicLinkSent) {
-              return _MagicLinkSentView(email: state.email);
+            if (state is SignInSuccess) {
+              return Center(
+                child: Text('Success! Setting up your session...'),
+              );
             }
 
             return Center(
@@ -72,7 +75,7 @@ class _AuthPageState extends State<AuthPage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'We will send a magic link to your email',
+                        'Enter your email and password to continue',
                         style: Theme.of(context).textTheme.bodyMedium,
                         textAlign: TextAlign.center,
                       ),
@@ -80,18 +83,36 @@ class _AuthPageState extends State<AuthPage> {
 
                       FormBuilder(
                         key: _formKey,
-                        child: FormBuilderTextField(
-                          name: 'email',
-                          decoration: const InputDecoration(
-                            labelText: 'Email Address',
-                            prefixIcon: Icon(Icons.email),
-                            border: OutlineInputBorder(),
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                          validator: FormBuilderValidators.compose([
-                            FormBuilderValidators.required(),
-                            FormBuilderValidators.email(),
-                          ]),
+                        child: Column(
+                          children: [
+                            FormBuilderTextField(
+                              name: 'email',
+                              decoration: const InputDecoration(
+                                labelText: 'Email Address',
+                                prefixIcon: Icon(Icons.email),
+                                border: OutlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                              validator: FormBuilderValidators.compose([
+                                FormBuilderValidators.required(),
+                                FormBuilderValidators.email(),
+                              ]),
+                            ),
+                            const SizedBox(height: 16),
+                            FormBuilderTextField(
+                              name: 'password',
+                              decoration: const InputDecoration(
+                                labelText: 'Password',
+                                prefixIcon: Icon(Icons.lock),
+                                border: OutlineInputBorder(),
+                              ),
+                              obscureText: true,
+                              validator: FormBuilderValidators.compose([
+                                FormBuilderValidators.required(),
+                                FormBuilderValidators.minLength(6),
+                              ]),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -142,57 +163,17 @@ class _AuthPageState extends State<AuthPage> {
   void _onSubmit(BuildContext context) {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       final email = _formKey.currentState?.value['email'] as String;
+      final password = _formKey.currentState?.value['password'] as String;
       if (_isSignUp) {
         context
             .read<SignInBloc>()
-            .add(SignInEvent.signUpRequested(email: email));
+            .add(SignInEvent.signUpRequested(email: email, password: password));
       } else {
         context
             .read<SignInBloc>()
-            .add(SignInEvent.signInRequested(email: email));
+            .add(SignInEvent.signInRequested(email: email, password: password));
       }
     }
   }
 }
 
-class _MagicLinkSentView extends StatelessWidget {
-  final String email;
-
-  const _MagicLinkSentView({required this.email});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 400),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.mark_email_read, size: 80, color: Colors.green),
-              const SizedBox(height: 24),
-              Text(
-                'Check your email',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'We sent a magic link to $email. Please click the link to sign in.',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              const SizedBox(height: 32),
-              OutlinedButton(
-                onPressed: () {
-                  context.read<SignInBloc>().add(const SignInEvent.formReset());
-                },
-                child: const Text('Back to Sign In'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

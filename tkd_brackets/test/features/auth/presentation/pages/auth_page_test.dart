@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/auth_failures.dart';
 import 'package:tkd_brackets/core/di/injection.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_bloc.dart';
 import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_event.dart';
 import 'package:tkd_brackets/features/auth/presentation/bloc/authentication_state.dart';
@@ -25,6 +26,16 @@ void main() {
   late MockAuthenticationBloc mockAuthenticationBloc;
   late MockSignInBloc mockSignInBloc;
 
+  final testUser = UserEntity(
+    id: 'user-123',
+    email: 'test@example.com',
+    displayName: 'Test User',
+    organizationId: 'org-123',
+    role: UserRole.owner,
+    isActive: true,
+    createdAt: DateTime(2026),
+  );
+
   setUp(() {
     mockAuthenticationBloc = MockAuthenticationBloc();
     mockSignInBloc = MockSignInBloc();
@@ -41,12 +52,14 @@ void main() {
 
   Widget createWidgetUnderTest() {
     return MaterialApp(
-      home: MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthenticationBloc>.value(value: mockAuthenticationBloc),
-          BlocProvider<SignInBloc>.value(value: mockSignInBloc),
-        ],
-        child: const AuthPage(),
+      home: Scaffold(
+        body: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthenticationBloc>.value(value: mockAuthenticationBloc),
+            BlocProvider<SignInBloc>.value(value: mockSignInBloc),
+          ],
+          child: const AuthPage(),
+        ),
       ),
     );
   }
@@ -57,6 +70,7 @@ void main() {
 
       expect(find.text('Sign in'), findsWidgets); // Header
       expect(find.text('Email Address'), findsOneWidget); // Label
+      expect(find.text('Password'), findsOneWidget); // Label
       expect(find.text('Sign In'), findsWidgets); // Button
     });
 
@@ -78,21 +92,20 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('shows success view when SignInMagicLinkSent', (tester) async {
+    testWidgets('shows success view when SignInSuccess', (tester) async {
       when(() => mockSignInBloc.state)
-          .thenReturn(const SignInMagicLinkSent(email: 'test@example.com'));
+          .thenReturn(SignInSuccess(testUser));
 
       await tester.pumpWidget(createWidgetUnderTest());
 
-      expect(find.text('Check your email'), findsOneWidget);
-      expect(find.textContaining('test@example.com'), findsOneWidget);
+      expect(find.text('Sign in successful!'), findsOneWidget);
     });
 
     testWidgets('shows error snackbar on SignInFailure', (tester) async {
       whenListen(
         mockSignInBloc,
         Stream.fromIterable([
-          const SignInFailure(MagicLinkSendFailure()),
+          const SignInFailure(AuthFailure()),
         ]),
         initialState: const SignInInitial(),
       );
@@ -100,7 +113,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      expect(find.text('Unable to send magic link. Please try again.'), findsOneWidget);
+      expect(find.text('Authentication failed. Please try again.'), findsOneWidget);
     });
   });
 }

@@ -27,100 +27,94 @@ class AuthRepositoryImplementation implements AuthRepository {
   final UserLocalDatasource _userLocalDatasource;
 
   @override
-  Future<Either<Failure, Unit>> sendSignUpMagicLink({
+  Future<Either<Failure, UserEntity>> signUpWithEmailPassword({
     required String email,
+    required String password,
   }) async {
     try {
-      await _authDatasource.sendMagicLink(email: email, shouldCreateUser: true);
-      return const Right(unit);
-    } on AuthException catch (e) {
-      return Left(_mapAuthException(e));
-    } on Exception catch (e) {
-      return Left(ServerConnectionFailure(technicalDetails: 'Exception: $e'));
-    }
-  }
-
-  @override
-  Future<Either<Failure, Unit>> sendSignInMagicLink({
-    required String email,
-  }) async {
-    try {
-      await _authDatasource.sendMagicLink(
+      final authResponse = await _authDatasource.signUp(
         email: email,
-        shouldCreateUser: false,
-      );
-      return const Right(unit);
-    } on AuthException catch (e) {
-      return Left(_mapAuthException(e));
-    } on Exception catch (e) {
-      return Left(ServerConnectionFailure(technicalDetails: 'Exception: $e'));
-    }
-  }
-
-  @override
-  Future<Either<Failure, UserEntity>> verifyMagicLinkOtp({
-    required String email,
-    required String token,
-  }) async {
-    try {
-      // Step 1: Verify OTP with Supabase
-      final authResponse = await _authDatasource.verifyOtp(
-        email: email,
-        token: token,
-        type: OtpType.magiclink,
+        password: password,
       );
 
-      // Step 2: Validate we got a user back
       final supabaseUser = authResponse.user;
       if (supabaseUser == null) {
         return const Left(
-          OtpVerificationFailure(
-            technicalDetails:
-                'AuthResponse.user is null after OTP verification',
+          ServerConnectionFailure(
+            technicalDetails: 'User is null after sign up',
           ),
         );
       }
 
-      // Step 3: Fetch or create user profile from Supabase (users table)
-      // NOTE: getUserById returns UserModel? (nullable)
+      // Create user profile
+      final now = DateTime.now();
+      final newUser = UserModel(
+        id: supabaseUser.id,
+        email: supabaseUser.email ?? email,
+        displayName:
+            supabaseUser.userMetadata?['display_name'] as String? ??
+            email.split('@').first,
+        organizationId: '',
+        role: 'owner',
+        isActive: true,
+        createdAtTimestamp: now,
+        updatedAtTimestamp: now,
+        syncVersion: 1,
+        isDeleted: false,
+        isDemoData: false,
+        lastSignInAtTimestamp: now,
+      );
+      
+      final userModel = await _userRemoteDatasource.insertUser(newUser);
+      await _userLocalDatasource.insertUser(userModel);
+
+      return Right(userModel.convertToEntity());
+    } on AuthException catch (e) {
+      return Left(_mapAuthException(e));
+    } on Exception catch (e) {
+      return Left(ServerConnectionFailure(technicalDetails: 'Exception: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> signInWithEmailPassword({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final authResponse = await _authDatasource.signInWithPassword(
+        email: email,
+        password: password,
+      );
+
+      final supabaseUser = authResponse.user;
+      if (supabaseUser == null) {
+        return const Left(
+          UserNotFoundFailure(
+            technicalDetails: 'User is null after sign in',
+          ),
+        );
+      }
+
       final existingUser = await _userRemoteDatasource.getUserById(
         supabaseUser.id,
       );
 
-      UserModel userModel;
       if (existingUser == null) {
-        // First-time sign-in: Create user profile from Supabase auth data
-        // This happens when user clicked magic link from sign-up flow
-        final now = DateTime.now();
-        final newUser = UserModel(
-          id: supabaseUser.id,
-          email: supabaseUser.email ?? email,
-          displayName:
-              supabaseUser.userMetadata?['display_name'] as String? ??
-              email.split('@').first,
-          organizationId: '', // Will be set in Story 2.7 (Create Organization)
-          role: 'owner', // Default role for new users
-          isActive: true,
-          createdAtTimestamp: now,
-          updatedAtTimestamp: now,
-          syncVersion: 1,
-          isDeleted: false,
-          isDemoData: false,
-          lastSignInAtTimestamp: now,
+        return const Left(
+          UserNotFoundFailure(
+            technicalDetails: 'User profile not found after sign in',
+          ),
         );
-        userModel = await _userRemoteDatasource.insertUser(newUser);
-      } else {
-        // Existing user: Update lastSignInAtTimestamp
-        // Update lastSignInAtTimestamp for existing user
-        userModel = existingUser.copyWith(
-          lastSignInAtTimestamp: DateTime.now(),
-          updatedAtTimestamp: DateTime.now(),
-        );
-        await _userRemoteDatasource.updateUser(userModel);
       }
 
-      // Step 4: Cache user locally
-      // Check if user exists locally first
+      final userModel = existingUser.copyWith(
+        lastSignInAtTimestamp: DateTime.now(),
+        updatedAtTimestamp: DateTime.now(),
+      );
+      
+      await _userRemoteDatasource.updateUser(userModel);
+
       final localUser = await _userLocalDatasource.getUserById(userModel.id);
       if (localUser != null) {
         await _userLocalDatasource.updateUser(userModel);
@@ -128,16 +122,11 @@ class AuthRepositoryImplementation implements AuthRepository {
         await _userLocalDatasource.insertUser(userModel);
       }
 
-      // Step 5: Return the user entity
       return Right(userModel.convertToEntity());
     } on AuthException catch (e) {
-      return Left(_mapAuthExceptionForOtp(e));
+      return Left(_mapAuthException(e));
     } on Exception catch (e) {
-      return Left(
-        ServerConnectionFailure(
-          technicalDetails: 'Exception during OTP verification: $e',
-        ),
-      );
+      return Left(ServerConnectionFailure(technicalDetails: 'Exception: $e'));
     }
   }
 
@@ -225,36 +214,7 @@ class AuthRepositoryImplementation implements AuthRepository {
         technicalDetails: 'Supabase rate limit: ${e.message}',
       );
     }
-    return MagicLinkSendFailure(
-      technicalDetails: 'AuthException: ${e.message}',
-    );
-  }
-
-  /// Maps Supabase AuthException to domain Failure types for OTP verification.
-  Failure _mapAuthExceptionForOtp(AuthException e) {
-    final message = e.message.toLowerCase();
-
-    if (message.contains('expired') || message.contains('otp expired')) {
-      return ExpiredTokenFailure(
-        technicalDetails: 'Supabase error: ${e.message}',
-      );
-    }
-    if (message.contains('invalid') || message.contains('otp invalid')) {
-      return InvalidTokenFailure(
-        technicalDetails: 'Supabase error: ${e.message}',
-      );
-    }
-    if (message.contains('user not found')) {
-      return UserNotFoundFailure(
-        technicalDetails: 'Supabase error: ${e.message}',
-      );
-    }
-    if (message.contains('rate limit') || message.contains('too many')) {
-      return RateLimitExceededFailure(
-        technicalDetails: 'Supabase error: ${e.message}',
-      );
-    }
-    return OtpVerificationFailure(
+    return AuthFailure(
       technicalDetails: 'AuthException: ${e.message}',
     );
   }

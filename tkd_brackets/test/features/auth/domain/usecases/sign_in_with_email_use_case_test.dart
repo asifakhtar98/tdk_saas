@@ -2,11 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tkd_brackets/core/error/auth_failures.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/sign_in_with_email_params.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/sign_in_with_email_use_case.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
+class MockUserEntity extends Mock implements UserEntity {}
 
 void main() {
   late MockAuthRepository mockAuthRepository;
@@ -21,12 +23,13 @@ void main() {
     const validEmail = 'test@example.com';
     const invalidEmail = 'invalid-email';
     const emptyEmail = '';
+    const testPassword = 'password123';
 
     group('email validation', () {
       test('returns InvalidEmailFailure for empty email', () async {
         // Act
         final result = await useCase(
-          const SignInWithEmailParams(email: emptyEmail),
+          const SignInWithEmailParams(email: emptyEmail, password: testPassword),
         );
 
         // Assert
@@ -41,7 +44,7 @@ void main() {
       test('returns InvalidEmailFailure for invalid email format', () async {
         // Act
         final result = await useCase(
-          const SignInWithEmailParams(email: invalidEmail),
+          const SignInWithEmailParams(email: invalidEmail, password: testPassword),
         );
 
         // Assert
@@ -55,47 +58,51 @@ void main() {
 
       test('trims and lowercases email before validation', () async {
         // Arrange
+        final mockUser = MockUserEntity();
         when(
-          () => mockAuthRepository.sendSignInMagicLink(
+          () => mockAuthRepository.signInWithEmailPassword(
             email: any(named: 'email'),
+            password: any(named: 'password'),
           ),
-        ).thenAnswer((_) async => const Right(unit));
+        ).thenAnswer((_) async => Right(mockUser));
 
         // Act
         await useCase(
-          const SignInWithEmailParams(email: '  TEST@EXAMPLE.COM  '),
+          const SignInWithEmailParams(email: '  TEST@EXAMPLE.COM  ', password: testPassword),
         );
 
         // Assert
         verify(
           () =>
-              mockAuthRepository.sendSignInMagicLink(email: 'test@example.com'),
+              mockAuthRepository.signInWithEmailPassword(email: 'test@example.com', password: testPassword),
         ).called(1);
       });
     });
 
-    group('successful magic link send', () {
-      test('returns Right(unit) on successful magic link send', () async {
+    group('successful sign in', () {
+      test('returns Right(UserEntity) on successful sign in', () async {
         // Arrange
+        final mockUser = MockUserEntity();
         when(
-          () => mockAuthRepository.sendSignInMagicLink(
+          () => mockAuthRepository.signInWithEmailPassword(
             email: any(named: 'email'),
+            password: any(named: 'password'),
           ),
-        ).thenAnswer((_) async => const Right(unit));
+        ).thenAnswer((_) async => Right(mockUser));
 
         // Act
         final result = await useCase(
-          const SignInWithEmailParams(email: validEmail),
+          const SignInWithEmailParams(email: validEmail, password: testPassword),
         );
 
         // Assert
         expect(result.isRight(), isTrue);
         result.fold(
           (_) => fail('Expected Right'),
-          (value) => expect(value, unit),
+          (value) => expect(value, mockUser),
         );
         verify(
-          () => mockAuthRepository.sendSignInMagicLink(email: validEmail),
+          () => mockAuthRepository.signInWithEmailPassword(email: validEmail, password: testPassword),
         ).called(1);
       });
     });
@@ -104,8 +111,9 @@ void main() {
       test('returns UserNotFoundFailure when user does not exist', () async {
         // Arrange
         when(
-          () => mockAuthRepository.sendSignInMagicLink(
+          () => mockAuthRepository.signInWithEmailPassword(
             email: any(named: 'email'),
+            password: any(named: 'password'),
           ),
         ).thenAnswer(
           (_) async => const Left(
@@ -115,7 +123,7 @@ void main() {
 
         // Act
         final result = await useCase(
-          const SignInWithEmailParams(email: validEmail),
+          const SignInWithEmailParams(email: validEmail, password: testPassword),
         );
 
         // Assert
@@ -129,8 +137,9 @@ void main() {
       test('returns RateLimitExceededFailure for rate limit error', () async {
         // Arrange
         when(
-          () => mockAuthRepository.sendSignInMagicLink(
+          () => mockAuthRepository.signInWithEmailPassword(
             email: any(named: 'email'),
+            password: any(named: 'password'),
           ),
         ).thenAnswer(
           (_) async => const Left(
@@ -140,7 +149,7 @@ void main() {
 
         // Act
         final result = await useCase(
-          const SignInWithEmailParams(email: validEmail),
+          const SignInWithEmailParams(email: validEmail, password: testPassword),
         );
 
         // Assert

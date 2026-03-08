@@ -10,12 +10,6 @@ class SignInState with _$SignInState {
 
   const factory SignInState.loadInProgress() = SignInLoadInProgress;
 
-  const factory SignInState.magicLinkSent({required String email}) =
-      SignInMagicLinkSent;
-
-  const factory SignInState.verificationInProgress() =
-      SignInVerificationInProgress;
-
   const factory SignInState.success(UserEntity user) = SignInSuccess;
 
   const factory SignInState.failure(Failure failure) = SignInFailure;

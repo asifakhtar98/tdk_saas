@@ -11,39 +11,28 @@ import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 /// user profile CRUD operations. This repository handles
 /// authentication flows (magic link, sessions, etc.).
 abstract class AuthRepository {
-  /// Send magic link (OTP) to email for sign-up.
+  /// Sign up with email and password.
   ///
   /// Creates a new user if the email doesn't exist.
   ///
   /// Returns:
-  /// - [Right(Unit)] on success - email sent
+  /// - [Right(UserEntity)] on success - authenticated user
   /// - [Left(Failure)] on error (invalid email, rate limit, network)
-  Future<Either<Failure, Unit>> sendSignUpMagicLink({required String email});
+  Future<Either<Failure, UserEntity>> signUpWithEmailPassword({
+    required String email,
+    required String password,
+  });
 
-  /// Send magic link (OTP) to email for sign-in.
+  /// Sign in with email and password.
   ///
   /// Only works for existing users.
   ///
   /// Returns:
-  /// - [Right(Unit)] on success - email sent
-  /// - [Left(Failure)] on error (user not found, rate limit, network)
-  Future<Either<Failure, Unit>> sendSignInMagicLink({required String email});
-
-  /// Verify OTP token from magic link.
-  ///
-  /// This completes the sign-in flow:
-  /// 1. Validates the OTP with Supabase
-  /// 2. Establishes the user session
-  /// 3. Fetches user profile from Supabase
-  /// 4. Caches user locally
-  /// 5. Updates lastSignInAt
-  ///
-  /// Returns:
   /// - [Right(UserEntity)] on success - authenticated user
-  /// - [Left(Failure)] on error (expired, invalid, network)
-  Future<Either<Failure, UserEntity>> verifyMagicLinkOtp({
+  /// - [Left(Failure)] on error (user not found, rate limit, network)
+  Future<Either<Failure, UserEntity>> signInWithEmailPassword({
     required String email,
-    required String token,
+    required String password,
   });
 
   /// Sign out the current user.

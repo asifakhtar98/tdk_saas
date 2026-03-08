@@ -67,3 +67,11 @@ class SignOutFailure extends Failure {
     super.technicalDetails,
   });
 }
+
+/// Generic authentication failure.
+class AuthFailure extends Failure {
+  const AuthFailure({
+    super.userFriendlyMessage = 'Authentication failed. Please try again.',
+    super.technicalDetails,
+  });
+}

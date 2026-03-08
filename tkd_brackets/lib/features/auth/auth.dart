@@ -52,8 +52,6 @@ export 'domain/usecases/sign_up_with_email_params.dart';
 export 'domain/usecases/sign_up_with_email_use_case.dart';
 export 'domain/usecases/update_user_role_params.dart';
 export 'domain/usecases/update_user_role_use_case.dart';
-export 'domain/usecases/verify_magic_link_params.dart';
-export 'domain/usecases/verify_magic_link_use_case.dart';
 // Presentation - BLoC
 export 'presentation/bloc/authentication_bloc.dart';
 export 'presentation/bloc/authentication_event.dart';
@@ -66,7 +64,6 @@ export 'presentation/bloc/organization_management_event.dart';
 export 'presentation/bloc/organization_management_state.dart';
 // Presentation - Pages
 export 'presentation/pages/auth_page.dart';
-export 'presentation/pages/magic_link_callback_page.dart';
 export 'presentation/pages/organization_dashboard_page.dart';
 export 'presentation/pages/organization_setup_page.dart';
 export 'presentation/pages/user_settings_page.dart';

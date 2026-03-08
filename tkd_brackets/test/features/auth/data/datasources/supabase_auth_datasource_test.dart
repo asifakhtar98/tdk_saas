@@ -25,107 +25,73 @@ void main() {
   });
 
   group('SupabaseAuthDatasource', () {
-    group('sendMagicLink', () {
-      test('calls signInWithOtp with correct parameters for sign-up', () async {
+    group('signUp', () {
+      test('calls signUp with correct parameters', () async {
         // Arrange
         when(
-          () => mockAuth.signInWithOtp(
+          () => mockAuth.signUp(
             email: any(named: 'email'),
-            shouldCreateUser: any(named: 'shouldCreateUser'),
-            emailRedirectTo: any(named: 'emailRedirectTo'),
+            password: any(named: 'password'),
           ),
         ).thenAnswer((_) async => AuthResponse());
 
         // Act
-        await datasource.sendMagicLink(
+        await datasource.signUp(
           email: 'test@example.com',
-          shouldCreateUser: true,
+          password: 'password123',
         );
 
         // Assert
         verify(
-          () => mockAuth.signInWithOtp(
+          () => mockAuth.signUp(
             email: 'test@example.com',
-            shouldCreateUser: true,
-            emailRedirectTo: null,
+            password: 'password123',
           ),
         ).called(1);
       });
 
-      test(
-        'calls signInWithOtp with shouldCreateUser false for sign-in',
-        () async {
-          // Arrange
-          when(
-            () => mockAuth.signInWithOtp(
-              email: any(named: 'email'),
-              shouldCreateUser: any(named: 'shouldCreateUser'),
-              emailRedirectTo: any(named: 'emailRedirectTo'),
-            ),
-          ).thenAnswer((_) async => AuthResponse());
-
-          // Act
-          await datasource.sendMagicLink(
-            email: 'existing@example.com',
-            shouldCreateUser: false,
-          );
-
-          // Assert
-          verify(
-            () => mockAuth.signInWithOtp(
-              email: 'existing@example.com',
-              shouldCreateUser: false,
-              emailRedirectTo: null,
-            ),
-          ).called(1);
-        },
-      );
-
       test('rethrows AuthException on failure', () async {
         // Arrange
         when(
-          () => mockAuth.signInWithOtp(
+          () => mockAuth.signUp(
             email: any(named: 'email'),
-            shouldCreateUser: any(named: 'shouldCreateUser'),
-            emailRedirectTo: any(named: 'emailRedirectTo'),
+            password: any(named: 'password'),
           ),
         ).thenThrow(const AuthException('Rate limit exceeded'));
 
         // Act & Assert
         expect(
-          () => datasource.sendMagicLink(
+          () => datasource.signUp(
             email: 'test@example.com',
-            shouldCreateUser: true,
+            password: 'password123',
           ),
           throwsA(isA<AuthException>()),
         );
       });
+    });
 
-      test('passes redirectTo parameter for web apps', () async {
+    group('signInWithPassword', () {
+      test('calls signInWithPassword with correct parameters', () async {
         // Arrange
-        const redirectUrl = 'https://app.example.com/auth/callback';
         when(
-          () => mockAuth.signInWithOtp(
+          () => mockAuth.signInWithPassword(
             email: any(named: 'email'),
-            shouldCreateUser: any(named: 'shouldCreateUser'),
-            emailRedirectTo: any(named: 'emailRedirectTo'),
+            password: any(named: 'password'),
           ),
         ).thenAnswer((_) async => AuthResponse());
 
         // Act
-        await datasource.sendMagicLink(
+        await datasource.signInWithPassword(
           email: 'test@example.com',
-          shouldCreateUser: true,
-          redirectTo: redirectUrl,
+          password: 'password123',
         );
 
         // Assert
         verify(
-          () => mockAuth.signInWithOtp(
-            email: 'test@example.com',
-            shouldCreateUser: true,
-            emailRedirectTo: redirectUrl,
-          ),
+            () => mockAuth.signInWithPassword(
+              email: 'test@example.com',
+              password: 'password123',
+            ),
         ).called(1);
       });
     });
@@ -169,35 +135,6 @@ void main() {
 
         // Assert
         verify(() => mockAuth.signOut()).called(1);
-      });
-    });
-
-    group('verifyOtp', () {
-      test('calls auth.verifyOTP with correct parameters', () async {
-        // Arrange
-        when(
-          () => mockAuth.verifyOTP(
-            email: any(named: 'email'),
-            token: any(named: 'token'),
-            type: any(named: 'type'),
-          ),
-        ).thenAnswer((_) async => AuthResponse());
-
-        // Act
-        await datasource.verifyOtp(
-          email: 'test@example.com',
-          token: '123456',
-          type: OtpType.magiclink,
-        );
-
-        // Assert
-        verify(
-          () => mockAuth.verifyOTP(
-            email: 'test@example.com',
-            token: '123456',
-            type: OtpType.magiclink,
-          ),
-        ).called(1);
       });
     });
   });

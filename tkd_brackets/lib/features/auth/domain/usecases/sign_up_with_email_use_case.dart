@@ -3,20 +3,13 @@ import 'package:injectable/injectable.dart';
 import 'package:tkd_brackets/core/error/auth_failures.dart';
 import 'package:tkd_brackets/core/error/failures.dart';
 import 'package:tkd_brackets/core/usecases/use_case.dart';
+import 'package:tkd_brackets/features/auth/domain/entities/user_entity.dart';
 import 'package:tkd_brackets/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tkd_brackets/features/auth/domain/usecases/sign_up_with_email_params.dart';
 
-/// Use case to send magic link for new user sign-up.
-///
-/// This use case:
-/// 1. Validates the email format
-/// 2. Delegates to [AuthRepository] to send the magic link
-/// 3. Returns success/failure
-///
-/// The user will receive an email with a magic link.
-/// When clicked, the link completes sign-up (Story 2.4).
+/// Use case to sign up a new user with email and password.
 @injectable
-class SignUpWithEmailUseCase extends UseCase<Unit, SignUpWithEmailParams> {
+class SignUpWithEmailUseCase extends UseCase<UserEntity, SignUpWithEmailParams> {
   SignUpWithEmailUseCase(this._authRepository);
 
   final AuthRepository _authRepository;
@@ -27,7 +20,7 @@ class SignUpWithEmailUseCase extends UseCase<Unit, SignUpWithEmailParams> {
   );
 
   @override
-  Future<Either<Failure, Unit>> call(SignUpWithEmailParams params) async {
+  Future<Either<Failure, UserEntity>> call(SignUpWithEmailParams params) async {
     // Validate email format
     final email = params.email.trim().toLowerCase();
     if (email.isEmpty || !_emailRegex.hasMatch(email)) {
@@ -35,8 +28,17 @@ class SignUpWithEmailUseCase extends UseCase<Unit, SignUpWithEmailParams> {
         InvalidEmailFailure(technicalDetails: 'Email failed regex validation'),
       );
     }
+    
+    if (params.password.length < 6) {
+      return const Left(
+        InvalidEmailFailure(technicalDetails: 'Password must be at least 6 characters'),
+      );
+    }
 
     // Delegate to repository (which handles infrastructure concerns)
-    return _authRepository.sendSignUpMagicLink(email: email);
+    return _authRepository.signUpWithEmailPassword(
+      email: email,
+      password: params.password,
+    );
   }
 }
