@@ -51,23 +51,28 @@ A free, standalone app for Taekwondo tournament organizers to instantly create, 
 
 ---
 
-## Future Checklist
+## Future Checklist & Product Vision
 
-### High Priority (v1.1)
-- [ ] Save & resume — don't lose brackets when you close the app
-- [ ] Multiple divisions — manage 20+ divisions in one tournament
-- [ ] Round Robin standings — auto-calculate W/L record and rankings
-- [ ] Score tracking — capture round-by-round points and penalties
+Based on our product roadmap, the following capabilities will be systematically implemented to evolve TKD Brackets from a standalone tool into a comprehensive tournament management platform.
 
-### Medium Priority (v1.2)
-- [ ] Ring/court assignment — assign matches to Ring 1, Ring 2, etc.
-- [ ] Match timer — built-in countdown for rounds and rest periods
-- [ ] Check-in workflow — mark athletes as present before generating brackets
-- [ ] Tournament info — add event name, date, venue to PDF header
+### Phase 2: Growth Features (SaaS & Multi-Ring)
+- [ ] **Data Persistence & Accounts:** Save brackets to the cloud, allowing users to return to previous tournaments.
+- [ ] **Multi-Division Management:** Create and manage dozens of divisions within a single tournament dashboard.
+- [ ] **Smart Division Builder:** Automatically sort athletes into divisions based on age, belt rank, and weight.
+- [ ] **Federation Templates:** Built-in standard weight and age classes for WT (World Taekwondo), ITF, and ATA formats.
+- [ ] **Roles & Permissions:** Invite volunteers as "Scorers" who can only update match results for specific rings without altering the bracket structure.
+- [ ] **Venue Display Mode:** Full-screen, auto-refreshing projector mode for displaying active brackets to the audience.
 
-### Long-Term Vision
-- [ ] Cloud sync — multiple devices scoring different rings, all in sync
-- [ ] Live spectator view — parents and coaches follow results on their phones via QR code
-- [ ] WT/Kukkiwon rule compliance — official seeding and repêchage rules
-- [ ] Athlete photos on match cards
-- [ ] Official tie sheet templates matching USAT/WT paper formats
+### Phase 3: Advanced Tournament Operations
+- [ ] **Advanced Formats:** Pool play advancing to elimination, and multi-stage brackets.
+- [ ] **Scoring Enhancements:** Detailed scoring models (e.g., WT head kicks vs trunk kicks, gamjeon tracking, forms/poomsae judge panels).
+- [ ] **Check-In & Weigh-In Workflow:** Mark athletes as present/cleared before generating final brackets.
+- [ ] **Ring & Schedule Management:** Assign specific matches to designated rings, preventing athlete schedule overlaps.
+
+### Phase 4: Long-Term Vision & Ecosystem
+- [ ] **Dojang Integrations:** Direct import from martial arts management software (Kicksite, Zen Planner, Ember).
+- [ ] **Public Spectator App:** View-only mobile access for parents and coaches to track match times and live bracket updates.
+- [ ] **Athlete Profiles & Analytics:** Track competitor performance history, win rates, and ranking points across multiple tournaments.
+- [ ] **Federation Leaderboards:** Aggregate data for regional or national federation standings.
+- [ ] **Premium Subscriptions:** Free tier for small events, affordable premium tier for custom branding, massive tournaments, and priority support.
+- [ ] **Webhooks & Automation:** Zapier integration for triggering external actions when matches complete or tournaments conclude.
